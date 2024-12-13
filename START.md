@@ -50,7 +50,9 @@ This tutorial will guide you through:
 
 5. **Create User Account**
 
-## 3 **Update Ubuntu**
+---
+
+## 3️⃣   **Update Ubuntu**
 
 1. **Open Ubuntu terminal** and run :
    ```bash
@@ -70,8 +72,9 @@ This tutorial will guide you through:
    git config --global user.name "Your Name"
    git config --global user.email "your.email@example.qqch"
    ```
+---
 
-## **Set Up SSH for GitHub**
+## 4️⃣   **Set Up SSH for GitHub**
 
 1. **Generate an SSH key**
    ```bash
@@ -82,47 +85,50 @@ This tutorial will guide you through:
    cat ~/.shh/id_ed25519.pub
    ```
 3. **Add the SSH Key to GitHub**
-Copy the SSH key.
-Go to GitHub > Settings > SSH and GPG keys > New SSH key.
-Paste the key and click "Add SSH key."
+. Copy the SSH key.
+. Go to GitHub > Settings > SSH and GPG keys > New SSH key.
+. Paste the key and click "Add SSH key."
 
-## **Clone the Repository**
+---
+
+## 5️⃣   **Clone the Repository**
 
 1. Go to the repository on GitHub
-2. Click *Code* and copy the SSH URL (e.g.,`git@github.com:username/repository.git`).
+2. Click **Code** and copy the SSH URL (e.g.,`git@github.com:username/repository.git`).
 3. In the Ubuntu terminal, run:
    ```bash
    git clone "the SSH URL"
    ```
+---
 
-## **Git Workflow**
+## 6️⃣   **Git Workflow**
 
-**Avoid Direct Changes to `main`**
-Follow this worflow to keep `main`clean:
+**Avoid Direct Changes to** `main`
+Follow this worflow to keep `main` clean:
 
-*Step-by-Step Workfow*
-1. *Update* `main`:
+**Step-by-Step Workfow**
+1. **Update** `main`:
    ```bash
    git pull origin main
    ```
-2. *Create a New Branch*:
+2. **Create a New Branch**:
    ```bash
    git checkout -b new_branch_name
    ```
-3. *Make Changes*
-4. *Stage and Commit Changes*:
+3. **Make Changes**
+4. **Stage and Commit Changes**:
    ```bash
    git add .
    git commit -m "describe the commit"
    ```
-5. *Push the Branch*:
+5. **Push the Branch**:
    ```bash
    git push origin new_branch_name
    ```
-6. *Create a Pull Request on GitHub*:
-Go to your repository on GitHub.
-Click "Compare & pull request."
-Add a title and description, then click "Create pull request."
+6. **Create a Pull Request on GitHub**:
+. Go to your repository on GitHub.
+. Click "Compare & pull request."
+. Add a title and description, then click "Create pull request."
 
 
 
