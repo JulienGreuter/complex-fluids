@@ -54,27 +54,28 @@ This tutorial will guide you through:
 
 ## 3️⃣   **Update Ubuntu**
 
-1. **Open Ubuntu terminal** and run :
+**Open Ubuntu terminal** and run :
    ```bash
    sudo apt-get update
    sudo apt-get upgrade
    ```
-2. **Install Git on Ubuntu** by running:
+## 4️⃣   **Install Git on Ubuntu**
+1. **Run**:
    ```bash
    sudo apt-get install git
    ```
-3. **Check installation** with:
+2. **Check installation** with:
    ```bash
    git --version
    ```
-4. **Configure Git** with your user information:
+3. **Configure Git** with your user information:
    ```bash
    git config --global user.name "Your Name"
    git config --global user.email "your.email@example.qqch"
    ```
 ---
 
-## 4️⃣   **Set Up SSH for GitHub**
+## 5️⃣   **Set Up SSH for GitHub**
 
 1. **Generate an SSH key**
    ```bash
@@ -85,13 +86,13 @@ This tutorial will guide you through:
    cat ~/.shh/id_ed25519.pub
    ```
 3. **Add the SSH Key to GitHub**
-. Copy the SSH key.
-. Go to GitHub > Settings > SSH and GPG keys > New SSH key.
-. Paste the key and click "Add SSH key."
+- Copy the SSH key.
+- Go to GitHub > Settings > SSH and GPG keys > New SSH key.
+- Paste the key and click "Add SSH key."
 
 ---
 
-## 5️⃣   **Clone the Repository**
+## 6️⃣   **Clone the Repository**
 
 1. Go to the repository on GitHub
 2. Click **Code** and copy the SSH URL (e.g.,`git@github.com:username/repository.git`).
@@ -101,7 +102,7 @@ This tutorial will guide you through:
    ```
 ---
 
-## 6️⃣   **Git Workflow**
+## 7️⃣   **Git Workflow**
 
 **Avoid Direct Changes to** `main`
 Follow this worflow to keep `main` clean:
@@ -126,9 +127,9 @@ Follow this worflow to keep `main` clean:
    git push origin new_branch_name
    ```
 6. **Create a Pull Request on GitHub**:
-. Go to your repository on GitHub.
-. Click "Compare & pull request."
-. Add a title and description, then click "Create pull request."
+- Go to your repository on GitHub.
+- Click "Compare & pull request."
+- Add a title and description, then click "Create pull request."
 
 
 
