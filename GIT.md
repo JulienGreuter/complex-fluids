@@ -1,6 +1,6 @@
 # **Guide Complet sur Git**
 
-## **Pourquoi utiliser Git ?**
+## &#x31;&#xFE0F;&#x20E3; **Pourquoi utiliser Git ?**
 
 ### **Qu'est-ce que le contrôle de version ?**
 
@@ -31,7 +31,7 @@ Inconvénient : Risque de perte totale des données si le serveur central tombe 
 - **DVCS** (Distributed Version Control Systems) comme Git :
 Chaque utilisateur possède une copie complète du projet (historique inclus), en local et sur un serveur distant comme GitHub. Cela rend le système plus résilient.
 
-## **Installation de Git**
+## &#x32;&#xFE0F;&#x20E3; **Installation de Git**
 **Sur Ubuntu / Debian**
 Installez Git avec :
 
@@ -44,14 +44,14 @@ Vérifiez l’installation avec :
 ```bash
 git --version
 ```
-## **Configuration de Git**
+## &#x33;&#xFE0F;&#x20E3; **Configuration de Git**
 Après l’installation, configurez votre nom et e-mail :
 
 ```bash
 git config --global user.name "Votre Nom"
 git config --global user.email "votre.email@exemple.com"
 ```
-## **Commandes de base Git**
+## &#x34;&#xFE0F;&#x20E3; **Commandes de base Git**
 Les trois zones de Git
 - **Working Directory** : La zone de travail où vous modifiez les fichiers.
 - **Staging Area** : La zone où vous ajoutez les modifications avant de les valider.
@@ -83,11 +83,11 @@ git diff --staged
 ```bash
 git commit -m "Description des modifications"
 ```
-## **Gestion des branches**
+## &#x35;&#xFE0F;&#x20E3; **Gestion des branches**
 Pourquoi utiliser des branches ?
 Les branches permettent de travailler sur différentes fonctionnalités sans affecter la branche principale (`master` ou `main`).
 
-## **Commandes pour gérer les branches**
+## &#x36;&#xFE0F;&#x20E3; **Commandes pour gérer les branches**
 - **Créer une nouvelle branche** :
 
 ```bash
@@ -106,9 +106,8 @@ git checkout nom_de_la_branche  "si la branche est existente"
 git checkout -b nom_de_la_branche  "si elle n'existe pas encore"
 ```
 
-## **Utilisation des remotes avec GitHub**
-- **Ajouter un remote** (par exemple, GitHub)
-- Pour lier votre projet local à un repository distant sur GitHub:
+## &#x37;&#xFE0F;&#x20E3; **Utilisation des remotes avec GitHub**
+- **Pour lier votre projet local à un repository distant sur GitHub**:
 
 ```bash
 git remote add origin https://github.com/utilisateur/nom_du_repository.git
