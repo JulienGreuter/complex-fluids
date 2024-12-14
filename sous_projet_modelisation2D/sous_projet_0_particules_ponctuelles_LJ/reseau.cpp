@@ -2,7 +2,7 @@
 #include <cstdlib>  // Pour rand()
 
 // Constructeur pour initialiser le réseau
-Réseau::Réseau(double xmin, double xmax, double zmin, double zmax, double taille_case)
+Reseau::Reseau(double xmin, double xmax, double zmin, double zmax, double taille_case)
     : xmin(xmin), xmax(xmax), zmin(zmin), zmax(zmax), taille_case(taille_case) {
 
     // Calcul du nombre de cases en x et z
@@ -24,60 +24,52 @@ Réseau::Réseau(double xmin, double xmax, double zmin, double zmax, double tail
             double pos_x = xmin + i * taille_case + decalage_x + taille_case / 2.0;
             double pos_z = zmin + j * taille_case + decalage_z + taille_case / 2.0;
             cases[i][j] = Case(pos_x, pos_z, taille_case);
+            cases_libres.push_back(&cases[i][j]);  // Ajouter toutes les cases initialement à cases_libres
         }
     }
 }
 
 // Méthode pour tirer une case libre aléatoire
-Case* Réseau::tirerCaseLibre() {
-    std::vector<Case*> cases_libres;
-    for (int i = 0; i < n_lignes; ++i) {
-        for (int j = 0; j < n_colonnes; ++j) {
-            if (cases[i][j].estLibre()) {
-                // Si la case est libre et n'a pas été subdivisée, on l'ajoute à la liste
-                cases_libres.push_back(&cases[i][j]);
-            } else if (cases[i][j].estParent()) {
-                // Si la case est un parent, tirer une case parmi ses enfants
-                for (auto enfant : cases[i][j].enfants) {
-                    if (enfant->estLibre()) {
-                        cases_libres.push_back(enfant);
-                    }
-                }
-            }
-        }
+Case* Reseau::tirerCaseLibre() {
+    if (cases_libres.empty()) {
+        return nullptr;  // Si aucune case libre, on retourne nullptr
     }
 
-    if (!cases_libres.empty()) {
-        int index = rand() % cases_libres.size();
-        Case* case_choisie = cases_libres[index];
-        // Marquer la case comme occupée
-        case_choisie->est_libre = false;
-        return case_choisie;
-    } else {
-        return nullptr;  // Aucune case libre disponible
-    }
+    int index = rand() % cases_libres.size();
+    Case* case_choisie = cases_libres[index];
+
+    // Marquer la case choisie comme occupée
+    case_choisie->est_libre = false;
+
+    // Retirer la case choisie de l'ensemble des cases libres
+    retirerCaseLibre(case_choisie);
+
+    return case_choisie;
 }
 
 // Méthode pour subdiviser une case libre en 4 enfants
-void Réseau::subdiviserCase(Case* case_a_subdiviser) {
+void Reseau::subdiviserCase(Case* case_a_subdiviser) {
     if (case_a_subdiviser != nullptr && case_a_subdiviser->estLibre()) {
-        case_a_subdiviser->subdiviser();
+        case_a_subdiviser->subdiviser();  // Subdiviser la case
+
+        // Ajouter les enfants de la case parent à l'ensemble des cases libres
+        ajouterEnfantsCasesLibres(case_a_subdiviser);
     }
 }
 
-// Méthode pour libérer la mémoire des cases occupées après subdivision
-void Réseau::libererCasesOccupees() {
-    for (int i = 0; i < n_lignes; ++i) {
-        for (int j = 0; j < n_colonnes; ++j) {
-            if (!cases[i][j].estLibre()) {
-                // Si la case est occupée, libérer la mémoire de ses enfants (si subdivisée)
-                if (cases[i][j].estParent()) {
-                    for (auto enfant : cases[i][j].enfants) {
-                        delete enfant;  // Libération de la mémoire des enfants
-                    }
-                    cases[i][j].enfants.clear();  // Effacer le vecteur d'enfants
-                }
-            }
-        }
+// Méthode pour retirer une case de l'ensemble des cases libres
+void Reseau::retirerCaseLibre(Case* case_a_retirer) {
+    auto it = std::find(cases_libres.begin(), cases_libres.end(), case_a_retirer);
+    if (it != cases_libres.end()) {
+        cases_libres.erase(it);
     }
+}
+
+// Méthode pour ajouter les enfants d'une case parent à cases_libres
+void Reseau::ajouterEnfantsCasesLibres(Case* case_parent) {
+    for (auto enfant : case_parent->enfants) {
+        cases_libres.push_back(enfant);
+    }
+    // Retirer la case parent de l'ensemble des cases libres
+    retirerCaseLibre(case_parent);
 }
