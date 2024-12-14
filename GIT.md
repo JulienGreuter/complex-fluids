@@ -1,8 +1,8 @@
-# Guide Complet sur Git
+# **Guide Complet sur Git**
 
-## Pourquoi utiliser Git ?
+## **Pourquoi utiliser Git ?**
 
-### Qu'est-ce que le contrôle de version ?
+### **Qu'est-ce que le contrôle de version ?**
 
 Le **contrôle de version** (ou *Version Control System*, VCS) est un système qui permet de suivre les modifications d'un fichier ou d'un ensemble de fichiers au fil du temps. Cela facilite :
 
@@ -101,14 +101,14 @@ git branch
 - **Changer de branche** :
 
 ```bash
-git checkout nom_de_la_branche  <si la branche est existente>
+git checkout nom_de_la_branche  "si la branche est existente"
 
-git checkout -b nom_de_la_branche  <si elle n'existe pas encore>
+git checkout -b nom_de_la_branche  "si elle n'existe pas encore"
 ```
 
 ## **Utilisation des remotes avec GitHub**
-Ajouter un remote (par exemple, GitHub)
-- Pour lier votre projet local à un repository distant sur GitHub :
+- **Ajouter un remote** (par exemple, GitHub)
+- Pour lier votre projet local à un repository distant sur GitHub:
 
 ```bash
 git remote add origin https://github.com/utilisateur/nom_du_repository.git
@@ -128,17 +128,17 @@ git pull origin nom_de_la_branche
 - **Historique des modifications**
    - **Afficher l'historique des commits** :
 
-```bash
-git log
-```
+   ```bash
+   git log
+   ```
    - **Voir l'historique en résumé (une ligne par commit)** :
 
-```bash
-git log --pretty=oneline
-```
+   ```bash
+   git log --pretty=oneline
+   ```
    - **Afficher les 2 derniers commits avec leurs différences** :
 
-```bash
-git log -p -2
-```
+   ```bash
+   git log -p -2
+   ```
 
