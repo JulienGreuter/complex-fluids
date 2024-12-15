@@ -34,7 +34,7 @@
     - `Constructeur` : Initialise les paramètres de la boîte de simulation et des régulateurs.
     - `initialisation(double T, Reseau& reseau)` : Initialise les positions et vitesses des particules en utilisant les classes Reseau et Case.
     - `calculer_forces()` : Calcule les forces d'interactions entre les particules.
-        📝 Explication du code
+        - ## 📝 Explication du code
 
         - ### 1. Initialisation :
             - `forces_interactions.clear()` : Nettoie le vecteur des forces avant le recalcul.
