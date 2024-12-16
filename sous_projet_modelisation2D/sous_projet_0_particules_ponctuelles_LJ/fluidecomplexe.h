@@ -23,7 +23,7 @@ public:
     FluideComplexe(double L_x, double L_z, double delta_t, double kappa, double tau_P, double tau_T, double r_c);
 
     // Méthode d'initialisation des positions et vitesses
-    void initialisation(double T, Reseau& reseau);
+    void initialisation(std::ifstream& fichier);
 
     // Méthode pour calculer les forces d'interactions entre les particules
     void calculer_forces();
