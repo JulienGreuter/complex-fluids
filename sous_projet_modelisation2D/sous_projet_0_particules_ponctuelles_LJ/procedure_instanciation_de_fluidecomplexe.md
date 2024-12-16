@@ -60,24 +60,24 @@ Les domaines `D31`, `D32`, et `D33` permettent d'initialiser plusieurs ensembles
 
 # **3. Étapes pour instancier `FluideComplexe`**
 - ### Lecture du fichier `fichier_initialisation.txt` :
-    Lire les paramètres de chaque ensemble de particules et stocker les informations dans des objets temporaires de type `Particules`.
+    Lire les paramètres de chaque ensemble de particules et stocker les informations dans des objets de type `Particules`.
 
 - ### Tri des ensembles par taille croissante :
-    Pour chaque domaine attribué, trier les ensembles de particules par taille (`Particules.taille`). Le tri est facultatif si toutes les tailles sont égales (par exemple, pour des particules ponctuelles avec taille = 0).
+    Pour chaque domaine attribué, trier les ensembles de particules par taille (`Particules.taille`). **Le tri est facultatif si toutes les tailles sont égales** (par exemple, pour des particules ponctuelles avec `taille = 0`).
 
 - ### Initialisation des positions :
-    Utiliser la méthode d'initialisation de la classe `FluideComplexe` pour assigner des positions aux particules en utilisant la classe `Reseau` pour gérer l'agencement des particules dans le domaine.
+    Utiliser la méthode d'initialisation de la classe `FluideComplexe` pour assigner des positions aux particules en utilisant la classe `Reseau` pour gérer l'agencement des particules dans **le domaine**.
 
-- ### Ajout des ensembles de particules à l'attribut particules de FluideComplexe :
+- ### Ajout des ensembles de particules à l'attribut particules de `FluideComplexe` :
     Une fois les positions initialisées, ajouter les ensembles de particules au vecteur `particules` de `FluideComplexe`.
 
 - ### Répétition du processus pour chaque domaine attribué :
-    Pour chaque domaine (`D31`, `D32`, `D33`), construire le vecteur des ensembles de particules correspondant, initialiser leurs positions, puis passer au domaine suivant.
+    Pour chaque domaine (`D31`, `D32`, `D33`), construire le vecteur des ensembles de particules correspondant, initialiser leurs positions, puis passer au domaine suivant. Sinon une seule étape est necessaire pour `D1` et `D2`.
 
 # **4. Modularité et automatisation**
 Pour automatiser l'instanciation de plusieurs objets `FluideComplexe` avec des paramètres `E_0` et `d` variables, il faut :
 
-- ### Créer plusieurs fichiers d'initialisation (`fichier_initialisation_1.txt`, `fichier_initialisation_2.txt`, etc.), chacun contenant des valeurs différentes de **E_0** et **d**.
+- ### Créer plusieurs fichiers d'initialisation (`fichier_initialisation_1.txt`, `fichier_initialisation_2.txt`, etc.), chacun contenant des valeurs différentes de **E_0** et **d** ( via un script Bash ).
 
 - ### Utiliser un **script Bash** pour parcourir ces fichiers et lancer le programme de simulation avec chacun d'eux.
 
