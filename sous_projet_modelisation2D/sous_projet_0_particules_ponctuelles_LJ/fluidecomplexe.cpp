@@ -226,6 +226,7 @@ void FluideComplexe::calculer_forces() {
     }
 }
 
+
 // Méthode pour mettre à jour les positions des particules
 
 // Méthode pour mettre à jour les vitesses des particules
