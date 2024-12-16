@@ -5,7 +5,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <cmath>
-#include <iostream>
+
 
 // Constante de Boltzmann (en unités SI : J/K)
 const double K_B = 1.380649e-23;
