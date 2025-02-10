@@ -10,12 +10,16 @@
     - `positions` : Vecteur des positions des particules.
     - `vitesses` : Vecteur des vitesses des particules.
     - `taille` : Taille des particules (initialisée à 0 pour des particules ponctuelles).
+    - `masse` : Masse des particules.
     
     ## **Méthodes :**
 
     - `Constructeur` : Initialise les paramètres des particules.
     - `initialiserVitesses(double T)` : Initialise les vitesses en fonction de la température T.
     - `appliquerConditionsPeriodiques(double L_x, double L_z)` : Applique les conditions périodiques en fonction des dimensions L_x et L_z de la boîte.
+
+    ## **Remarques**
+    si taille ==0, alors on considere les particules de l'ensemble `particules` comme étant ponctuelles, pour leurs initialisation on utilisera alors le parametre `d` pour déterminer quel ensemble placer en premier ( pour se rapporcher de conditions initiale physique )
 
 - ## **Classe `FluideComplexe`**
     
@@ -48,7 +52,7 @@
         - ### 4. Stockage des forces :
             - La force totale sur chaque particule est ajoutée au vecteur forces_interactions.
     - `mettre_a_jour_positions()` : Met à jour les positions des particules en fonction des vitesses et des forces.
-    - `mettre_a_jour_vitesses()` : Met à jour les vitesses des particules en fonction des forces.
+    - `mettre_a_jour_vitesses(forces_interactions_precedente)` : Met à jour les vitesses des particules en fonction des forces.
     - `appliquer_conditions_periodiques()` : Applique les conditions périodiques à toutes les particules.
     - `appliquer_thermostat(double T)` : Modifie les vitesses des particules pour ajuster la température.
     - `appliquer_barostat(double P)` : Modifie les positions et vitesses des particules pour ajuster la pression.

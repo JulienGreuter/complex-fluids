@@ -10,22 +10,23 @@ Le fichier contiendra les informations nécessaires pour créer chaque ensemble 
 - **Charge** électrique (`charge`)
 - **Taille** des particules (`taille`)
 - **Nombre** de particules (`N`)
+- **Masse** des particules (`masse`)
 - **Identifiant d'initialisation** (`id_ini`) pour attribuer un domaine à chaque ensemble de particules.
 
 Exemple de contenu de `fichier_initialisation.txt` :
 ```
-# Format : N E_0 d charge taille id_ini
-100 1.0 0.01  0.0 0.0 D31
-250 1.2 0.015 0.0 0.0 D32
-500 1.0 0.01  0.0 0.0 D32
-100 1.0 0.01  0.0 0.0 D33
+# Format : N E_0 d charge taille masse id_ini
+100 1.0 0.01  0.0 0.0 10 D31
+250 1.2 0.015 0.0 0.0 36 D32
+500 1.0 0.01  0.0 0.0 10 D32
+100 1.0 0.01  0.0 0.0 10 D33
 ```
 Explication de l'exemple :
 ```
 la boite de simulation est separé en 3 tranches adjacentes D31,D32,D33.
 On a deux types de particules dans la boite :
-    type A : E_0 = 1.0, d = 0.01,  charge = 0.0, taille = 0.0
-    type B : E_0 = 1.2, d = 0.015, charge = 0.0, taille = 0.0
+    type A : E_0 = 1.0, d = 0.01,  charge = 0.0, taille = 0.0, masse = 10
+    type B : E_0 = 1.2, d = 0.015, charge = 0.0, taille = 0.0, masse = 36
 
     les particules de type A sont presentent dans toute la boite :
         100 dans D31
