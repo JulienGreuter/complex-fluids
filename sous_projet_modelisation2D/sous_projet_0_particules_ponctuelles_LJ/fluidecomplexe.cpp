@@ -33,7 +33,7 @@ Vec2 force_LJ(double E_0i, double E_0j, double di, double dj, Vec2 r_ij) {
     double A = d / distance;                      // Rapport d / distance
     double factor = 24 * E_0 * (2 * std::pow(A, 13) - std::pow(A, 7)) / (d * distance);
 
-    return factor * r_ij;                         // Retourne la force de Lennard-Jones sous forme de Vec2
+    return r_ij * factor;                         // Retourne la force de Lennard-Jones sous forme de Vec2
 }
 
 void initialisation_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire) {
@@ -164,15 +164,15 @@ void FluideComplexe::calculer_forces() {
     Vec2 uz(0.0, 1.0);  // Unité en z
 
     std::vector<Vec2> vecteurs_periodiques = {
-        Vec2(0.0, 0.0),                   // Vecteur nul (pas de translation)
-        L_x * ux,                         // Translation +L_x en x
-        L_z * uz,                         // Translation +L_z en z
-        -L_x * ux,                        // Translation -L_x en x
-        -L_z * uz,                        // Translation -L_z en z
-        L_x * ux - L_z * uz,              // Translation +L_x et -L_z
-        L_x * ux + L_z * uz,              // Translation +L_x et +L_z
-        -L_x * ux + L_z * uz,             // Translation -L_x et +L_z
-        -L_x * ux - L_z * uz              // Translation -L_x et -L_z
+        Vec2(0.0, 0.0),                    // Vecteur nul (pas de translation)
+        ux * L_x ,                         // Translation +L_x en x
+        uz * L_z ,                         // Translation +L_z en z
+        ux * -L_x ,                        // Translation -L_x en x
+        uz * -L_z ,                        // Translation -L_z en z
+        ux * L_x + uz * - L_z ,            // Translation +L_x et -L_z
+        ux * L_x  + uz * L_z ,             // Translation +L_x et +L_z
+        ux * -L_x  + uz* L_z ,             // Translation -L_x et +L_z
+        ux * -L_x + uz * - L_z             // Translation -L_x et -L_z
     };
 
     // Boucle sur chaque ensemble de particules i
