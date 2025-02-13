@@ -3,33 +3,41 @@
 
 #include <vector>
 #include <iostream>
+#include <memory>  // Pour unique_ptr
 
 class Case {
+private:
+
+    double x, z;                        // Position du centre de la case
+    int ordre_subdivision;              // Ordre de subdivision
+    std::vector<std::unique_ptr<Case>> enfants; // Pointeurs intelligents pour éviter les fuites mémoire
+    double taille_case;                 // Taille de la case
+    bool est_libre;                     // État de la case
+
 public:
-    // Attributs publics
-    double x, z;                // Position du centre de la case
-    int ordre_subdivision;      // Ordre de subdivision de la case
-    std::vector<Case*> enfants; // Enfants si c'est une case parent
-    double taille_case;         // Taille de la case en fonction de son ordre de subdivision
-    bool est_libre;             // Si la case est libre ou occupée
 
     // Constructeur
     Case(double x, double z, double taille_case, int ordre_subdivision = 0, bool est_libre = true);
 
-    // Destructeur pour libérer la mémoire des enfants
-    ~Case();
-
     // Méthode pour subdiviser une case en 4 enfants
     void subdiviser();
 
-    // Méthode pour vérifier si la case est une case parent
-    bool estParent() const;
+    // Vérifie si la case est un parent
+    bool estParent() const { return !enfants.empty(); }
 
-    // Méthode pour vérifier si la case est libre
-    bool estLibre() const;
+    // Vérifie si la case est libre
+    bool estLibre() const { return est_libre; }
 
-    // Méthode pour marquer la case comme occupée
-    void marquerOccupee();
+    // Marque la case comme occupée
+    void marquerOccupee() { est_libre = false; }
+
+    // Affichage des informations de la case
+    void afficher() const;
+
+    // Getter
+    int getOrdreSubdivision() const { return ordre_subdivision; }
+    
+    const std::vector<std::unique_ptr<Case>>& getEnfants() const { return enfants; }
 };
 
 #endif // CASE_H
