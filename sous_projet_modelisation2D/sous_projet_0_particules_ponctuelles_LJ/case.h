@@ -34,10 +34,12 @@ public:
     // Affichage des informations de la case
     void afficher() const;
 
-    // Getter
+    // Getter pour accéder aux attributs privés
+    double getX() const { return x; }
+    double getZ() const { return z; }
     int getOrdreSubdivision() const { return ordre_subdivision; }
-    
     const std::vector<std::unique_ptr<Case>>& getEnfants() const { return enfants; }
+    double getTaille() const { return taille_case; }
 };
 
 #endif // CASE_H

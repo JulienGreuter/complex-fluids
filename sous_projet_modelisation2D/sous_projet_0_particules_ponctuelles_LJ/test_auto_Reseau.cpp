@@ -1,4 +1,6 @@
 #include "reseau.h"
+#include <iostream>
+#include <string>
 #include <functional> // Pour std::function
 #include <fstream>    // Pour std::ofstream
 
@@ -16,34 +18,8 @@ Reseau genererReseau( double xmax, double zmax, int N ) {
         }
     }
     reseau.afficher_details();
-    reseau.afficher();
 
     return reseau;  // Retourne le réseau généré
-}
-
-void testSubdivisionMultiple( int N ){
-    std::cout << "\nInstanciation du reseau...\n";
-    Reseau reseau(0.0, 55.0, 0.0, 50.0, 10.0);
-    std::cout << "Affichage du reseau...\n";
-    reseau.afficher();
-
-    std::cout << "\n=== Test subdivision multiple N=" << N <<" ===\n";
-    for (int it = 0; it < N ; ++it){
-        std::cout << "Tirage d'une case libre...\n";
-        Case* case_tiree = reseau.tirerCaseLibre();
-        if (case_tiree) {
-        case_tiree->afficher();
-        std::cout << "Subdivision de la case tiree...\n";
-        reseau.subdiviserCase(case_tiree);
-        }
-        else { 
-            std::cout << "Aucune case libre tirée\n";    
-        }
-    }
-    std::cout << "\nAffichage du reseau...\n";
-    reseau.afficher();
-    std::cout << "\nAffichage details...\n";
-    reseau.afficher_details();
 }
 
 void exporterReseauCSV(const Reseau& reseau, const std::string& filename) {
@@ -76,17 +52,20 @@ void exporterReseauCSV(const Reseau& reseau, const std::string& filename) {
     std::cout << "Exportation terminée : " << filename << std::endl;
 }
 
+int main(int argc, char* argv[]) {
+    // Vérifier que le nom du fichier est fourni
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <nom_fichier.csv>" << std::endl;
+        return 1;
+    }
 
+    std::string nom_fichier = argv[1];  // Nom du fichier passé en argument
+    int nb_subdivisions = 10;  // Nombre fixe de subdivisions (modifiable ici)
 
-int main() {
+    // Générer le réseau et exporter en CSV
+    Reseau reseau = genererReseau(60.0, 60.0, nb_subdivisions);
+    exporterReseauCSV(reseau, nom_fichier);
 
-    std::cout << "\n=== Test classe Reseau ===\n";
-
-    //testSubdivisionMultiple( 20 );
-
-    Reseau reseau = genererReseau(60.0, 60.0, 10);
-    //exporterReseauCSV(reseau, "test_reseau.csv");
-
-    std::cout << "\n=== Fin des tests de la classe Reseau ===\n";
+    std::cout << "Fichier généré : " << nom_fichier << " (" << nb_subdivisions << " subdivisions)" << std::endl;
     return 0;
 }

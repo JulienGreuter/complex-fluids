@@ -41,6 +41,9 @@ public:
 
     // Méthode pour afficher les statistiques du reseau
     void afficher_details() const;
+
+    // Getter pour accéder aux attributs privés
+    const std::vector<std::vector<std::unique_ptr<Case>>>& getCases() const { return cases; }
 };
 
 #endif // RESEAU_H

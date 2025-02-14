@@ -1,23 +1,12 @@
 #include "reseau.h"
-#include <cstdlib>  // Pour rand()
-#include <ctime>    // Pour initialiser rand()
+#include <random>  // Pour std::random_device, std::mt19937 et std::uniform_int_distribution
 #include <algorithm> // Pour std::find
 #include <map>  // Pour stocker les statistiques par ordre
-
-void debug_i(){
-    std::cout << "Action en cours\n";
-}
-void debug_f(){
-    std::cout << "fin de l'action\n";
-}
 
 // Constructeur
 Reseau::Reseau(double xmin, double xmax, double zmin, double zmax, double taille_case)
     : xmin(xmin), xmax(xmax), zmin(zmin), zmax(zmax), taille_case(taille_case) {
-
-    // Initialisation du générateur de nombres aléatoires
-    std::srand(std::time(nullptr));
-
+    
     // Calcul du nombre de cases en x et z
     n_lignes = static_cast<int>((xmax - xmin) / taille_case);
     n_colonnes = static_cast<int>((zmax - zmin) / taille_case);
@@ -50,7 +39,13 @@ Case* Reseau::tirerCaseLibre() {
         return nullptr;  // Aucune case libre
     }
 
-    int index = rand() % cases_libres.size();
+    // Génèrateur de nombres aléatoires
+    std::random_device rd;           // Fournit une source aléatoire basée sur le matériel (si disponible)
+    std::mt19937 gen(rd());          // Générateur Mersenne Twister, initialisé avec la graine aléatoire
+    // Distribution uniforme pour obtenir un index valide dans le tableau
+    std::uniform_int_distribution<> dis(0, cases_libres.size() - 1); // Distribution uniforme entre 0 et cases_libres.size() - 1
+    // Tirer un nombre aléatoire pour l'index
+    int index = dis(gen);  // Utilise le générateur pour obtenir un index valide
     Case* case_choisie = cases_libres[index];
 
     return case_choisie;
@@ -72,10 +67,8 @@ void Reseau::subdiviserCase(Case* case_a_subdiviser) {
 void Reseau::retirerCaseLibre(Case* case_a_retirer) {
     auto it = std::find(cases_libres.begin(), cases_libres.end(), case_a_retirer);
     if (it != cases_libres.end()) {
-        debug_i();
         cases_libres.erase(it);
         case_a_retirer->marquerOccupee();
-        debug_f();
     }
     else {
         std::cerr << "Erreur : la case n'est pas trouvée dans cases_libres";
