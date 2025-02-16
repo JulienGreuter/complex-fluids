@@ -82,7 +82,7 @@ int main() {
 
     std::cout << "\n=== Test classe Reseau ===\n";
 
-    //testSubdivisionMultiple( 20 );
+    testSubdivisionMultiple( 20 );
 
     Reseau reseau = genererReseau(60.0, 60.0, 10);
     //exporterReseauCSV(reseau, "test_reseau.csv");
