@@ -2,12 +2,17 @@
 #define FLUIDECOMPLEXE_H
 
 #include <vector>
+#include <unordered_map>
+#include <string>
+#include <fstream>
 #include "particules.h"
 #include "vec2.h"  // Inclut la structure Vec2 pour les vecteurs 2D (x, z)
 #include "reseau.h" // Inclut la classe Reseau et Case pour l'initialisation des positions
 
+Vec2 force_LJ(double E_0i, double E_0j, double di, double dj, Vec2 r_ij);
+
 class FluideComplexe {
-public:
+private:
     // Attributs
     double L_x;                          // Longueur de la boîte en x
     double L_z;                          // Longueur de la boîte en z
@@ -18,12 +23,18 @@ public:
     double r_c;                          // Rayon de coupure des interactions
     std::vector<Particules> particules;  // Ensemble des ensembles de particules
     std::vector<Vec2> forces_interactions;  // Forces d'interactions des particules (indices correspondants à particules)
+    std::string fichier_nom;   // Fichier contenant la description de fluide complexe en termes d'ensemble de particules
+    
+    std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines;
+    void initialisation_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire);
+    void traiter_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire);
 
+public:
     // Constructeur
-    FluideComplexe(double L_x, double L_z, double delta_t, double kappa, double tau_P, double tau_T, double r_c);
+    FluideComplexe(double L_x, double L_z, double delta_t, double kappa, double tau_P, double tau_T, double r_c, const std::string fichier_nom);
 
     // Méthode d'initialisation des positions et vitesses
-    void initialisation(std::ifstream& fichier);
+    void initialisation(double T);
 
     // Méthode pour calculer les forces d'interactions entre les particules
     void calculer_forces();

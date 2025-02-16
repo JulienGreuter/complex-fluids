@@ -1,23 +1,14 @@
-#include "fluidecomplexe.h"
-#include "reseau.h"
-#include "vec2.h"
 #include <algorithm>  // Pour std::sort
 #include <iostream>
 #include <unordered_map>
 #include <cmath>
+#include <sstream>
+#include "fluidecomplexe.h"
+
 
 
 // Constante de Boltzmann (en unités SI : J/K)
 const double K_B = 1.380649e-23;
-
-// Fonction pour convertir une chaîne de caractères représentant un domaine en ses limites (xmin, xmax, zmin, zmax)
-std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines = {
-    {"D1",  std::make_tuple(-L_x / 2, L_x / 2, -L_z / 2, L_z / 2)},
-    {"D2",  std::make_tuple(-L_x / 2, L_x / 2, -L_z / 4, L_z / 4)},
-    {"D31", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 2, -L_z / 4)},
-    {"D32", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 4, L_z / 4)},
-    {"D33", std::make_tuple(-L_x / 2, L_x / 2, L_z / 4, L_z / 2)}
-};
 
 // Fonction pour calculer la force de Lennard-Jones entre deux particules
 Vec2 force_LJ(double E_0i, double E_0j, double di, double dj, Vec2 r_ij) {
@@ -36,122 +27,131 @@ Vec2 force_LJ(double E_0i, double E_0j, double di, double dj, Vec2 r_ij) {
     return r_ij * factor;                         // Retourne la force de Lennard-Jones sous forme de Vec2
 }
 
-void initialisation_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire) {
-    // Obtenir les limites du domaine
+
+
+// Constructeur
+
+FluideComplexe::FluideComplexe(double L_x, double L_z, double delta_t, double kappa, double tau_P, double tau_T, double r_c, const std::string fichier_nom) 
+: L_x(L_x), L_z(L_z), delta_t(delta_t), kappa(kappa), tau_P(tau_P), tau_T(tau_T), r_c(r_c), fichier_nom(fichier_nom) {
+
+    // Initialiser la table des domaines
+    domaines = {
+        {"D1",  std::make_tuple(-L_x / 2, L_x / 2, -L_z / 2, L_z / 2)},
+        {"D2",  std::make_tuple(-L_x / 2, L_x / 2, -L_z / 4, L_z / 4)},
+        {"D31", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 2, -L_z / 4)},
+        {"D32", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 4, L_z / 4)},
+        {"D33", std::make_tuple(-L_x / 2, L_x / 2, L_z / 4, L_z / 2)}
+    };
+}
+
+void FluideComplexe::initialisation_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire) {
+    std::cout << "--------------------------------------------------\n";
+    std::cout << "Appel de initialisation_domaine()\n";
+    std::cout << "domaine :" << domaine << std::endl;
     if (domaines.find(domaine) == domaines.end()) {
-        std::cerr << "Erreur : Domaine non reconnu." << std::endl;
+        std::cerr << "Erreur : Domaine non reconnu : " << domaine << std::endl;
         return;
     }
+    std::cout << "Correspond à : ";
     auto [xmin, xmax, zmin, zmax] = domaines[domaine];
+    std::cout << "xmin = " << xmin << " | xmax = " << xmax << " | zmin = " << zmin << " | zmax = " << zmax << std::endl;
 
-    // Déterminer la taille initiale des cases du réseau
+    if (vecteur_intermediaire.empty()) {
+        std::cerr << "Erreur : Aucun ensemble de particules fourni pour le domaine " << domaine << std::endl;
+        return;
+    }
+
     double taille_case = vecteur_intermediaire[0].taille > 0 ? vecteur_intermediaire[0].taille : vecteur_intermediaire[0].d;
-
-    // Créer le réseau pour le domaine spécifié
+    int ordre_subdivision = 0;
+    std::cout << "taille_case = " << taille_case << std::endl;
     Reseau reseau(xmin, xmax, zmin, zmax, taille_case);
 
-    for (size_t k = 0; k < vecteur_intermediaire.size(); ++k) {
-        auto& ensemble = vecteur_intermediaire[k];
-
-        // Vérifier si une subdivision est nécessaire avant de placer cet ensemble
+    for (auto& ensemble : vecteur_intermediaire) {
         double taille_ensemble = ensemble.taille > 0 ? ensemble.taille : ensemble.d;
+        std::cout << "taille_ensemble = " << taille_ensemble << std::endl;
         while (taille_ensemble < taille_case / 2.0) {
-            // Subdiviser toutes les cases libres
-            for (auto* case_libre : reseau.cases_libres) {
-                reseau.subdiviserCase(case_libre);
-            }
-
-            // Mettre à jour la taille des cases après subdivision
+            std::cout << "  Subdivision du reseau...\n";
+            
+            reseau.subdiviser(ordre_subdivision);
+            
             taille_case /= 2.0;
+            ordre_subdivision += 1;
         }
-
-        // Initialiser les positions des particules de l'ensemble courant
+        std::cout << "  Remplissage du reseau...\n";
         for (int i = 0; i < ensemble.N; ++i) {
             Case* case_libre = reseau.tirerCaseLibre();
             if (!case_libre) {
                 std::cerr << "Erreur : Plus de cases libres disponibles pour le domaine " << domaine << std::endl;
                 return;
             }
-
-            ensemble.positions.push_back(Vec2(case_libre->x, case_libre->z));
-        }
-
-        // Vérifier si le prochain ensemble nécessite une subdivision
-        if (k + 1 < vecteur_intermediaire.size()) {
-            double prochaine_taille = vecteur_intermediaire[k + 1].taille;
-            double prochain_d = vecteur_intermediaire[k + 1].d;
-
-            if ((prochaine_taille > 0 && prochaine_taille < taille_case / 2.0) || 
-                (prochaine_taille == 0 && prochain_d < taille_case / 2.0)) {
-                
-                // Subdiviser toutes les cases libres
-                for (auto* case_libre : reseau.cases_libres) {
-                    reseau.subdiviserCase(case_libre);
-                }
-
-                // Mettre à jour la taille des cases après subdivision
-                taille_case /= 2.0;
-            }
+            ensemble.positions.push_back(Vec2(case_libre->getX(), case_libre->getZ()));
+            reseau.retirerCaseLibre(case_libre);
         }
     }
-
-    // Initialiser les vitesses des particules en fonction de la température T
+    // visualisation du reseau 
+    reseau.afficher_details();
     for (auto& ensemble : vecteur_intermediaire) {
         ensemble.initialiserVitesses(T);
     }
+    std::cout << "Fin de l'initialisation du domaine " << domaine << std::endl;
+    std::cout << "--------------------------------------------------\n";
 }
 
+void FluideComplexe::traiter_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire) {
+    std::cout << "--------------------------------------------------\n";
+    std::cout << "Appel de traiter_domaine()\n";
+    if (vecteur_intermediaire.empty()) return; // Éviter un traitement inutile
 
+    // Trier les particules en fonction de leur taille ou d si taille = 0
+    std::cout << "Trie du vecteur intermediaire...\n";
+    std::sort(vecteur_intermediaire.begin(), vecteur_intermediaire.end(), [](const Particules& a, const Particules& b) {
+        return (a.taille > 0 ? a.taille : a.d) > (b.taille > 0 ? b.taille : b.d);
+    });
+    // Initialiser le domaine avec les particules triées
+    initialisation_domaine(T, domaine, vecteur_intermediaire);
+    // Ajouter les particules traitées à l'attribut principal
+    particules.insert(particules.end(), vecteur_intermediaire.begin(), vecteur_intermediaire.end());
+    // Vider le vecteur pour le prochain domaine
+    vecteur_intermediaire.clear();
+    std::cout << "Fin de traiter_domaine()\n";
+    std::cout << "--------------------------------------------------\n";
+}
 
-
-
-
-
-// Constructeur
-
-// Méthode d'initialisation des positions et vitesses
-void FluideComplexe::initialisation(std::ifstream& fichier) {
+void FluideComplexe::initialisation(double T) { 
+    std::cout << "Initialisation...\n";
     std::string ligne;
     std::vector<Particules> vecteur_intermediaire;
+    std::string dernier_domaine = "";
+    std::cout << "Lecture du fichier d'initialisation...\n";
+    std::ifstream fichier_initialisation(fichier_nom);
 
-    while (std::getline(fichier, ligne)) {
-        // Ignorer les commentaires et les lignes vides
+    while (std::getline(fichier_initialisation, ligne)) {
         if (ligne.empty() || ligne[0] == '#') continue;
 
-        // Lire les attributs des particules depuis la ligne
         int N;
-        double E_0, d, charge, taille, masse;
+        double E_0, d, masse, taille, charge;
         std::string id_ini;
-
         std::istringstream iss(ligne);
-        if (!(iss >> N >> E_0 >> d >> charge >> taille >> masse >> id_ini)) {
+
+        if (!(iss >> N >> E_0 >> d >> masse >> taille >> charge >> id_ini)) {
             std::cerr << "Erreur : Format de ligne incorrect : " << ligne << std::endl;
             continue;
         }
+        std::cout << "Instanciation d'un ensemble de particules...\n";
+        Particules ensemble(N, E_0, d, masse, taille, charge);
+        std::cout << "N = " << N << " | E_0 = " << E_0 << " | d = " << d << " | masse = " << masse << " | taille = " <<taille << " | charge = " << charge << " | domaine : " << id_ini << std::endl;
 
-    // Créer une instance de Particules avec les paramètres lus
-    Particules ensemble(N, E_0, d, charge, taille, masse);
-
-    // Ajouter l'ensemble au vecteur intermédiaire
-    vecteur_intermediaire.push_back(ensemble);
-
-        // Si la fin du fichier ou une ligne vide est atteinte, procéder à l'initialisation du domaine
-        if (fichier.eof() || fichier.peek() == '\n') {
-            // Trier le vecteur par taille (ou par d si taille == 0)
-            std::sort(vecteur_intermediaire.begin(), vecteur_intermediaire.end(), [](const Particules& a, const Particules& b) {
-                return a.taille > 0 && b.taille > 0 ? a.taille < b.taille : a.d < b.d;
-            });
-
-            // Appeler la fonction d'initialisation pour le domaine spécifié
-            initialisation_domaine(T, id_ini, vecteur_intermediaire);
-
-            // Ajouter les ensembles initialisés à l'attribut `particules`
-            particules.insert(particules.end(), vecteur_intermediaire.begin(), vecteur_intermediaire.end());
-
-            // Vider le vecteur intermédiaire pour le prochain domaine
-            vecteur_intermediaire.clear();
+        if (id_ini != dernier_domaine && !dernier_domaine.empty()) {
+            traiter_domaine(T, dernier_domaine, vecteur_intermediaire);
         }
+
+        dernier_domaine = id_ini;
+        vecteur_intermediaire.push_back(ensemble);
     }
+
+    // Traiter le dernier domaine après la lecture du fichier
+    traiter_domaine(T, dernier_domaine, vecteur_intermediaire);
+    std::cout << "Fin de L'initialisation\n";
 }
 
 // Méthode pour calculer les forces d'interactions entre les particules

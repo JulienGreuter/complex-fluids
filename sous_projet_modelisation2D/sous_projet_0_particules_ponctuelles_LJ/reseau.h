@@ -30,6 +30,9 @@ public:
     // Méthode pour subdiviser une case libre en 4 enfants
     void subdiviserCase(Case* case_a_subdiviser);
 
+    // Méthode pour subdiviser toutes les cases libres du reseau pour un ordre de subdivision donné
+    void subdiviser(int ordre);
+
     // Méthode pour retirer une case de l'ensemble des cases libres
     void retirerCaseLibre(Case* case_a_retirer);
 

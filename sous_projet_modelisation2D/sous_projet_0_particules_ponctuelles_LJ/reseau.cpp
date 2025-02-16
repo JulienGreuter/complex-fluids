@@ -63,6 +63,23 @@ void Reseau::subdiviserCase(Case* case_a_subdiviser) {
     }
 }
 
+// Methode pour subdiviser toutres les cases libres d'un ordre de subdivisation donné
+void Reseau::subdiviser(int ordre) {
+    // Créer une copie temporaire des cases à subdiviser
+    std::vector<Case*> cases_a_subdiviser;
+    
+    for (auto* c : cases_libres) {  // Utilisation de *c pour éviter les erreurs
+        if (c && ordre == c->getOrdreSubdivision()) {  
+            cases_a_subdiviser.push_back(c);
+        }
+    }
+
+    // On subdivise en dehors de la boucle d'itération sur cases_libres
+    for (auto* c : cases_a_subdiviser) {
+        subdiviserCase(c);
+    }
+}
+
 // Retirer une case de l'ensemble des cases libres
 void Reseau::retirerCaseLibre(Case* case_a_retirer) {
     auto it = std::find(cases_libres.begin(), cases_libres.end(), case_a_retirer);
@@ -97,43 +114,54 @@ void Reseau::afficher() const {
 }
 
 void Reseau::afficher_details() const {
-    std::map<int, std::pair<int, int>> stats;  // {ordre : (cases libres, cases occupées)}
+    std::map<int, std::tuple<int, int, int>> stats;  
+    // {ordre : (cases libres, cases occupées, cases occupées non parentes)}
 
     // Fonction récursive pour parcourir les cases et remplir les stats
     std::function<void(const Case&)> compterCases = [&](const Case& c) {
         int ordre = c.getOrdreSubdivision();
         if (stats.find(ordre) == stats.end()) {
-            stats[ordre] = {0, 0};
+            stats[ordre] = {0, 0, 0};  // Initialisation à (0, 0, 0)
         }
+
+        auto& [libres, occupees, occupees_non_parents] = stats[ordre];
+
         if (c.estLibre()) {
-            stats[ordre].first++;  // Cases libres
+            libres++;  // Case libre
         } else {
-            stats[ordre].second++; // Cases occupées
+            occupees++;  // Case occupée
+            if (!c.estParent()) {
+                occupees_non_parents++;  // Case occupée non parente
+            }
         }
+
         for (const auto& enfant : c.getEnfants()) {
             compterCases(*enfant);
         }
     };
 
-    // Parcourir toutes les cases parents pour remplir les statistiques
+    // Parcourir toutes les cases racines du réseau
     for (const auto& row : cases) {
         for (const auto& cell : row) {
             compterCases(*cell);
         }
     }
 
-    // Affichage des statistiques sous forme d'arborescence
+    // Affichage des statistiques
     std::cout << "=== Statistiques du Réseau ===\n";
     std::cout << "Réseau (xmin=" << xmin << ", xmax=" << xmax 
               << ", zmin=" << zmin << ", zmax=" << zmax 
               << ", taille_case=" << taille_case << ")\n";
 
     for (const auto& [ordre, counts] : stats) {
-        int libres = counts.first;
-        int occupees = counts.second;
+        int libres, occupees, occupees_non_parents;
+        std::tie(libres, occupees, occupees_non_parents) = counts;
+
         std::cout << std::string(ordre * 2, ' ')  // Indentation
                   << "├── Ordre " << ordre << " : " 
                   << (libres + occupees) << " cases "
-                  << "(Libres: " << libres << " | Occupées: " << occupees << ")\n";
+                  << "(Libres: " << libres 
+                  << " | Occupées: " << occupees 
+                  << " | Occupées non parentes: " << occupees_non_parents << ")\n";
     }
 }
