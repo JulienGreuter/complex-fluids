@@ -44,6 +44,7 @@ public:
 
     // Getter pour accéder aux attributs privés
     const std::vector<std::vector<std::unique_ptr<Case>>>& getCases() const { return cases; }
+    const std::vector<Case*>& getCasesLibres() const {return cases_libres;}
 };
 
 #endif // RESEAU_H
