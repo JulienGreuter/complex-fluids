@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <memory>  // Pour unique_ptr
+#include <fstream>
 
 
 
@@ -44,6 +45,9 @@ public:
 
     // Méthode pour afficher les statistiques du reseau
     void afficher_details() const;
+
+    // Méthode pour exporter le reseau sous CSV
+    void exporterCSV(const std::string& filename) const;
 
     // Getter pour accéder aux attributs privés
     const std::vector<std::vector<std::unique_ptr<Case>>>& getCases() const { return cases; }

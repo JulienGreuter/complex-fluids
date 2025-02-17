@@ -90,6 +90,7 @@ void FluideComplexe::initialisation_domaine(double T, const std::string& domaine
     }
     // visualisation du reseau 
     reseau.afficher_details();
+    reseau.exporterCSV(domaine);
     for (auto& ensemble : vecteur_intermediaire) {
         ensemble.initialiserVitesses(T);
     }

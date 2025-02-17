@@ -1,0 +1,35 @@
+# Description :
+
+#la boite de simulation est separé en 3 tranches adjacentes D31,D32,D33.
+#On a 5 types de particules dans la boite :
+#    type A : E_0 = 1.0, d = 1  , masse = 10,  taille = 0.0, charge = 0.0
+#    type B : E_0 = 1.2, d = 0.4, masse = 30,  taille = 0.0, charge = 0.0
+#    type C : E_0 = 0.1, d = 8  , masse = 100, taille = 3  , charge = 0.0
+#    type D : E_0 = 0.2, d = 7  , masse = 300, taille = 9  , charge = 0.0
+#    type E : E_0 = 0.5, d = 1  , masse = 10,  taille = 0.1, charge = 0.0
+
+#    les particules de type A sont presentent dans toute la boite :
+#        100  dans D31
+#        200  dans D32
+#        100  dans D33
+
+#    les particules de type B, C, D et E sont presentent au centre la boite :
+#        300  dans D32 pour B
+#        30   dans D32 pour C
+#        10   dans D32 pour D
+#        500  dans D32 pour E
+
+#cette situation initiale pourrait correspondre à une interface liquide/vapeur,
+#où le liquide serait composé des particules A, B, C, D, E et la vapeurs des particules A uniquement.
+
+
+# Format :
+
+#N      E_0     d     masse   taille charge id_ini
+100     1.0     1      10     0.0     0.0     D31
+300     1.2     0.4    30     0.0     0.0     D32
+200     1.0     1      10     0.0     0.0     D32
+30      0.1     8      100    3       0.0     D32
+10      0.2     7      300    9       0.0     D32
+500     0.5     1      10     0.1     0.0     D32
+100     1.0     1      10     0.0     0.0     D33

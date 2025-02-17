@@ -3,6 +3,7 @@
 #include <algorithm> // Pour std::find
 #include <map>  // Pour stocker les statistiques par ordre
 
+
 // Constructeur
 Reseau::Reseau(double xmin, double xmax, double zmin, double zmax, double taille_case)
     : xmin(xmin), xmax(xmax), zmin(zmin), zmax(zmax), taille_case(taille_case) {
@@ -132,6 +133,7 @@ void Reseau::afficher_details() const {
             occupees++;  // Case occupée
             if (!c.estParent()) {
                 occupees_non_parents++;  // Case occupée non parente
+                c.afficher();
             }
         }
 
@@ -164,4 +166,45 @@ void Reseau::afficher_details() const {
                   << " | Occupées: " << occupees 
                   << " | Occupées non parentes: " << occupees_non_parents << ")\n";
     }
+}
+
+void Reseau::exporterCSV(const std::string& filename) const {
+    std::string file = filename + ".csv";
+    std::ofstream fichier(file);
+    if (!fichier) {
+        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << file << std::endl;
+        return;
+    }
+    
+    // Écriture de l'en-tête du fichier CSV
+    fichier << "x,z,taille,ordre,est_libre,est_parent" << std::endl;
+    
+    // Fonction récursive pour exporter une case et ses enfants
+    std::function<void(const Case*)> exporterCase = [&](const Case* case_ptr) {
+        if (!case_ptr) return;
+        
+        fichier << case_ptr->getX() << ","
+                << case_ptr->getZ() << ","
+                << case_ptr->getTaille() << ","
+                << case_ptr->getOrdreSubdivision() << ","
+                << (case_ptr->estLibre() ? "true" : "false") << ","
+                << (case_ptr->estParent() ? "true" : "false")
+                << std::endl;
+        
+        for (const auto& enfant : case_ptr->getEnfants()) {
+            exporterCase(enfant.get());
+        }
+    };
+    
+    // Parcours de la matrice de cases pour écrire les données dans le fichier
+    for (const auto& ligne : cases) {
+        for (const auto& case_ptr : ligne) {
+            if (case_ptr) { // Vérifier que la case existe
+                exporterCase(case_ptr.get());
+            }
+        }
+    }
+    
+    fichier.close();
+    std::cout << "Exportation du réseau vers " << file << " réussie." << std::endl;
 }
