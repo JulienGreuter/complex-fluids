@@ -62,6 +62,9 @@ public:
 
     // Méthode pour faire évoluer le système vers l'état suivant
     void evoluer(double T, double P);
+
+    // Méthode pour exporter les positions des particules sous CSV
+    void exporterCSV() const;
 };
 
 #endif // FLUIDECOMPLEXE_H

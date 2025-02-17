@@ -44,6 +44,7 @@ FluideComplexe::FluideComplexe(double L_x, double L_z, double delta_t, double ka
     };
 }
 
+// Méthode d'initialisation des positions et vitesses d'un domaine du fluide complexe
 void FluideComplexe::initialisation_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire) {
     std::cout << "--------------------------------------------------\n";
     std::cout << "Appel de initialisation_domaine()\n";
@@ -89,8 +90,8 @@ void FluideComplexe::initialisation_domaine(double T, const std::string& domaine
         }
     }
     // visualisation du reseau 
-    reseau.afficher_details();
-    reseau.exporterCSV(domaine);
+    reseau.afficher_details(); // decommenter c.afficher() dans reseau.cpp si besoin;
+    //reseau.exporterCSV(domaine);
     for (auto& ensemble : vecteur_intermediaire) {
         ensemble.initialiserVitesses(T);
     }
@@ -118,6 +119,7 @@ void FluideComplexe::traiter_domaine(double T, const std::string& domaine, std::
     std::cout << "--------------------------------------------------\n";
 }
 
+// Méthode d'initialisation des positions et vitesses
 void FluideComplexe::initialisation(double T) { 
     std::cout << "Initialisation...\n";
     std::string ligne;
@@ -153,6 +155,7 @@ void FluideComplexe::initialisation(double T) {
     // Traiter le dernier domaine après la lecture du fichier
     traiter_domaine(T, dernier_domaine, vecteur_intermediaire);
     std::cout << "Fin de L'initialisation\n";
+    exporterCSV();
 }
 
 // Méthode pour calculer les forces d'interactions entre les particules
@@ -243,4 +246,33 @@ void FluideComplexe::calculer_forces() {
 // Méthode pour calculer le tenseur de pression sur une tranche donnée
 
 // Méthode pour faire évoluer le système vers l'état suivant
-    
+
+// Méthode pour exporter les positions des particules sous CSV
+void FluideComplexe::exporterCSV() const {
+    std::cout << "Exportation des positions des particules...\n";
+    std::string file = "positions.csv";
+    std::ofstream fichier(file);
+    if (!fichier) {
+        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << file << std::endl;
+        return;
+    }
+    fichier << "x,z,taille\n";
+    for (const auto& ensemble : particules) {
+        if (ensemble.positions.empty()) continue; // Ignorer les ensembles vides
+        
+        // Écriture de l'en-tête
+        fichier << "# Ensemble de particules : N = " << ensemble.N
+                << " | d = " << ensemble.d
+                << " | E_0 = " << ensemble.E_0
+                << " | taille = " << ensemble.taille << "\n";
+        
+        double taille_particule = ensemble.taille;
+        for (const auto& position : ensemble.positions) {
+            fichier << position.x << "," << position.z << "," << taille_particule << "\n";
+        }
+        fichier << "\n\n";
+    }
+
+    std::cout << "Exportation vers " << file << " réussie." << std::endl;
+}
+ 

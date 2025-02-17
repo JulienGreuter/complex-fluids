@@ -12,7 +12,7 @@ parser.add_argument("--output", help="Nom du fichier image à sauvegarder (optio
 args = parser.parse_args()
 
 # Charger le fichier CSV
-df = pd.read_csv(args.input)
+df = pd.read_csv(args.input, comment='#', header=0, skip_blank_lines=True)
 if "ordre" in df:
     # Définir la colormap et normaliser les couleurs en fonction de l'ordre de subdivision
     ordre_min, ordre_max = df["ordre"].min(), df["ordre"].max()

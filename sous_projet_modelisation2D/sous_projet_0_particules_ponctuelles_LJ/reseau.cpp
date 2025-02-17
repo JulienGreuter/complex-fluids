@@ -133,7 +133,7 @@ void Reseau::afficher_details() const {
             occupees++;  // Case occupée
             if (!c.estParent()) {
                 occupees_non_parents++;  // Case occupée non parente
-                c.afficher();
+                //c.afficher();
             }
         }
 
