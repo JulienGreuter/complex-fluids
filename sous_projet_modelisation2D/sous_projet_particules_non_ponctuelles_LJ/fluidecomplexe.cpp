@@ -155,7 +155,8 @@ void FluideComplexe::initialisation(double T) {
     // Traiter le dernier domaine après la lecture du fichier
     traiter_domaine(T, dernier_domaine, vecteur_intermediaire);
     std::cout << "Fin de L'initialisation\n";
-    exporterCSV();
+    exporterPositionsCSV();
+    exporterVitessesCSV();
 }
 
 // Méthode pour calculer les forces d'interactions entre les particules
@@ -248,7 +249,7 @@ void FluideComplexe::calculer_forces() {
 // Méthode pour faire évoluer le système vers l'état suivant
 
 // Méthode pour exporter les positions des particules sous CSV
-void FluideComplexe::exporterCSV() const {
+void FluideComplexe::exporterPositionsCSV() const {
     std::cout << "Exportation des positions des particules...\n";
     std::string file = "positions.csv";
     std::ofstream fichier(file);
@@ -264,7 +265,8 @@ void FluideComplexe::exporterCSV() const {
         fichier << "# Ensemble de particules : N = " << ensemble.N
                 << " | d = " << ensemble.d
                 << " | E_0 = " << ensemble.E_0
-                << " | taille = " << ensemble.taille << "\n";
+                << " | taille = " << ensemble.taille 
+                << " | masse = " << ensemble.masse << "\n";
         
         double taille_particule = ensemble.taille;
         for (const auto& position : ensemble.positions) {
@@ -276,3 +278,31 @@ void FluideComplexe::exporterCSV() const {
     std::cout << "Exportation vers " << file << " réussie." << std::endl;
 }
  
+// Méthode pour exporter les vitesses des particules sous CSV
+void FluideComplexe::exporterVitessesCSV() const {
+    std::cout << "Exportation des vitesses des particules...\n";
+    std::string file = "vitesses.csv";
+    std::ofstream fichier(file);
+    if (!fichier) {
+        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << file << std::endl;
+        return;
+    }
+    fichier << "vx,vz\n";
+    for (const auto& ensemble : particules) {
+        if (ensemble.vitesses.empty()) continue; // Ignorer les ensembles vides
+        
+        // Écriture de l'en-tête
+        fichier << "# Ensemble de particules : N = " << ensemble.N
+                << " | d = " << ensemble.d
+                << " | E_0 = " << ensemble.E_0
+                << " | taille = " << ensemble.taille 
+                << " | masse = " << ensemble.masse << "\n";
+        
+        for (const auto& vitesse : ensemble.vitesses) {
+            fichier << vitesse.x << "," << vitesse.z << "\n";
+        }
+        fichier << "\n\n";
+    }
+
+    std::cout << "Exportation vers " << file << " réussie." << std::endl;
+}

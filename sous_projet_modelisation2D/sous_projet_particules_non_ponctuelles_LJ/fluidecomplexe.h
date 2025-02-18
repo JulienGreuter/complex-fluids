@@ -64,7 +64,10 @@ public:
     void evoluer(double T, double P);
 
     // Méthode pour exporter les positions des particules sous CSV
-    void exporterCSV() const;
+    void exporterPositionsCSV() const;
+
+    // Méthode pour exporter les vitesses des particules sous CSV
+    void exporterVitessesCSV() const;
 };
 
 #endif // FLUIDECOMPLEXE_H
