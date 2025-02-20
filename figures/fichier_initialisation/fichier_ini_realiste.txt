@@ -1,0 +1,17 @@
+# Description :
+
+#la boite de simulation est constitué du domaine D1.
+#    type A : E_0 = 1e-21, d = 7e-12, masse = 1e-10 ,  taille = 0.0, charge = 0.0
+
+#    les particules de type A sont presentent dans toute la boite :
+#        1000 dans D1
+
+#cette situation initiale pourrait correspondre à un liquide pur.
+
+
+
+# Format : 
+
+#N      E_0     d     masse   taille charge id_ini
+1000   1e-21   7e-12   1e-10   7e-12     0.0     D1
+

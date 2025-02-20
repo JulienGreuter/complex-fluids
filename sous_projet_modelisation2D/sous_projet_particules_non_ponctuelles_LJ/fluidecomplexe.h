@@ -40,10 +40,10 @@ public:
     void calculer_forces();
 
     // Méthode pour mettre à jour les positions des particules
-    void mettre_a_jour_positions();
+    void mettre_a_jour_positions(double P);
 
     // Méthode pour mettre à jour les vitesses des particules
-    void mettre_a_jour_vitesses();
+    void mettre_a_jour_vitesses(double T, const std::vector<Vec2>& forces_interactions_precedentes);
 
     // Méthode pour appliquer les conditions périodiques
     void appliquer_conditions_periodiques();
@@ -64,10 +64,10 @@ public:
     void evoluer(double T, double P);
 
     // Méthode pour exporter les positions des particules sous CSV
-    void exporterPositionsCSV() const;
+    void exporterPositionsCSV(const std::string& fileCSV) const;
 
     // Méthode pour exporter les vitesses des particules sous CSV
-    void exporterVitessesCSV() const;
+    void exporterVitessesCSV(const std::string& fileCSV) const;
 };
 
 #endif // FLUIDECOMPLEXE_H

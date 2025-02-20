@@ -9,6 +9,7 @@ k_B = 1.38e-23
 # Configuration d'argparse
 parser = argparse.ArgumentParser(description="Visualisation de la distribution des vitesses des particules")
 parser.add_argument("--input", required=True, help="Nom du fichier contenant les vitesses")
+parser.add_argument("--T", required=True, help="Temperature du fluide complexe", type = float)
 parser.add_argument("--output", help="Nom du fichier image à sauvegarder (optionnel)", default=None)
 args = parser.parse_args()
 
@@ -74,12 +75,12 @@ for i, (data, params) in enumerate(zip(ensembles, parametres)):
 
     # Histogramme des vitesses |v|
     ax2 = axes[i][1]
-    bins = np.linspace(0, vitesses.max(), 30)
+    bins = np.linspace(0, vitesses.max(), 300)
     ax2.hist(vitesses, bins=bins, density=True, alpha=0.7, color="blue", label="Données")
 
     # Ajout de la courbe théorique de Maxwell-Boltzmann en 2D
     m = params["masse"]
-    T = 300  # Température fixée à 300K
+    T =  args.T  # Température en K
 
     v_theorique = np.linspace(0, vitesses.max(), 100)
     P_v = (m / (k_B * T)) * v_theorique * np.exp(-m * v_theorique**2 / (2 * k_B * T))

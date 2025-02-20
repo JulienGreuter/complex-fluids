@@ -155,12 +155,16 @@ void FluideComplexe::initialisation(double T) {
     // Traiter le dernier domaine après la lecture du fichier
     traiter_domaine(T, dernier_domaine, vecteur_intermediaire);
     std::cout << "Fin de L'initialisation\n";
-    exporterPositionsCSV();
-    exporterVitessesCSV();
+    exporterPositionsCSV("positions_ini.csv");
+    exporterVitessesCSV("vitesses_ini.csv");
+    // Initialisation de forces_interactions
+    calculer_forces();
 }
 
 // Méthode pour calculer les forces d'interactions entre les particules
 void FluideComplexe::calculer_forces() {
+    std::cout << "--------------------------------------------------\n";
+    std::cout << "Appel de calculer_forces()\n";
     // Nettoyer le vecteur des forces d'interaction avant de recalculer
     forces_interactions.clear();
 
@@ -182,8 +186,10 @@ void FluideComplexe::calculer_forces() {
 
     // Boucle sur chaque ensemble de particules i
     for (auto& ensemble_i : particules) {
+        std::cout << "Calcul des forces d'interaction d'un ensemble de particules...\n";
         // Boucle sur chaque position i dans l'ensemble de particules i
         for (size_t i = 0; i < ensemble_i.positions.size(); ++i) {
+            int k = 0;
             Vec2 position_i = ensemble_i.positions[i];
 
             // Initialiser la force totale subie par la particule i
@@ -196,7 +202,7 @@ void FluideComplexe::calculer_forces() {
                     Vec2 position_j = ensemble_j.positions[j];
 
                     // Évite le calcul de la force avec soi-même
-                    if (position_i.x == position_j.x && position_i.z == position_j.z) {
+                    if ( (position_i-position_j).norme() < 1e-15 ) {
                         continue;
                     }
 
@@ -215,6 +221,7 @@ void FluideComplexe::calculer_forces() {
 
                         // Vérifier si la distance est inférieure au rayon de coupure r_c
                         if (r_ij.norme() < r_c) {
+                            k += 1;
                             f_ij = force_LJ(ensemble_i.E_0, ensemble_j.E_0, ensemble_i.d, ensemble_j.d, r_ij);
                             break;  // Par construction (r_c correctement choisi), une particule i n'interagit qu'avec une des 9 particules j 
                         }
@@ -224,37 +231,199 @@ void FluideComplexe::calculer_forces() {
                     force_totale += f_ij;
                 }
             }
-
+            //std::cout << k << " particules intergissant sur la particule i : fi = "; force_totale.afficher();
             // Ajouter la force totale pour cette particule au vecteur des forces d'interactions
             forces_interactions.push_back(force_totale);
         }
     }
+    std::cout << "Fin de calculer_forces()\n";
+    std::cout << "--------------------------------------------------\n";
 }
 
-
 // Méthode pour mettre à jour les positions des particules
+void FluideComplexe::mettre_a_jour_positions(double P) {
+    std::cout << "--------------------------------------------------\n";
+    std::cout << "Mise à jour des positions des particules...\n";
+    std::cout << "Calcul des positions des particules à l'instant suivant...\n";
+
+    size_t index = 0; // Indice pour parcourir forces_interactions
+
+    // Parcours de chaque ensemble de particules
+    for (auto& ensemble : particules) {
+        for (size_t i = 0; i < ensemble.positions.size(); ++i) {
+            // Calcul des nouvelles positions
+            ensemble.positions[i] += ensemble.vitesses[i] * delta_t  
+                                  + forces_interactions[index] * (std::pow(delta_t, 2) / (2.0 * ensemble.masse));
+
+            // Incrémentation de l'index pour correspondre à la bonne force
+            index++;
+        }
+    }
+    // Application des conditions periodiques
+    appliquer_conditions_periodiques();
+    // Aplication du barostat pour tenir compte de la pression fixée P, modifie les positions, L_x et L_z
+    //appliquer_barostat(P);
+    double Pxx = calculer_tenseur_pression(0,0,L_z,0);
+    double Pzz = calculer_tenseur_pression(1,1,L_z,0);
+    std::cout << "Pxx = " << Pxx << " Pa\n";
+    std::cout << "Pzz = " << Pzz << " Pa\n";
+
+    std::cout << "Fin de mise à jour des positions.\n";
+    std::cout << "--------------------------------------------------\n";
+}
 
 // Méthode pour mettre à jour les vitesses des particules
-    
+void FluideComplexe::mettre_a_jour_vitesses(double T, const std::vector<Vec2>& forces_interactions_precedentes) {
+    std::cout << "--------------------------------------------------\n";
+    std::cout << "Mise à jour des vitesses des particules...\n";
+    std::cout << "Calcul des vitesses des particules à l'instant suivant...\n";
+
+    size_t index = 0; // Indice pour parcourir forces_interactions
+
+    // Parcours de chaque ensemble de particules
+    for (auto& ensemble : particules) {
+        for (size_t i = 0; i < ensemble.vitesses.size(); ++i) {
+            // Calcul des nouvelles vitesses
+            ensemble.vitesses[i] +=  (forces_interactions_precedentes[index] + forces_interactions[index])* (delta_t / (2.0 * ensemble.masse));
+
+            // Incrémentation de l'index pour correspondre à la bonne force
+            index++;
+        }
+    }
+    // Aplication du thermostat pour tenir compte de la temperature fixée T, modifie les vitesses
+    appliquer_thermostat(T);
+
+    std::cout << "Fin de mise à jour des vitesses.\n";
+    std::cout << "--------------------------------------------------\n";
+}
 // Méthode pour appliquer les conditions périodiques
+void FluideComplexe::appliquer_conditions_periodiques() {
+    std::cout << "Application des conditions périodiques...\n";
+    int k = 0;
+    // Parcours de chaque ensemble de particules
+    for (auto& ensemble : particules) {
+        for (auto& position : ensemble.positions) {
+            bool modifie = false;
+            // Correction de x si nécessaire
+            if (position.x > L_x / 2.0 || position.x < -L_x / 2.0) {
+                position.x = std::fmod(position.x + L_x / 2.0, L_x) - L_x / 2.0;
+                modifie = true;
+            }
+            // Correction de z si nécessaire
+            if (position.z > L_z / 2.0 || position.z < -L_z / 2.0) {
+                position.z = std::fmod(position.z + L_z / 2.0, L_z) - L_z / 2.0;
+                modifie = true;
+            }
     
+            // Incrémente k uniquement si une modification a eu lieu
+            if (modifie) {
+                k += 1;
+            }
+        }
+    }
+    std::cout << "Modification de : " << k << " particules\n";
+}
+
 // Méthode pour appliquer le thermostat en fonction de la température T
-    
+void FluideComplexe::appliquer_thermostat(double T) {
+    std::cout << "Calcul de T...\n";
+    double T_mes = calculer_temperature();
+    std::cout << "T = " << T_mes << " K\n";
+    double lambda = std::sqrt( 1 + delta_t * (T/T_mes -1) / tau_T );
+    // Parcours de chaque ensemble de particules
+    for (auto& ensemble : particules) {
+        for (auto& vitesse : ensemble.vitesses) {
+            vitesse = vitesse * lambda;
+        }
+    }
+    std::cout << "Thermostat appliqué\n";
+}
+
 // Méthode pour appliquer le barostat en fonction de la pression P
+void FluideComplexe::appliquer_barostat(double P) {
+    std::cout << "Calcul de P...\n";
+    double P_mes = (calculer_tenseur_pression(0,0,L_z,0) + calculer_tenseur_pression(1,1,L_z,0)) / 2.0;
+    std::cout << "P = " << P_mes << " Pa\n";
+    double lambda = 1 - kappa * delta_t * (P - P_mes) / tau_P;
+    L_x = std::pow(lambda, 1/3.0) * L_x;
+    L_z = std::pow(lambda, 1/3.0) * L_z;
+
+    // Parcours de chaque ensemble de particules
+    for (auto& ensemble : particules) {
+        for (auto& position : ensemble.positions) {
+            position = position * std::pow(lambda, 1/3.0);
+        }
+    }
+    std::cout << "Barostat appliqué.\n";
+}
 
 // Méthode pour calculer la température du fluide  
+double FluideComplexe::calculer_temperature() const {
+    double T_mes = 0;
+    int N_tot = 0; // nombre totale de particules
+    // Parcours de chaque ensemble de particules
+    for (auto& ensemble : particules) {
+        N_tot += ensemble.N;
+        for (auto& vitesse : ensemble.vitesses) {
+            T_mes += ensemble.masse * std::pow(vitesse.norme(), 2); // 2 -> 3 pour essayer de tenir compte du passage 3D -> 2D
+        }
+    }
+    T_mes /= (2 * N_tot * K_B);
+    return T_mes;
+}
 
 // Méthode pour calculer le tenseur de pression sur une tranche donnée
+double FluideComplexe::calculer_tenseur_pression(int alpha, int beta, double Delta_z, double z_k) const {
+    // Delta_z : largeur de la tranche | z_k milieu de la tranche
+    // alpha = 0 -> x | alpha = 1 -> z | beta = 0 -> x | beta = 1 -> z
+    double P_mes = 0;
+    int index =0;
+    // A IMPLEMENTER : version provisoire Pxx et Pzz sur totalité du fluide + formule incorrecte
+    if (alpha ==0 && beta ==0) {
+        // Parcours de chaque ensemble de particules
+        for (auto& ensemble : particules) {
+            for (size_t i = 0; i < ensemble.vitesses.size(); ++i) {
+              P_mes += ( ensemble.masse * ensemble.vitesses[i].x * ensemble.vitesses[i].x
+                    + forces_interactions[index].x * ensemble.positions[i].x ) / (L_x * L_z * ensemble.d); // on divise par d pour essayer de tenir compte du passage 3D -> 2D
+
+                // Incrémentation de l'index pour correspondre à la bonne force
+                index++;
+            }
+        }
+    }
+    if (alpha ==1 && beta ==1) {
+        // Parcours de chaque ensemble de particules
+        for (auto& ensemble : particules) {
+            for (size_t i = 0; i < ensemble.vitesses.size(); ++i) {
+              P_mes += ( ensemble.masse * ensemble.vitesses[i].z * ensemble.vitesses[i].z 
+                    + forces_interactions[index].z * ensemble.positions[i].z ) / (L_x * L_z * ensemble.d); // on divise par d pour essayer de tenir compte du passage 3D -> 2D
+
+                // Incrémentation de l'index pour correspondre à la bonne force
+                index++;
+            }
+        }
+    }
+    return P_mes;
+}
 
 // Méthode pour faire évoluer le système vers l'état suivant
+void FluideComplexe::evoluer(double T, double P) {
+    std::cout << "--------------------------------------------------\n";
+    std::cout << "Evolution du fluide complexe...\n";
+    std::vector<Vec2> forces_interactions_precedentes = forces_interactions;  // Forces d'interactions des particules à t
+    mettre_a_jour_positions(P);
+    calculer_forces();
+    mettre_a_jour_vitesses(T, forces_interactions_precedentes);
+    std::cout << "Fin de l'evolution du fluide complexe.\n";
+    std::cout << "--------------------------------------------------\n";
+}
 
 // Méthode pour exporter les positions des particules sous CSV
-void FluideComplexe::exporterPositionsCSV() const {
+void FluideComplexe::exporterPositionsCSV(const std::string& fileCSV) const {
     std::cout << "Exportation des positions des particules...\n";
-    std::string file = "positions.csv";
-    std::ofstream fichier(file);
+    std::ofstream fichier(fileCSV);
     if (!fichier) {
-        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << file << std::endl;
+        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << fileCSV << std::endl;
         return;
     }
     fichier << "x,z,taille\n";
@@ -275,16 +444,15 @@ void FluideComplexe::exporterPositionsCSV() const {
         fichier << "\n\n";
     }
 
-    std::cout << "Exportation vers " << file << " réussie." << std::endl;
+    std::cout << "Exportation vers " << fileCSV << " réussie." << std::endl;
 }
  
 // Méthode pour exporter les vitesses des particules sous CSV
-void FluideComplexe::exporterVitessesCSV() const {
+void FluideComplexe::exporterVitessesCSV(const std::string& fileCSV) const {
     std::cout << "Exportation des vitesses des particules...\n";
-    std::string file = "vitesses.csv";
-    std::ofstream fichier(file);
+    std::ofstream fichier(fileCSV);
     if (!fichier) {
-        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << file << std::endl;
+        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << fileCSV << std::endl;
         return;
     }
     fichier << "vx,vz\n";
@@ -304,5 +472,5 @@ void FluideComplexe::exporterVitessesCSV() const {
         fichier << "\n\n";
     }
 
-    std::cout << "Exportation vers " << file << " réussie." << std::endl;
+    std::cout << "Exportation vers " << fileCSV << " réussie." << std::endl;
 }
