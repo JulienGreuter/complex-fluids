@@ -1,0 +1,16 @@
+# Ignorer les exécutables générés
+*.exe
+*.out
+*.log
+
+# Ignorer les résultats des tests
+figures/runs/
+
+# Ignorer les fichiers de données générés par les tests (CSV, TXT, etc.)
+*.csv
+*.txt
+
+# Ignorer les fichiers temporaires
+*.swp
+*.bak
+*.tmp
