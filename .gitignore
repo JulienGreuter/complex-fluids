@@ -1,5 +1,6 @@
 # Ignorer les exécutables générés
 *.exe
+!tests/*.exe # Permet le partage d'executable pour faire des tests en commun
 *.out
 *.log
 
@@ -8,7 +9,9 @@ figures/runs/
 
 # Ignorer les fichiers de données générés par les tests (CSV, TXT, etc.)
 *.csv
+!figures/raw_data/*.csv
 *.txt
+!figures/fichier_initialisation/*.txt
 
 # Ignorer les fichiers temporaires
 *.swp
