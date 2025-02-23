@@ -4,6 +4,7 @@
 #include <cmath>
 #include <sstream>
 #include "fluidecomplexe.h"
+#include <random>
 
 
 
@@ -27,7 +28,34 @@ Vec2 force_LJ(double E_0i, double E_0j, double di, double dj, Vec2 r_ij) {
     return r_ij * factor;                         // Retourne la force de Lennard-Jones sous forme de Vec2
 }
 
+// Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann
+Vec2 maxwellBoltzmannSample(double T, double masse) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    double sigma = std::
+    sqrt(K_B * T / masse); // Écart-type basé sur la température
+    std::normal_distribution<double> dist(0.0, sigma);
+    return Vec2(dist(gen),dist(gen));
+}
 
+// Appliquer la relaxation vers Maxwell-Boltzmann
+void relaxationVersMaxwell(Vec2& vitesse, double T, double masse, double alpha) {
+    vitesse = vitesse * (1-alpha) + maxwellBoltzmannSample(T, masse) * alpha;  
+}
+
+// Fonction pour appliquer les conditions périodiques uniquement si nécessaire
+double periodic_boundary_if_needed(double coord, double L, bool& modifie) {
+    if (coord > L / 2.0 || coord < -L / 2.0) {  // Vérifie si la correction est nécessaire
+        coord = std::fmod(coord, L);
+        if (coord > L / 2.0) {
+            coord -= L;
+        } else if (coord < -L / 2.0) {
+            coord += L;
+        }
+        modifie = true;
+    }
+    return coord;
+}
 
 // Constructeur
 
@@ -263,6 +291,7 @@ void FluideComplexe::mettre_a_jour_positions(double P) {
     appliquer_conditions_periodiques();
     // Aplication du barostat pour tenir compte de la pression fixée P, modifie les positions, L_x et L_z
     //appliquer_barostat(P);
+        
     double Pxx = calculer_tenseur_pression(0,0,L_z,0);
     double Pzz = calculer_tenseur_pression(1,1,L_z,0);
     std::cout << "Pxx = " << Pxx << " Pa\n";
@@ -300,25 +329,13 @@ void FluideComplexe::mettre_a_jour_vitesses(double T, const std::vector<Vec2>& f
 void FluideComplexe::appliquer_conditions_periodiques() {
     std::cout << "Application des conditions périodiques...\n";
     int k = 0;
+    bool modifie = false;
     // Parcours de chaque ensemble de particules
     for (auto& ensemble : particules) {
         for (auto& position : ensemble.positions) {
-            bool modifie = false;
-            // Correction de x si nécessaire
-            if (position.x > L_x / 2.0 || position.x < -L_x / 2.0) {
-                position.x = std::fmod(position.x + L_x / 2.0, L_x) - L_x / 2.0;
-                modifie = true;
-            }
-            // Correction de z si nécessaire
-            if (position.z > L_z / 2.0 || position.z < -L_z / 2.0) {
-                position.z = std::fmod(position.z + L_z / 2.0, L_z) - L_z / 2.0;
-                modifie = true;
-            }
-    
-            // Incrémente k uniquement si une modification a eu lieu
-            if (modifie) {
-                k += 1;
-            }
+            position.x = periodic_boundary_if_needed(position.x, L_x, modifie);
+            position.z = periodic_boundary_if_needed(position.z, L_z, modifie);
+            if (modifie){k+=1;}
         }
     }
     std::cout << "Modification de : " << k << " particules\n";
@@ -329,14 +346,19 @@ void FluideComplexe::appliquer_thermostat(double T) {
     std::cout << "Calcul de T...\n";
     double T_mes = calculer_temperature();
     std::cout << "T = " << T_mes << " K\n";
+    double alpha = 0.5;
     double lambda = std::sqrt( 1 + delta_t * (T/T_mes -1) / tau_T );
     // Parcours de chaque ensemble de particules
     for (auto& ensemble : particules) {
         for (auto& vitesse : ensemble.vitesses) {
-            vitesse = vitesse * lambda;
+            //vitesse = vitesse * lambda;
+            relaxationVersMaxwell(vitesse, 2*T, ensemble.masse, alpha);
         }
     }
+    T_mes = calculer_temperature();
+    std::cout << "La temperature est maintenant de : " << T_mes << std::endl;
     std::cout << "Thermostat appliqué\n";
+    
 }
 
 // Méthode pour appliquer le barostat en fonction de la pression P
@@ -347,6 +369,7 @@ void FluideComplexe::appliquer_barostat(double P) {
     double lambda = 1 - kappa * delta_t * (P - P_mes) / tau_P;
     L_x = std::pow(lambda, 1/3.0) * L_x;
     L_z = std::pow(lambda, 1/3.0) * L_z;
+    r_c = std::pow(lambda, 1/3.0) * r_c;
 
     // Parcours de chaque ensemble de particules
     for (auto& ensemble : particules) {
@@ -365,10 +388,11 @@ double FluideComplexe::calculer_temperature() const {
     for (auto& ensemble : particules) {
         N_tot += ensemble.N;
         for (auto& vitesse : ensemble.vitesses) {
-            T_mes += ensemble.masse * std::pow(vitesse.norme(), 2); // 2 -> 3 pour essayer de tenir compte du passage 3D -> 2D
+            T_mes += ensemble.masse * std::pow(vitesse.norme(), 2); 
         }
     }
-    T_mes /= (2 * N_tot * K_B);
+    std::cout << "Smv2 " << T_mes << std::endl;
+    T_mes /= (2 * N_tot * K_B); // 3 -> 2 pour essayer de tenir compte du passage 3D -> 2D
     return T_mes;
 }
 
@@ -383,8 +407,8 @@ double FluideComplexe::calculer_tenseur_pression(int alpha, int beta, double Del
         // Parcours de chaque ensemble de particules
         for (auto& ensemble : particules) {
             for (size_t i = 0; i < ensemble.vitesses.size(); ++i) {
-              P_mes += ( ensemble.masse * ensemble.vitesses[i].x * ensemble.vitesses[i].x
-                    + forces_interactions[index].x * ensemble.positions[i].x ) / (L_x * L_z * ensemble.d); // on divise par d pour essayer de tenir compte du passage 3D -> 2D
+              P_mes += ( ensemble.masse * std::pow(ensemble.vitesses[i].x, 2));
+                    //+ forces_interactions[index].x * ensemble.positions[i].x ) / (L_x * L_z * ensemble.d); // on divise par d pour essayer de tenir compte du passage 3D -> 2D
 
                 // Incrémentation de l'index pour correspondre à la bonne force
                 index++;
@@ -395,8 +419,8 @@ double FluideComplexe::calculer_tenseur_pression(int alpha, int beta, double Del
         // Parcours de chaque ensemble de particules
         for (auto& ensemble : particules) {
             for (size_t i = 0; i < ensemble.vitesses.size(); ++i) {
-              P_mes += ( ensemble.masse * ensemble.vitesses[i].z * ensemble.vitesses[i].z 
-                    + forces_interactions[index].z * ensemble.positions[i].z ) / (L_x * L_z * ensemble.d); // on divise par d pour essayer de tenir compte du passage 3D -> 2D
+              P_mes += ( ensemble.masse * std::pow(ensemble.vitesses[i].z, 2));
+                    //+ forces_interactions[index].z * ensemble.positions[i].z ) / (L_x * L_z * ensemble.d); // on divise par d pour essayer de tenir compte du passage 3D -> 2D
 
                 // Incrémentation de l'index pour correspondre à la bonne force
                 index++;

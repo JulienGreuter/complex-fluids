@@ -8,13 +8,13 @@ double L_x = 50e-10;                  // Longueur de la boîte en x (en m)
 double L_z = 100e-10;                 // Longueur de la boîte en z (en m)
 double delta_t = 1e-8;               // Pas de temps pour la discrétisation (en s)
 double kappa = 1.;                    // Coefficient de compressibilité isotherme
-double tau_P = 1e-6;                  // Temps de réponse du barostat (en s)
-double tau_T = 1e-6;                  // Temps de réponse du thermostat (en s)
-double r_c = 4.0e-10;                 // Rayon de coupure des interactions (en m)
+double tau_P = 1e-8;                  // Temps de réponse du barostat (en s)
+double tau_T = 1e-8;                  // Temps de réponse du thermostat (en s)
+double r_c = 10e-10;                 // Rayon de coupure des interactions (en m)
 
 int main(int argc, char* argv[]) {
-    if (argc != 3) {  // Vérifier qu'on a bien 2 arguments (fichier + température)
-        std::cerr << "Usage: " << argv[0] << " <fichier_initialisation> <temperature>" << std::endl;
+    if (argc != 4) {  // Vérifier qu'on a bien 3 arguments (fichier + température + nombre d'iterations)
+        std::cerr << "Usage: " << argv[0] << " <fichier_initialisation> <temperature> <nombre_iterations>" << std::endl;
         return 1;
     }
 
@@ -23,6 +23,9 @@ int main(int argc, char* argv[]) {
 
     // Récupérer la température et la convertir en double
     double T = std::stod(argv[2]);
+
+    // Récupérer le nombre d'iterations et le convertir en int
+    double N_it = std::stod(argv[3]);
 
     // Vérifier que la température est valide
     if (T <= 0) {
@@ -41,23 +44,19 @@ int main(int argc, char* argv[]) {
     FluideComplexe fluide = FluideComplexe(L_x, L_z, delta_t, kappa, tau_P, tau_T, r_c, fichier_ini);
 
     // Initialisation et évolution du fluide
-    double P = 1e6;  // Pression fixée
+    double P = 1e7;  // Pression fixée
     std::cout << "T = " << T << " K et P = " << P << " Pa\n";
     std::string positionsCSV = "positions_";
     std::string vitessesCSV = "vitesses_";
     fluide.initialisation(T);
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < N_it; i++) {
         fluide.evoluer(T, P);
         fluide.exporterPositionsCSV(positionsCSV + std::to_string(i) + ".csv");
         fluide.exporterVitessesCSV(vitessesCSV + std::to_string(i) + ".csv");
 
     }
 
-    // Export des résultats
-    //fluide.exporterPositionsCSV("positions_suivantes.csv");
-    //fluide.exporterVitessesCSV("vitesses_suivantes.csv");
-
-    std::cout << "Simulation terminée avec T = " << T << " K et fichier " << fichier_ini << "." << std::endl;
+    std::cout << "Simulation de " << N_it << " pas de temps (" << delta_t << " s) terminée avec T = " << T << " K et fichier " << fichier_ini << "." << std::endl;
 
     return 0;
 }
