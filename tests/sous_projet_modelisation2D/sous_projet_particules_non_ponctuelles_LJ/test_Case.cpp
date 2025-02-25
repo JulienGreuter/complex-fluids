@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include "case.h"
+#include "../../../sous_projet_modelisation2D/sous_projet_particules_non_ponctuelles/case.h"
 
 void testSubdivision() {
     std::cout << "=== Test de subdivision ===\n";

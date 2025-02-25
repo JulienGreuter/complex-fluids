@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
-#include "particules.h"
-#include "vec2.h"  // Assurez-vous que le fichier vec2.h est inclus et correctement défini
+#include "../../../sous_projet_modelisation2D/sous_projet_particules_non_ponctuelles/particules.h"
+#include "../../../sous_projet_modelisation2D/vec2.h"  
 
 int main() {
     std::cout << " Test de l'instanciation de l'objet Particules sans positions et vitesses initialisées\n";

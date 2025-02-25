@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "vec2.h"
+#include "../../../sous_projet_modelisation2D/vec2.h"
 
 int main() {
     // Création de deux vecteurs

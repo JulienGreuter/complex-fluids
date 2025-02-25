@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>  // Pour std::stod
-#include "fluidecomplexe.h"  
+#include "../../../sous_projet_modelisation2D/sous_projet_particules_non_ponctuelles/fluidecomplexe.h"  
 
 double L_x = 150e-10;                  // Longueur de la boîte en x (en m)
 double L_z = 150e-10;                 // Longueur de la boîte en z (en m)

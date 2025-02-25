@@ -2,7 +2,7 @@
 #define PARTICULES_H
 
 #include <vector>
-#include "vec2.h"  // Inclut la structure Vec2 représentant un vecteur 2D (x, z)
+#include "../vec2.h"  // Inclut la structure Vec2 représentant un vecteur 2D (x, z)
 
 class FluideComplexe;
 

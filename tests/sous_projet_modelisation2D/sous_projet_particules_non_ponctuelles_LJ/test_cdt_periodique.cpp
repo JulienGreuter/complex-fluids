@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>  // Pour std::stod
-#include "vec2.h"
+#include "../../../sous_projet_modelisation2D/vec2.h"
 
 // Fonction pour appliquer les conditions périodiques correctement
 double periodic_boundary(double coord, double L) {

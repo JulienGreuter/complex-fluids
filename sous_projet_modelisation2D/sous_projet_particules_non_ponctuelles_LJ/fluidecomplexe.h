@@ -6,7 +6,7 @@
 #include <string>
 #include <fstream>
 #include "particules.h"
-#include "vec2.h"  // Inclut la structure Vec2 pour les vecteurs 2D (x, z)
+#include "../vec2.h"  // Inclut la structure Vec2 pour les vecteurs 2D (x, z)
 #include "reseau.h" // Inclut la classe Reseau et Case pour l'initialisation des positions
 
 Vec2 force_LJ(double E_0i, double E_0j, double di, double dj, Vec2 r_ij);

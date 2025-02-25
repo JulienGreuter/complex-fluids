@@ -1,4 +1,4 @@
-#include "reseau.h"
+#include "../../../sous_projet_modelisation2D/sous_projet_particules_non_ponctuelles/reseau.h"
 #include <functional> // Pour std::function
 #include <fstream>    // Pour std::ofstream
 
