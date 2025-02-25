@@ -6,8 +6,6 @@
 #include "fluidecomplexe.h"
 #include <random>
 
-
-
 // Constante de Boltzmann (en unités SI : J/K)
 const double K_B = 1.380649e-23;
 
@@ -23,7 +21,7 @@ Vec2 force_LJ(double E_0i, double E_0j, double di, double dj, Vec2 r_ij) {
     }
 
     double A = d / distance;                      // Rapport d / distance
-    double factor = 24 * E_0 * (2 * std::pow(A, 13) - std::pow(A, 7)) / (d * distance);
+    double factor = -24 * E_0 * (2 * std::pow(A, 13) - std::pow(A, 7)) / (d * distance); // test avec -24 a la place de 24
 
     return r_ij * factor;                         // Retourne la force de Lennard-Jones sous forme de Vec2
 }
@@ -32,19 +30,19 @@ Vec2 force_LJ(double E_0i, double E_0j, double di, double dj, Vec2 r_ij) {
 Vec2 maxwellBoltzmannSample(double T, double masse) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
-    double sigma = std::
-    sqrt(K_B * T / masse); // Écart-type basé sur la température
+    double sigma = std::sqrt(K_B * T / masse); // Écart-type basé sur la température
     std::normal_distribution<double> dist(0.0, sigma);
     return Vec2(dist(gen),dist(gen));
 }
 
-// Appliquer la relaxation vers Maxwell-Boltzmann
+// Fonction pour appliquer la relaxation vers Maxwell-Boltzmann
 void relaxationVersMaxwell(Vec2& vitesse, double T, double masse, double alpha) {
     vitesse = vitesse * (1-alpha) + maxwellBoltzmannSample(T, masse) * alpha;  
 }
 
 // Fonction pour appliquer les conditions périodiques uniquement si nécessaire
 double periodic_boundary_if_needed(double coord, double L, bool& modifie) {
+    modifie = false;
     if (coord > L / 2.0 || coord < -L / 2.0) {  // Vérifie si la correction est nécessaire
         coord = std::fmod(coord, L);
         if (coord > L / 2.0) {
@@ -52,7 +50,7 @@ double periodic_boundary_if_needed(double coord, double L, bool& modifie) {
         } else if (coord < -L / 2.0) {
             coord += L;
         }
-        modifie = true;
+        modifie = true; //indique si la modification à eu lieu via modifie
     }
     return coord;
 }
@@ -215,6 +213,7 @@ void FluideComplexe::calculer_forces() {
     // Boucle sur chaque ensemble de particules i
     for (auto& ensemble_i : particules) {
         std::cout << "Calcul des forces d'interaction d'un ensemble de particules...\n";
+        int moyenne_k =0; // pour le calcul du nombres d'interactions en moyennes par ensembles
         // Boucle sur chaque position i dans l'ensemble de particules i
         for (size_t i = 0; i < ensemble_i.positions.size(); ++i) {
             int k = 0;
@@ -249,7 +248,7 @@ void FluideComplexe::calculer_forces() {
 
                         // Vérifier si la distance est inférieure au rayon de coupure r_c
                         if (r_ij.norme() < r_c) {
-                            k += 1;
+                            k += 1; // conteur pour determiner le nombre moyen d'interactions
                             f_ij = force_LJ(ensemble_i.E_0, ensemble_j.E_0, ensemble_i.d, ensemble_j.d, r_ij);
                             break;  // Par construction (r_c correctement choisi), une particule i n'interagit qu'avec une des 9 particules j 
                         }
@@ -259,10 +258,12 @@ void FluideComplexe::calculer_forces() {
                     force_totale += f_ij;
                 }
             }
-            //std::cout << k << " particules intergissant sur la particule i : fi = "; force_totale.afficher();
+            moyenne_k += k;
             // Ajouter la force totale pour cette particule au vecteur des forces d'interactions
             forces_interactions.push_back(force_totale);
         }
+        moyenne_k /= ensemble_i.N;
+        std::cout << moyenne_k << "interactions en moyenne sur les particules de l'ensemble\n";
     }
     std::cout << "Fin de calculer_forces()\n";
     std::cout << "--------------------------------------------------\n";
@@ -294,8 +295,8 @@ void FluideComplexe::mettre_a_jour_positions(double P) {
         
     double Pxx = calculer_tenseur_pression(0,0,L_z,0);
     double Pzz = calculer_tenseur_pression(1,1,L_z,0);
-    std::cout << "Pxx = " << Pxx << " Pa\n";
-    std::cout << "Pzz = " << Pzz << " Pa\n";
+    std::cout << "Pxx = " << Pxx << " Pa.m\n";
+    std::cout << "Pzz = " << Pzz << " Pa.m\n";
 
     std::cout << "Fin de mise à jour des positions.\n";
     std::cout << "--------------------------------------------------\n";
@@ -351,8 +352,17 @@ void FluideComplexe::appliquer_thermostat(double T) {
     // Parcours de chaque ensemble de particules
     for (auto& ensemble : particules) {
         for (auto& vitesse : ensemble.vitesses) {
-            //vitesse = vitesse * lambda;
-            relaxationVersMaxwell(vitesse, 2*T, ensemble.masse, alpha);
+            if (vitesse.norme() > 1e3){ // correction pour limiter explosion des vitesses, à supprimer si possible
+                std::cout << "vitesse tres grande : ";
+                vitesse.afficher();
+                vitesse.x = 1e2;
+                vitesse.z = 1e2;
+            }
+            //vitesse = vitesse * lambda; 
+            // ancienne regulation de temperature, genere des changements trop brutaux et ne conserve pas la districution de Maxwell Boltzmann 
+            // (mauvais parametres d'initialisation du fluide complexe ? ou juste innefficace ?)
+            relaxationVersMaxwell(vitesse, 3*T, ensemble.masse, alpha); // version provisoire du controle de temperature
+            
         }
     }
     T_mes = calculer_temperature();
@@ -398,37 +408,93 @@ double FluideComplexe::calculer_temperature() const {
 
 // Méthode pour calculer le tenseur de pression sur une tranche donnée
 double FluideComplexe::calculer_tenseur_pression(int alpha, int beta, double Delta_z, double z_k) const {
-    // Delta_z : largeur de la tranche | z_k milieu de la tranche
-    // alpha = 0 -> x | alpha = 1 -> z | beta = 0 -> x | beta = 1 -> z
-    double P_mes = 0;
-    int index =0;
-    // A IMPLEMENTER : version provisoire Pxx et Pzz sur totalité du fluide + formule incorrecte
-    if (alpha ==0 && beta ==0) {
-        // Parcours de chaque ensemble de particules
-        for (auto& ensemble : particules) {
-            for (size_t i = 0; i < ensemble.vitesses.size(); ++i) {
-              P_mes += ( ensemble.masse * std::pow(ensemble.vitesses[i].x, 2));
-                    //+ forces_interactions[index].x * ensemble.positions[i].x ) / (L_x * L_z * ensemble.d); // on divise par d pour essayer de tenir compte du passage 3D -> 2D
-
-                // Incrémentation de l'index pour correspondre à la bonne force
-                index++;
+    std::vector<Vec2> vecteurs_periodiques = {
+        Vec2(0.0, 0.0),
+        Vec2(L_x, 0.0), Vec2(-L_x, 0.0),
+        Vec2(0.0, L_z), Vec2(0.0, -L_z),
+        Vec2(L_x, L_z), Vec2(-L_x, L_z),
+        Vec2(L_x, -L_z), Vec2(-L_x, -L_z)
+    };
+    
+    // Définition des bornes du domaine avec conditions périodiques
+    double z_min = z_k - Delta_z / 2;
+    double z_max = z_k + Delta_z / 2;
+    
+    // Prise en compte des conditions périodiques
+    if (z_min < -L_z / 2) z_min += L_z;
+    if (z_max > L_z / 2) z_max -= L_z;
+    
+    // Liste des particules dans le domaine actuel
+    std::vector<std::pair<const Particules*, size_t>> particules_domaine;
+    
+    // Sélectionner les particules qui appartiennent au domaine [z_min, z_max]
+    for (const auto& ensemble : particules) {
+        for (size_t i = 0; i < ensemble.positions.size(); ++i) {
+            double zi = ensemble.positions[i].z;
+            
+            // Vérifier si la particule est dans la tranche avec conditions périodiques
+            if ((zi >= z_min && zi <= z_max) || (z_min > z_max && (zi >= z_min || zi <= z_max))) {
+                particules_domaine.emplace_back(&ensemble, i);
             }
         }
     }
-    if (alpha ==1 && beta ==1) {
-        // Parcours de chaque ensemble de particules
-        for (auto& ensemble : particules) {
-            for (size_t i = 0; i < ensemble.vitesses.size(); ++i) {
-              P_mes += ( ensemble.masse * std::pow(ensemble.vitesses[i].z, 2));
-                    //+ forces_interactions[index].z * ensemble.positions[i].z ) / (L_x * L_z * ensemble.d); // on divise par d pour essayer de tenir compte du passage 3D -> 2D
+    
+    // Calcul du tenseur de pression
+    double P_alpha_beta = 0.0;
+    
+    // Boucle sur les particules i du domaine
+    for (const auto& [ensemble_i, i] : particules_domaine) {
+        Vec2 position_i = ensemble_i->positions[i];
+        Vec2 v_i = ensemble_i->vitesses[i];
+        double m_i = ensemble_i->masse;
+        // Ajouter la contribution au tenseur de pression des termes cinetiques
+        // Contribution au tenseur de pression
+        double contribution = 0.0;
+             if (alpha == 0 && beta == 0) contribution = m_i * v_i.x * v_i.x;
+        else if (alpha == 0 && beta == 1) contribution = m_i * v_i.x * v_i.z;
+        else if (alpha == 1 && beta == 0) contribution = m_i * v_i.z * v_i.x;
+        else if (alpha == 1 && beta == 1) contribution = m_i * v_i.z * v_i.z;
 
-                // Incrémentation de l'index pour correspondre à la bonne force
-                index++;
+        P_alpha_beta += contribution;
+        
+        // Boucle sur toutes les particules j (dans et hors du domaine)
+        for (const auto& ensemble_j : particules) {
+            for (size_t j = 0; j < ensemble_j.positions.size(); ++j) {
+                Vec2 position_j = ensemble_j.positions[j];
+                
+                // Éviter le calcul avec soi-même
+                if (ensemble_i == &ensemble_j && i == j) continue;
+                
+                // Gérer les conditions périodiques
+                Vec2 f_ij(0.0, 0.0);
+                Vec2 r_ij(0.0, 0.0);
+
+                for (const auto& vecteur : vecteurs_periodiques) {
+                    r_ij = position_j - position_i + vecteur;
+
+                    if (r_ij.norme() < r_c) {
+                        f_ij = force_LJ(ensemble_i->E_0, ensemble_j.E_0, ensemble_i->d, ensemble_j.d, r_ij);
+                        break;
+                    }
+                }
+                
+                // Ajouter la contribution au tenseur de pression
+                // Contribution au tenseur de pression
+                double contribution = 0.0;
+                     if (alpha == 0 && beta == 0) contribution = f_ij.x * r_ij.x;
+                else if (alpha == 0 && beta == 1) contribution = f_ij.x * r_ij.z;
+                else if (alpha == 1 && beta == 0) contribution = f_ij.z * r_ij.x;
+                else if (alpha == 1 && beta == 1) contribution = f_ij.z * r_ij.z;
+
+                P_alpha_beta += contribution;
             }
         }
     }
-    return P_mes;
+    
+    // Normalisation par la surface du domaine (L_x * Delta_z), correspond à des Pa.m !
+    return P_alpha_beta / (L_x * Delta_z);
 }
+
 
 // Méthode pour faire évoluer le système vers l'état suivant
 void FluideComplexe::evoluer(double T, double P) {
