@@ -3,7 +3,7 @@
 !tests/*.exe # Permet le partage d'executable pour faire des tests en commun
 *.out
 *.log
-
+*.o
 # Ignorer les résultats des tests
 figures/runs/
 
