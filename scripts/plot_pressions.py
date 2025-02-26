@@ -52,9 +52,9 @@ def tracer_graphique(dossier, mean):
         delta_P = P_N - P_T
         integrale_delta_P = np.cumsum(delta_P) * np.gradient(z_k)  # Intégration numérique
         
-        plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", label=f"P_N (i={i})", alpha = 0.2)
-        plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="--", label=f"P_T (i={i})", alpha = 0.2)
-        plt.plot(z_k, integrale_delta_P, color=cmap_blue[idx], linestyle="-.", label=f"∫(P_N - P_T) (i={i})", alpha = 0.2)
+        #plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", alpha = 0.2)
+        #plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="--", alpha = 0.2)
+        plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-.", alpha = 0.2)
     
     if mean:
         P_N_mean = np.mean(all_P_N, axis=0)
@@ -65,7 +65,7 @@ def tracer_graphique(dossier, mean):
         
         plt.plot(z_k_mean, P_N_mean, color="darkred", linestyle="-", linewidth=2, label="P_N moyen")
         plt.plot(z_k_mean, P_T_mean, color="darkgreen", linestyle="--", linewidth=2, label="P_T moyen")
-        plt.plot(z_k_mean, integrale_delta_P_mean, color="darkblue", linestyle="-.", linewidth=2, label="∫(P_N - P_T) moyen")
+        plt.plot(z_k_mean, delta_P_mean, color="darkblue", linestyle="-.", linewidth=2, label="P_N - P_T moyen")
     
     plt.xlabel("z_k")
     plt.ylabel("Pression")
