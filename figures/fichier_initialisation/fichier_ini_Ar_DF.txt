@@ -1,0 +1,30 @@
+# Description :
+
+#la boite de simulation est constitué du domaine D31, D32 et D33.
+#   type Ar : E_0 = 1.19e-21, d = 3.3e-10, masse = 6.63e-26 ,  taille = 3.99e-10, charge = 0.0     # (en USI)
+
+#   les particules de type Ar sont presentent dans toute la boite :
+#        25     dans DFG
+#        2000   dans DFM = [-L_z/40 , L_z/40]
+#        25     dans DFD
+
+# Cette situation initiale correspond à une interface argon liquide pur / argon gazeux pur à 87K, si la boite est tel que ( basé sur une densité de l'Ar de 1394 kg/m3 à 87K )
+# Soit pour ces valeurs de N et taille, 
+
+#   L_x = 800e-10
+#   L_z = 800e-10   
+
+# Dans ces conditions la force initiale subit par une particules dans D32 est de l'ordre de 2.5e-10
+# Pour garantir des deplacements initiaux par pas de temps, au plus de l'ordre de (taille - d), on doit prendre delta_t = 5e-14 s
+# Ainsi :
+#    delta_r ~ f_ini * delta_t * delta_t / m        = 0.1e-10 (m)
+#    delta_v ~ f_ini * delta_t / m                  = 94 (m/s)
+
+
+
+# Format : 
+
+#N          E_0             d               masse           taille      charge      id_ini
+25         1.19e-21        3.3e-10         6.63e-26        3.99e-10       0.0         DFG
+1950       1.19e-21        3.3e-10         6.63e-26        3.99e-10       0.0         DFM
+25         1.19e-21        3.3e-10         6.63e-26        3.99e-10       0.0         DFD
