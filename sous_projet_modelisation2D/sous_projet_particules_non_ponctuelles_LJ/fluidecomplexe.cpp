@@ -93,7 +93,7 @@ FluideComplexe::FluideComplexe(double L_x, double L_z, double delta_t, double ka
 
         {"DFG", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 2, -L_z / 20)},
         {"DFM", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 20, L_z / 20)},
-        {"DFD", std::make_tuple(-L_x / 2, L_x / 2, L_z / 20, L_z / 20)}
+        {"DFD", std::make_tuple(-L_x / 2, L_x / 2,  L_z / 20, L_z / 2)}
     };
 }
 
