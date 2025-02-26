@@ -5,6 +5,7 @@
 #include <sstream>
 #include "fluidecomplexe.h"
 #include <random>
+#include <regex>
 
 // Constante de Boltzmann (en unités SI : J/K)
 const double K_B = 1.380649e-23;
@@ -54,6 +55,26 @@ double periodic_boundary_if_needed(double coord, double L, bool& modifie) {
     }
     return coord;
 }
+// Fonction pour lire les en-tetes
+bool extraireEnteteEnsemble(const std::string& ligne, int& N, double& d, double& E_0, double& taille, double& masse) {
+    static const std::regex regex_ensemble(R"#(# Ensemble de particules : N = (\d+) \| d = ([\d.eE-]+) \| E_0 = ([\d.eE-]+) \| taille = ([\d.eE-]+) \| masse = ([\d.eE-]+))#");
+
+    std::smatch match;
+    if (std::regex_search(ligne, match, regex_ensemble)) {
+        try {
+            N = std::stoi(match[1]);
+            d = std::stod(match[2]);
+            E_0 = std::stod(match[3]);
+            taille = std::stod(match[4]);
+            masse = std::stod(match[5]);
+            return true;
+        } catch (const std::exception& e) {
+            std::cerr << "Erreur lors de la conversion des valeurs de l'en-tête : " << e.what() << std::endl;
+            return false;
+        }
+    }
+    return false;
+}
 
 // Constructeur
 
@@ -63,10 +84,16 @@ FluideComplexe::FluideComplexe(double L_x, double L_z, double delta_t, double ka
     // Initialiser la table des domaines
     domaines = {
         {"D1",  std::make_tuple(-L_x / 2, L_x / 2, -L_z / 2, L_z / 2)},
+
         {"D2",  std::make_tuple(-L_x / 2, L_x / 2, -L_z / 4, L_z / 4)},
+
         {"D31", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 2, -L_z / 4)},
         {"D32", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 4, L_z / 4)},
-        {"D33", std::make_tuple(-L_x / 2, L_x / 2, L_z / 4, L_z / 2)}
+        {"D33", std::make_tuple(-L_x / 2, L_x / 2, L_z / 4, L_z / 2)},
+
+        {"DFG", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 2, -L_z / 20)},
+        {"DFM", std::make_tuple(-L_x / 2, L_x / 2, -L_z / 20, L_z / 20)},
+        {"DFD", std::make_tuple(-L_x / 2, L_x / 2, L_z / 20, L_z / 20)}
     };
 }
 
@@ -186,6 +213,99 @@ void FluideComplexe::initialisation(double T) {
     // Initialisation de forces_interactions
     calculer_forces();
 }
+
+void FluideComplexe::initialisationViaCSV(const std::string& filePositions, const std::string& fileVitesses) {
+    std::cout << "Initialisation du fluide complexe depuis les fichiers CSV..." << std::endl;
+    
+    std::ifstream fichierPositions(filePositions);
+    std::ifstream fichierVitesses(fileVitesses);
+    
+    if (!fichierPositions || !fichierVitesses) {
+        std::cerr << "Erreur : Impossible d'ouvrir les fichiers CSV fournis." << std::endl;
+        return;
+    }
+    
+    std::string ligne;
+    std::vector<Particules> ensembles_particules;
+    
+    /*** LECTURE DU FICHIER POSITIONS ***/
+    while (std::getline(fichierPositions, ligne)) {
+        if (ligne.empty()) continue;
+        
+        if (ligne[0] == '#') { // Détection d'un nouvel ensemble
+            int N;
+            double d, E_0, taille, masse;
+            if (extraireEnteteEnsemble(ligne, N, d, E_0, taille, masse)) {
+                ensembles_particules.emplace_back(N, E_0, d, masse, taille, 0.0);
+                std::cout << "Ensemble chargé : N = " << N << " | d = " << d 
+                          << " | E_0 = " << E_0 << " | taille = " << taille 
+                          << " | masse = " << masse << std::endl;
+            }
+        } else if (!ensembles_particules.empty()) { // Ajout des positions
+            std::istringstream iss(ligne);
+            double x, z, taille_particule;
+            char delimiter;
+            if (iss >> x >> delimiter >> z >> delimiter >> taille_particule) {
+                ensembles_particules.back().positions.emplace_back(x, z);
+            }
+        }
+    }
+
+    /*** LECTURE DU FICHIER VITESSES ***/
+    fichierVitesses.clear(); // Reset du fichier
+    fichierVitesses.seekg(0); // Revenir au début du fichier
+
+    size_t index_ensemble = 0;
+    while (std::getline(fichierVitesses, ligne)) {
+        if (ligne.empty()) continue;
+
+        if (ligne[0] == '#') { // Détection d'un nouvel ensemble
+            if (index_ensemble < ensembles_particules.size()) {
+                index_ensemble++;  // Passer à l'ensemble suivant
+            } else {
+                std::cerr << "Erreur : Trop d'ensembles de vitesses par rapport aux ensembles de particules !" << std::endl;
+                return;
+            }
+        } else if (index_ensemble > 0) { // Ajout des vitesses
+            Particules& ensemble_courant = ensembles_particules[index_ensemble - 1];
+
+            std::istringstream iss(ligne);
+            double vx, vz;
+            char delimiter;
+            if (iss >> vx >> delimiter >> vz) {
+                ensemble_courant.vitesses.emplace_back(vx, vz);
+            }
+        }
+    }
+
+    /*** VÉRIFICATION DE L'INTÉGRITÉ DES DONNÉES ***/
+    for (size_t i = 0; i < ensembles_particules.size(); ++i) {
+        size_t nb_positions = ensembles_particules[i].positions.size();
+        size_t nb_vitesses = ensembles_particules[i].vitesses.size();
+        
+        if (nb_positions != ensembles_particules[i].N) {
+            std::cerr << "Erreur : Ensemble " << i << " contient " << nb_positions 
+                      << " positions au lieu de " << ensembles_particules[i].N << std::endl;
+        }
+
+        if (nb_vitesses != ensembles_particules[i].N) {
+            std::cerr << "Erreur : Ensemble " << i << " contient " << nb_vitesses 
+                      << " vitesses au lieu de " << ensembles_particules[i].N << std::endl;
+        }
+    }
+
+    /*** AJOUT DES DONNÉES AU FLUIDE COMPLEXE ***/
+    particules = std::move(ensembles_particules);
+    std::cout << "Initialisation depuis CSV terminée avec succès." << std::endl;
+    
+    /*** EXPORTATION POUR VÉRIFICATION ***/
+    exporterPositionsCSV("positions_ini.csv");
+    exporterVitessesCSV("vitesses_ini.csv");
+
+    /*** INITIALISATION DES FORCES ***/
+    calculer_forces();
+}
+
 
 // Méthode pour calculer les forces d'interactions entre les particules
 void FluideComplexe::calculer_forces() {
@@ -348,7 +468,7 @@ void FluideComplexe::appliquer_thermostat(double T) {
     double T_mes = calculer_temperature();
     std::cout << "T = " << T_mes << " K\n";
     double alpha = 0.5;
-    double lambda = std::sqrt( 1 + delta_t * (T/T_mes -1) / tau_T );
+    //double lambda = std::sqrt( 1 + delta_t * (T/T_mes -1) / tau_T ); // ancienne regulation de temperature posait probleme, à re tester
     // Parcours de chaque ensemble de particules
     for (auto& ensemble : particules) {
         for (auto& vitesse : ensemble.vitesses) {
@@ -359,8 +479,7 @@ void FluideComplexe::appliquer_thermostat(double T) {
                 vitesse.z = 1e2;
             }
             //vitesse = vitesse * lambda; 
-            // ancienne regulation de temperature, genere des changements trop brutaux et ne conserve pas la districution de Maxwell Boltzmann 
-            // (mauvais parametres d'initialisation du fluide complexe ? ou juste innefficace ?)
+            // (mauvais parametres d'initialisation du fluide complexe ? ou juste innefficace ? ou ancienne erreur ?)
             relaxationVersMaxwell(vitesse, 3*T, ensemble.masse, alpha); // version provisoire du controle de temperature
             
         }

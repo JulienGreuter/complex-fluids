@@ -9,7 +9,16 @@
 #include "../vec2.h"  // Inclut la structure Vec2 pour les vecteurs 2D (x, z)
 #include "reseau.h" // Inclut la classe Reseau et Case pour l'initialisation des positions
 
+// Fonction pour calculer la force de Lennard-Jones entre deux particules
 Vec2 force_LJ(double E_0i, double E_0j, double di, double dj, Vec2 r_ij);
+// Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann
+Vec2 maxwellBoltzmannSample(double T, double masse);
+// Fonction pour appliquer la relaxation vers Maxwell-Boltzmann sur une vitesse
+void relaxationVersMaxwell(Vec2& vitesse, double T, double masse, double alpha);
+// Fonction pour appliquer les conditions périodiques à une coordonné uniquement si nécessaire
+double periodic_boundary_if_needed(double coord, double L, bool& modifie);
+// Fonction pour lire les en-tetes
+bool extraireEnteteEnsemble(const std::string& ligne, int& N, double& d, double& E_0, double& taille, double& masse);
 
 class FluideComplexe {
 private:
@@ -35,6 +44,7 @@ public:
 
     // Méthode d'initialisation des positions et vitesses
     void initialisation(double T);
+    void initialisationViaCSV(const std::string& filePositions, const std::string& fileVitesses);
 
     // Méthode pour calculer les forces d'interactions entre les particules
     void calculer_forces();
