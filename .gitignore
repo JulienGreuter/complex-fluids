@@ -9,10 +9,10 @@ figures/runs/
 
 # Ignorer les fichiers de données générés par les tests (CSV, TXT, etc.)
 *.csv
-!figures/raw_data/*.csv
+!figures/datas/*.csv
 *.txt
 !figures/fichier_initialisation/*.txt
-
+!figures/datas/*.txt
 # Ignorer les fichiers temporaires
 *.swp
 *.bak
