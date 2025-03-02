@@ -1,0 +1,65 @@
+T = 93 K et P = 1e+07 Pa
+Initialisation...
+Lecture du fichier d'initialisation...
+Instanciation d'un ensemble de particules...
+N = 160 | E_0 = 1.19e-21 | d = 3.3e-10 | masse = 6.63e-26 | taille = 3.99e-10 | charge = 0 | domaine : DFG
+Instanciation d'un ensemble de particules...
+N = 7900 | E_0 = 1.19e-21 | d = 3.3e-10 | masse = 6.63e-26 | taille = 3.99e-10 | charge = 0 | domaine : DFM
+--------------------------------------------------
+Appel de traiter_domaine()
+Trie du vecteur intermediaire...
+--------------------------------------------------
+Appel de initialisation_domaine()
+domaine :DFG
+Correspond à : xmin = -4e-08 | xmax = 4e-08 | zmin = -8e-08 | zmax = -8e-09
+taille_case = 3.99e-10
+taille_ensemble = 3.99e-10
+  Remplissage du reseau...
+=== Statistiques du Réseau ===
+Réseau (xmin=-4e-08, xmax=4e-08, zmin=-8e-08, zmax=-8e-09, taille_case=3.99e-10)
+├── Ordre 0 : 36000 cases (Libres: 35840 | Occupées: 160 | Occupées non parentes: 160)
+Fin de l'initialisation du domaine DFG
+--------------------------------------------------
+Fin de traiter_domaine()
+--------------------------------------------------
+Instanciation d'un ensemble de particules...
+N = 160 | E_0 = 1.19e-21 | d = 3.3e-10 | masse = 6.63e-26 | taille = 3.99e-10 | charge = 0 | domaine : DFD
+--------------------------------------------------
+Appel de traiter_domaine()
+Trie du vecteur intermediaire...
+--------------------------------------------------
+Appel de initialisation_domaine()
+domaine :DFM
+Correspond à : xmin = -4e-08 | xmax = 4e-08 | zmin = -8e-09 | zmax = 8e-09
+taille_case = 3.99e-10
+taille_ensemble = 3.99e-10
+  Remplissage du reseau...
+=== Statistiques du Réseau ===
+Réseau (xmin=-4e-08, xmax=4e-08, zmin=-8e-09, zmax=8e-09, taille_case=3.99e-10)
+├── Ordre 0 : 8000 cases (Libres: 100 | Occupées: 7900 | Occupées non parentes: 7900)
+Fin de l'initialisation du domaine DFM
+--------------------------------------------------
+Fin de traiter_domaine()
+--------------------------------------------------
+--------------------------------------------------
+Appel de traiter_domaine()
+Trie du vecteur intermediaire...
+--------------------------------------------------
+Appel de initialisation_domaine()
+domaine :DFD
+Correspond à : xmin = -4e-08 | xmax = 4e-08 | zmin = 8e-09 | zmax = 8e-08
+taille_case = 3.99e-10
+taille_ensemble = 3.99e-10
+  Remplissage du reseau...
+=== Statistiques du Réseau ===
+Réseau (xmin=-4e-08, xmax=4e-08, zmin=8e-09, zmax=8e-08, taille_case=3.99e-10)
+├── Ordre 0 : 36000 cases (Libres: 35840 | Occupées: 160 | Occupées non parentes: 160)
+Fin de l'initialisation du domaine DFD
+--------------------------------------------------
+Fin de traiter_domaine()
+--------------------------------------------------
+Fin de L'initialisation
+Exportation des positions des particules...
+Exportation vers positions_ini.csv réussie.
+Exportation des vitesses des particules...
+Exportation vers vitesses_ini.csv réussie.
