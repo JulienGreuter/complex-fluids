@@ -9,6 +9,7 @@ import matplotlib.cm as cm
 parser = argparse.ArgumentParser(description="Tracer les pressions à partir des fichiers pressions_i.csv dans un dossier.")
 parser.add_argument("--folder", type=str, help="Chemin du dossier contenant les fichiers pressions_i.csv")
 parser.add_argument("--mean", action="store_true", help="Afficher la moyenne de tous les fichiers")
+parser.add_argument("--i", type=int, help="numero du fichier à afficher specifiquement")
 args = parser.parse_args()
 
 def lire_fichier(fichier):
@@ -55,6 +56,10 @@ def tracer_graphique(dossier, mean):
         #plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", alpha = 0.2)
         #plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="--", alpha = 0.2)
         plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-.", alpha = 0.2)
+        if args.i == i :
+            plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", alpha = 0.9)
+            plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="--", alpha = 0.9)
+            plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-.", alpha = 0.9, linewidth=3)
     
     if mean:
         P_N_mean = np.mean(all_P_N, axis=0)
