@@ -2,7 +2,7 @@
 #include <random>  // Pour std::random_device, std::mt19937 et std::uniform_int_distribution
 #include <algorithm> // Pour std::find
 #include <map>  // Pour stocker les statistiques par ordre
-
+#include<functional>
 
 // Constructeur
 Reseau::Reseau(double xmin, double xmax, double zmin, double zmax, double taille_case)
