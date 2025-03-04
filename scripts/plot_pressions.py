@@ -9,6 +9,7 @@ import matplotlib.cm as cm
 parser = argparse.ArgumentParser(description="Tracer les pressions à partir des fichiers pressions_i.csv dans un dossier.")
 parser.add_argument("--folder", type=str, help="Chemin du dossier contenant les fichiers pressions_i.csv")
 parser.add_argument("--mean", action="store_true", help="Afficher la moyenne de tous les fichiers")
+parser.add_argument("--integrale", action="store_true", help="Afficher l'integrale de la moyenne'")
 parser.add_argument("--i", type=int, help="numero du fichier à afficher specifiquement")
 args = parser.parse_args()
 
@@ -51,30 +52,36 @@ def tracer_graphique(dossier, mean):
         all_z_k.append(z_k)
         
         delta_P = P_N - P_T
-        integrale_delta_P = np.cumsum(delta_P) * np.gradient(z_k)  # Intégration numérique
         
         #plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", alpha = 0.2)
         #plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="--", alpha = 0.2)
         plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-.", alpha = 0.2)
+
         if args.i == i :
             plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", alpha = 0.9)
-            plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="--", alpha = 0.9)
-            plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-.", alpha = 0.9, linewidth=3)
+            plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="-", alpha = 0.9)
+            plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-", alpha = 0.9, linewidth=3)
     
     if mean:
         P_N_mean = np.mean(all_P_N, axis=0)
         P_T_mean = np.mean(all_P_T, axis=0)
         z_k_mean = np.mean(all_z_k, axis=0)
         delta_P_mean = P_N_mean - P_T_mean
-        integrale_delta_P_mean = np.cumsum(delta_P_mean) * np.gradient(z_k_mean)
+        
         
         plt.plot(z_k_mean, P_N_mean, color="darkred", linestyle="-", linewidth=2, label="P_N moyen")
         plt.plot(z_k_mean, P_T_mean, color="darkgreen", linestyle="--", linewidth=2, label="P_T moyen")
         plt.plot(z_k_mean, delta_P_mean, color="darkblue", linestyle="-.", linewidth=2, label="P_N - P_T moyen")
+
+        if args.integrale :
+            integrale_delta_P_mean = np.cumsum(delta_P_mean) 
+            plt.plot(z_k_mean, integrale_delta_P_mean, color="yellow", linestyle="-", linewidth=4, label="cumsum de P_N - P_T moyen")
+    
+
     
     plt.xlabel("z_k")
     plt.ylabel("Pression")
-    plt.title("Évolution des pressions et de leur intégrale en fonction de z_k")
+    plt.title("Évolution des pression en fonction de z_k")
     plt.legend()
     plt.grid()
     plt.show()
