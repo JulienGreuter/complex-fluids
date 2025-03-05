@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser(description="Tracer les pressions à partir des
 parser.add_argument("--folder", type=str, help="Chemin du dossier contenant les fichiers pressions_i.csv")
 parser.add_argument("--mean", action="store_true", help="Afficher la moyenne de tous les fichiers")
 parser.add_argument("--integrale", action="store_true", help="Afficher l'integrale de la moyenne'")
+parser.add_argument("--all", action="store_true", help="Afficher toutes les courbes'")
 parser.add_argument("--i", type=int, help="numero du fichier à afficher specifiquement")
 args = parser.parse_args()
 
@@ -52,10 +53,10 @@ def tracer_graphique(dossier, mean):
         all_z_k.append(z_k)
         
         delta_P = P_N - P_T
-        
-        #plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", alpha = 0.2)
-        #plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="--", alpha = 0.2)
-        plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-.", alpha = 0.2)
+        if args.all :
+            plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", alpha = 0.2)
+            plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="--", alpha = 0.2)
+            plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-.", alpha = 0.2)
 
         if args.i == i :
             plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", alpha = 0.9)
