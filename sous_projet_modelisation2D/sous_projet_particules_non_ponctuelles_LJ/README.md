@@ -1,7 +1,7 @@
 # Les Classes:
 ## Particules:
 ### Attributs
-N : Nombre de particules
+N : Nombre de particules.
 E_0 : Paramètre du potentiel de Lennard-Jones
 d : Paramètre du potentiel de Lennard-Jones
 masse : Masse des particules
