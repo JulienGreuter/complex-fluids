@@ -411,10 +411,10 @@ void FluideComplexe::mettre_a_jour_positions(double P) {
     // Application des conditions periodiques
     appliquer_conditions_periodiques();
     // Aplication du barostat pour tenir compte de la pression fixée P, modifie les positions, L_x et L_z
-    //appliquer_barostat(P);
+    appliquer_barostat(P);
         
-    double Pxx = calculer_tenseur_pression(0,0,L_z,0);
-    double Pzz = calculer_tenseur_pression(1,1,L_z,0);
+    double Pxx = calculer_tenseur_pression(0,0,L_z/16.0,0);
+    double Pzz = calculer_tenseur_pression(1,1,L_z/16.0,0);
     std::cout << "Pxx = " << Pxx << " Pa.m\n";
     std::cout << "Pzz = " << Pzz << " Pa.m\n";
 
@@ -467,20 +467,20 @@ void FluideComplexe::appliquer_thermostat(double T) {
     std::cout << "Calcul de T...\n";
     double T_mes = calculer_temperature();
     std::cout << "T = " << T_mes << " K\n";
-    double alpha = 0.5;
-    //double lambda = std::sqrt( 1 + delta_t * (T/T_mes -1) / tau_T ); // ancienne regulation de temperature posait probleme, à re tester
+    //double alpha = 0.5;
+    double lambda = std::sqrt( 1 + delta_t * (T/T_mes -1) / tau_T ); 
+    std::cout << "lambda : " << lambda << std::endl;
     // Parcours de chaque ensemble de particules
     for (auto& ensemble : particules) {
+        double v_ODG = std::pow(K_B*T/ensemble.masse, 0.5);
         for (auto& vitesse : ensemble.vitesses) {
-            if (vitesse.norme() > 1e3){ // correction pour limiter explosion des vitesses, à supprimer si possible
+            if (vitesse.norme() > 10*v_ODG){ // correction pour limiter explosion des vitesses, à supprimer si possible
                 std::cout << "vitesse tres grande : ";
                 vitesse.afficher();
-                vitesse.x = 1e2;
-                vitesse.z = 1e2;
+                vitesse = maxwellBoltzmannSample(T, ensemble.masse);
             }
-            //vitesse = vitesse * lambda; 
-            // (mauvais parametres d'initialisation du fluide complexe ? ou juste innefficace ? ou ancienne erreur ?)
-            relaxationVersMaxwell(vitesse, 3*T, ensemble.masse, alpha); // version provisoire du controle de temperature
+            vitesse = vitesse * lambda; 
+            //relaxationVersMaxwell(vitesse, 3*T, ensemble.masse, alpha); // version provisoire du controle de temperature
             
         }
     }
@@ -493,17 +493,20 @@ void FluideComplexe::appliquer_thermostat(double T) {
 // Méthode pour appliquer le barostat en fonction de la pression P
 void FluideComplexe::appliquer_barostat(double P) {
     std::cout << "Calcul de P...\n";
-    double P_mes = (calculer_tenseur_pression(0,0,L_z,0) + calculer_tenseur_pression(1,1,L_z,0)) / 2.0;
+    double P_mes = (calculer_tenseur_pression(0,0,L_z/16.0,0) + calculer_tenseur_pression(1,1,L_z/16.0,0)) / 2.0; //calc pression au centres
     std::cout << "P = " << P_mes << " Pa\n";
-    double lambda = 1 - kappa * delta_t * (P - P_mes) / tau_P;
-    L_x = std::pow(lambda, 1/3.0) * L_x;
-    L_z = std::pow(lambda, 1/3.0) * L_z;
-    r_c = std::pow(lambda, 1/3.0) * r_c;
+    double lambda = std::pow(1 - kappa * delta_t * (P - P_mes) / tau_P, 1/2.0);
+    std::cout << "lambda : " << lambda << std::endl; 
+    L_x = lambda * L_x;
+    //L_x = lambda * (1-lambda/1000) * L_x;
+    //L_z = lambda * (1+lambda/1000) * L_z;
+    r_c = lambda * r_c;
 
     // Parcours de chaque ensemble de particules
     for (auto& ensemble : particules) {
         for (auto& position : ensemble.positions) {
-            position = position * std::pow(lambda, 1/3.0);
+            position = position * lambda;
+            //position.z = position.z * lambda;
         }
     }
     std::cout << "Barostat appliqué.\n";
@@ -576,6 +579,7 @@ double FluideComplexe::calculer_tenseur_pression(int alpha, int beta, double Del
 
         P_alpha_beta += contribution;
         
+        /*
         // Boucle sur toutes les particules j (dans et hors du domaine)
         for (const auto& ensemble_j : particules) {
             for (size_t j = 0; j < ensemble_j.positions.size(); ++j) {
@@ -592,7 +596,7 @@ double FluideComplexe::calculer_tenseur_pression(int alpha, int beta, double Del
                     r_ij = position_j - position_i + vecteur;
 
                     if (r_ij.norme() < r_c) {
-                        f_ij = force_LJ(ensemble_i->E_0, ensemble_j.E_0, ensemble_i->d, ensemble_j.d, r_ij);
+                        f_ij = force_LJ(ensemble_i->E_0, ensemble_j.E_0, ensemble_i->d, ensemble_j.d, r_ij) * (-1);//test car probleme sur les pressions (signe)
                         break;
                     }
                 }
@@ -608,6 +612,7 @@ double FluideComplexe::calculer_tenseur_pression(int alpha, int beta, double Del
                 P_alpha_beta += contribution;
             }
         }
+    */        
     }
     
     // Normalisation par la surface du domaine (L_x * Delta_z), correspond à des Pa.m !
@@ -655,7 +660,35 @@ void FluideComplexe::exporterPositionsCSV(const std::string& fileCSV) const {
 
     std::cout << "Exportation vers " << fileCSV << " réussie." << std::endl;
 }
- 
+
+// Méthode pour exporter les positions des particules sous CSV en tenant compte du changement de metrique induit par le barostat
+void FluideComplexe::exporterPositionsNormaliseesCSV(const std::string& fileCSV) const {
+    std::cout << "Exportation des positions des particules...\n";
+    std::ofstream fichier(fileCSV);
+    if (!fichier) {
+        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << fileCSV << std::endl;
+        return;
+    }
+    fichier << "x,z\n";
+    for (const auto& ensemble : particules) {
+        if (ensemble.positions.empty()) continue; // Ignorer les ensembles vides
+        
+        // Écriture de l'en-tête
+        fichier << "# Ensemble de particules : N = " << ensemble.N
+                << " | d = " << ensemble.d
+                << " | E_0 = " << ensemble.E_0
+                << " | taille = " << ensemble.taille 
+                << " | masse = " << ensemble.masse << "\n";
+        
+        for (const auto& position : ensemble.positions) {
+            fichier << position.x / L_x << "," << position.z / L_z << std::endl;
+        }
+        fichier << "\n\n";
+    }
+
+    std::cout << "Exportation vers " << fileCSV << " réussie." << std::endl;
+}
+
 // Méthode pour exporter les vitesses des particules sous CSV
 void FluideComplexe::exporterVitessesCSV(const std::string& fileCSV) const {
     std::cout << "Exportation des vitesses des particules...\n";
@@ -683,3 +716,30 @@ void FluideComplexe::exporterVitessesCSV(const std::string& fileCSV) const {
 
     std::cout << "Exportation vers " << fileCSV << " réussie." << std::endl;
 }
+
+// Méthode pour exporter les données necessaire pour le calcul des pressions sous CSV en tenant compte du changement de metrique induit par le barostat
+void FluideComplexe::exporterDataNormaliseesCSV(const std::string& fileCSV) const {
+    std::cout << "Exportation des données des particules...\n";
+    std::ofstream fichier(fileCSV);
+    if (!fichier) {
+        std::cerr << "Erreur : Impossible d'ouvrir le fichier " << fileCSV << std::endl;
+        return;
+    }
+    fichier << "x,z,mvx2,mvz2\n";
+    for (const auto& ensemble : particules) {
+        if (ensemble.positions.empty()) continue; // Ignorer les ensembles vides
+
+        for (int j = 0; j < ensemble.N; j++) {
+            fichier << ensemble.positions[j].x / L_x << "," 
+                    << ensemble.positions[j].z / L_z << "," 
+                    << ensemble.masse * std::pow(ensemble.vitesses[j].x, 2.0) / (L_x * L_z) << ","
+                    << ensemble.masse * std::pow(ensemble.vitesses[j].z, 2.0) / (L_x * L_z) << std::endl;
+        }
+        fichier << "\n\n";
+    }
+    std::cout << "Exportation vers " << fileCSV << " réussie." << std::endl;
+}
+
+// Getter pour accéder aux attributs privés
+double FluideComplexe::getL_z() const {return L_z;}
+double FluideComplexe::getR_c() const {return r_c;}

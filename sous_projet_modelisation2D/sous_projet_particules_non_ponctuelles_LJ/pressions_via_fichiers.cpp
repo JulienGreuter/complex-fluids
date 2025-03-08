@@ -7,7 +7,7 @@
 #include "fluidecomplexe.h"
 
 double L_x = 800e-10; // Longueur de la boîte en x (m)
-double L_z = 800e-10; // Longueur de la boîte en z (m)
+double L_z = 1600e-10; // Longueur de la boîte en z (m)
 double delta_t = 5e-14; // Pas de temps (s)
 double kappa = 1.;
 double tau_P = 1e-15;
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
     }
 
     double P = 1e-2;
-    double Delta_z = L_z / 30.0;
+    double Delta_z = L_z / 100;
 
     FluideComplexe fluide(L_x, L_z, delta_t, kappa, tau_P, tau_T, r_c, ""); // pas besoin de fichier d'initialisation
     fluide.initialisationViaCSV(fichier_positions, fichier_vitesses);
@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
             fichier_csv << P_N << "," << P_T << "," << z_k << "\n";
         }
         
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1; i++) {
             fluide.evoluer(T, P);
         }
     }

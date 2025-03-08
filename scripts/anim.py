@@ -15,6 +15,7 @@ parser.add_argument('--x-min', type=float, default=None, help="Coordonnée x min
 parser.add_argument('--x-max', type=float, default=None, help="Coordonnée x maximale de la boîte de filtrage")
 parser.add_argument('--z-min', type=float, default=None, help="Coordonnée z minimale de la boîte de filtrage")
 parser.add_argument('--z-max', type=float, default=None, help="Coordonnée z maximale de la boîte de filtrage")
+parser.add_argument('--tracer', type=int, default=0, help="Nombre de particules à suivre avec une couleur différente")
 args = parser.parse_args()
 
 folder = args.input_folder
@@ -67,21 +68,40 @@ else :
 fig, ax = plt.subplots()
 ax.set_xlim(x_min, x_max)
 ax.set_ylim(z_min, z_max)
+"""
 scatters = [ax.scatter([], [], s=50, color = 'gray', alpha=0.3) for i in range(trail_length)]
-
+"""
+# Créer un scatter unique pour toutes les particules
+scatter = ax.scatter([], [], s=50)
 # Fonction d'initialisation
+"""
 def init():
     for scatter in scatters:
         scatter.set_offsets(np.empty((0, 2)))  # Utiliser un tableau vide 2D avec 0 lignes et 2 colonnes
     return scatters
-
+"""
+def init():
+    scatter.set_offsets(np.empty((0, 2)))  # Initialiser avec un tableau vide
+    return scatter,
 # Fonction d'animation
+"""
 def update(frame):
     for i in range(trail_length):
         if frame - i >= 0:
             scatters[i].set_offsets(positions[frame - i])
     return scatters
+"""
+def update(frame):
+    frames = [max(frame - i, 0) for i in range(trail_length)]  # Sélectionner les frames pour la traînée
+    data = np.vstack([positions[f] for f in frames])  # Empiler les positions des frames sélectionnées
 
+    # Création d'un masque de couleurs :
+    colors = np.array(['red'] * min(args.tracer, len(data)) + ['gray'] * (len(data) - min(args.tracer, len(data))))
+
+    scatter.set_offsets(data)  # Mettre à jour les positions
+    scatter.set_color(colors)  # Mettre à jour les couleurs
+
+    return scatter,
 # Création de l'animation
 ani = FuncAnimation(fig, update, frames=len(positions), init_func=init, blit=False, interval=1000//fps)
 

@@ -76,8 +76,18 @@ public:
     // Méthode pour exporter les positions des particules sous CSV
     void exporterPositionsCSV(const std::string& fileCSV) const;
 
+    // Méthode pour exporter les positions des particules sous CSV en tenant compte du changement de metrique induit par le barostat
+    void exporterPositionsNormaliseesCSV(const std::string& fileCSV) const;
+
+    // Méthode pour exporter les données necessaire pour le calcul des pressions sous CSV en tenant compte du changement de metrique induit par le barostat
+    void exporterDataNormaliseesCSV(const std::string& fileCSV) const;
+
     // Méthode pour exporter les vitesses des particules sous CSV
     void exporterVitessesCSV(const std::string& fileCSV) const;
+
+    // Getter pour accéder aux attributs privés
+    double getL_z() const;
+    double getR_c() const;
 };
 
 #endif // FLUIDECOMPLEXE_H

@@ -47,7 +47,7 @@ def tracer_graphique(dossier, mean):
     for idx, fichier in enumerate(fichiers):
         i = int(os.path.splitext(os.path.basename(fichier))[0].split("_")[-1])  # Extraction de i
         P_N, P_T, z_k = lire_fichier(fichier)
-        
+
         all_P_N.append(P_N)
         all_P_T.append(P_T)
         all_z_k.append(z_k)
@@ -58,10 +58,14 @@ def tracer_graphique(dossier, mean):
             plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="--", alpha = 0.2)
             plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-.", alpha = 0.2)
 
-        if args.i == i :
+        elif args.i == i :
             plt.plot(z_k, P_N, color=cmap_red[idx], linestyle="-", alpha = 0.9)
             plt.plot(z_k, P_T, color=cmap_green[idx], linestyle="-", alpha = 0.9)
             plt.plot(z_k, delta_P, color=cmap_blue[idx], linestyle="-", alpha = 0.9, linewidth=3)
+
+            if args.integrale :
+                integrale_delta_P = np.cumsum(delta_P) 
+                plt.plot(z_k, integrale_delta_P, color="yellow", linestyle="--", linewidth=4, label="cumsum de P_N - P_T moyen")
     
     if mean:
         P_N_mean = np.mean(all_P_N, axis=0)
