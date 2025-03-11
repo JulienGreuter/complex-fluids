@@ -4,8 +4,8 @@
 #include <cstdlib>  // Pour std::stod
 #include "fluidecomplexe.h"
 
-double L_x = 300e-10;                  // Longueur de la boîte en x (en m)
-double L_z = 600e-10;                 // Longueur de la boîte en z (en m)
+double L_x = 680e-10;                  // Longueur de la boîte en x (en m)
+double L_z = 680e-10;                 // Longueur de la boîte en z (en m)
 double delta_t = 5e-14;               // Pas de temps pour la discrétisation (en s)
 double kappa = 1.;                    // Coefficient de compressibilité isotherme
 double tau_P = 1e-12;                  // Temps de réponse du barostat (en s)

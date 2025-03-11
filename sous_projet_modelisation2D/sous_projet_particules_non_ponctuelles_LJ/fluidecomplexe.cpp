@@ -313,7 +313,11 @@ void FluideComplexe::calculer_forces() {
     std::cout << "Appel de calculer_forces()\n";
     // Nettoyer le vecteur des forces d'interaction avant de recalculer
     forces_interactions.clear();
+    Pxx.clear();
+    Pzz.clear();
+    nb_interactions.clear();
 
+    double surface_locale = M_PI * r_c * r_c;
     // Vecteurs de translation pour appliquer les conditions périodiques
     Vec2 ux(1.0, 0.0);  // Unité en x
     Vec2 uz(0.0, 1.0);  // Unité en z
@@ -337,6 +341,8 @@ void FluideComplexe::calculer_forces() {
         // Boucle sur chaque position i dans l'ensemble de particules i
         for (size_t i = 0; i < ensemble_i.positions.size(); ++i) {
             int k = 0;
+	    double Pxx_local = ensemble_i.masse*std::pow(ensemble_i.vitesses[i].x,2.0);
+	    double Pzz_local = ensemble_i.masse*std::pow(ensemble_i.vitesses[i].z,2.0);
             Vec2 position_i = ensemble_i.positions[i];
 
             // Initialiser la force totale subie par la particule i
@@ -344,6 +350,7 @@ void FluideComplexe::calculer_forces() {
 
             // Boucle sur chaque ensemble de particules j
             for (auto& ensemble_j : particules) {
+		    double m = ensemble_j.masse;
                 // Boucle sur chaque position j dans l'ensemble de particules j
                 for (size_t j = 0; j < ensemble_j.positions.size(); ++j) {
                     Vec2 position_j = ensemble_j.positions[j];
@@ -372,12 +379,18 @@ void FluideComplexe::calculer_forces() {
                             f_ij = force_LJ(ensemble_i.E_0, ensemble_j.E_0, ensemble_i.d, ensemble_j.d, r_ij);
                             break;  // Par construction (r_c correctement choisi), une particule i n'interagit qu'avec une des 9 particules j 
                         }
+                        Pxx_local += m * ensemble_j.vitesses[j].x * ensemble_j.vitesses[j].x;
+                        Pzz_local += m * ensemble_j.vitesses[j].z * ensemble_j.vitesses[j].z;
                     }
 
                     // Ajouter la force d'interaction f_ij à la force totale
                     force_totale += f_ij;
                 }
             }
+            // Stocker le nombre d'interactions et les pressions locales
+            nb_interactions.push_back(k);
+	    Pxx.push_back(Pxx_local / surface_locale);
+	    Pzz.push_back(Pzz_local / surface_locale);
             moyenne_k += k;
             // Ajouter la force totale pour cette particule au vecteur des forces d'interactions
             forces_interactions.push_back(force_totale);
@@ -410,11 +423,12 @@ void FluideComplexe::mettre_a_jour_positions(double P) {
     }
     // Application des conditions periodiques
     appliquer_conditions_periodiques();
-    // Aplication du barostat pour tenir compte de la pression fixée P, modifie les positions, L_x et L_z
-    appliquer_barostat(P);
-        
-    double Pxx = calculer_tenseur_pression(0,0,L_z/16.0,0);
-    double Pzz = calculer_tenseur_pression(1,1,L_z/16.0,0);
+    // Aplication du barostat local pour tenir compte de la pression fixée P, modifie les positions des particules
+    // appliquer_barostat(P);
+    appliquer_barostat_local(P);
+
+    double Pxx_tranchecentrale = calculer_tenseur_pression(0,0,L_z/4.0,0);
+    double Pzz_tranchecentrale = calculer_tenseur_pression(1,1,L_z/4.0,0);
     std::cout << "Pxx = " << Pxx << " Pa.m\n";
     std::cout << "Pzz = " << Pzz << " Pa.m\n";
 
@@ -491,9 +505,9 @@ void FluideComplexe::appliquer_thermostat(double T) {
 }
 
 // Méthode pour appliquer le barostat en fonction de la pression P
-void FluideComplexe::appliquer_barostat(double P) {
+/*void FluideComplexe::appliquer_barostat(double P) {
     std::cout << "Calcul de P...\n";
-    double P_mes = (calculer_tenseur_pression(0,0,L_z/16.0,0) + calculer_tenseur_pression(1,1,L_z/16.0,0)) / 2.0; //calc pression au centres
+    double P_mes = (calculer_tenseur_pression(0,0,L_z/4.0,0) + calculer_tenseur_pression(1,1,L_z/4.0,0)) / 2.0; //calc pression au centres
     std::cout << "P = " << P_mes << " Pa\n";
     double lambda = std::pow(1 - kappa * delta_t * (P - P_mes) / tau_P, 1/2.0);
     std::cout << "lambda : " << lambda << std::endl; 
@@ -511,6 +525,49 @@ void FluideComplexe::appliquer_barostat(double P) {
     }
     std::cout << "Barostat appliqué.\n";
 }
+*/
+
+void FluideComplexe::appliquer_barostat_local(double P_cible) {
+    std::cout << "Application du barostat local...\n";
+
+    // Calcul de la moyenne des interactions par particule
+    double somme_interactions = 0.0;
+    int nb_total_particules = 0;
+    for (int i = 0; i < nb_interactions.size(); ++i) {
+        somme_interactions += nb_interactions[i];
+        nb_total_particules++;
+    }
+    double interactions_moy = somme_interactions / nb_total_particules;
+    double seuil = interactions_moy / 4.0;
+
+    // Calcul de lambda moyen pour ajuster les positions
+    double somme_lambda = 0.0;
+    int nb_particules_modifiees = 0;
+
+    for (int i = 0; i < nb_interactions.size(); ++i) {
+        if (nb_interactions[i] > seuil) {
+            double P_local = Pxx[i] + Pzz[i];
+            double lambda = sqrt(std::max(0.0, 1 - kappa * delta_t * (P_cible - P_local) / tau_P));
+            somme_lambda += lambda;
+            nb_particules_modifiees++;
+        }
+    }
+
+    // Appliquer la mise à l'échelle aux positions si nécessaire
+    if (nb_particules_modifiees > 0) {
+        double lambda_moyen = somme_lambda / nb_particules_modifiees;
+        int index_particule = 0;
+        for (auto& ensemble : particules) {
+            for (auto& position : ensemble.positions) {
+                position = position * lambda_moyen;
+                index_particule++;
+            }
+        }
+    }
+    std::cout << "Barostat local appliqué avec lambda moyen : "
+              << (nb_particules_modifiees > 0 ? somme_lambda / nb_particules_modifiees : 1.0) << "\n";
+}
+
 
 // Méthode pour calculer la température du fluide  
 double FluideComplexe::calculer_temperature() const {

@@ -32,7 +32,10 @@ private:
     double r_c;                          // Rayon de coupure des interactions
     std::vector<Particules> particules;  // Ensemble des ensembles de particules
     std::vector<Vec2> forces_interactions;  // Forces d'interactions des particules (indices correspondants à particules)
-    std::string fichier_nom;   // Fichier contenant la description de fluide complexe en termes d'ensemble de particules
+    std::vector<int> nb_interactions;    // Nombre de voisins d'une particule
+    std::vector<double> Pxx;             // Composante xx du tenseur de pression
+    std::vector<double> Pzz;             // Composante zz du tenseur de pression
+    std::string fichier_nom;             // Fichier contenant la description de fluide complexe en termes d'ensemble de particules
     
     std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines;
     void initialisation_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire);
@@ -62,7 +65,10 @@ public:
     void appliquer_thermostat(double T);
 
     // Méthode pour appliquer le barostat en fonction de la pression P
-    void appliquer_barostat(double P);
+//    void appliquer_barostat(double P);
+
+    // Méthode pour appliquer le barostat en fonction de la pression locale Pxx et Pzz
+    void appliquer_barostat_local(double P_cible);
 
     // Méthode pour calculer la température du fluide
     double calculer_temperature() const;
