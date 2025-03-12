@@ -429,8 +429,8 @@ void FluideComplexe::mettre_a_jour_positions(double P) {
 
     double Pxx_tranchecentrale = calculer_tenseur_pression(0,0,L_z/4.0,0);
     double Pzz_tranchecentrale = calculer_tenseur_pression(1,1,L_z/4.0,0);
-    std::cout << "Pxx = " << Pxx << " Pa.m\n";
-    std::cout << "Pzz = " << Pzz << " Pa.m\n";
+    std::cout << "Pxx = " << Pxx_tranchecentrale << " Pa.m\n";
+    std::cout << "Pzz = " << Pzz_tranchecentrale << " Pa.m\n";
 
     std::cout << "Fin de mise à jour des positions.\n";
     std::cout << "--------------------------------------------------\n";
@@ -563,6 +563,12 @@ void FluideComplexe::appliquer_barostat_local(double P_cible) {
                 index_particule++;
             }
         }
+	// Ajustement de la boîte
+        L_x *= lambda_moyen;
+        L_z *= lambda_moyen;
+
+        // Ajustement du rayon de coupure
+        r_c *= lambda_moyen;
     }
     std::cout << "Barostat local appliqué avec lambda moyen : "
               << (nb_particules_modifiees > 0 ? somme_lambda / nb_particules_modifiees : 1.0) << "\n";
