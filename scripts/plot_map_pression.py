@@ -11,7 +11,7 @@ from scipy.stats import binned_statistic_2d
 import matplotlib.animation as animation
 import multiprocessing
 import matplotlib
-matplotlib.use('Agg')  # Utilise le backend non interactif pour plus de rapidité
+#matplotlib.use('Agg')  # Utilise le backend non interactif pour plus de rapidité
 
 
 def pad_with_periodicity(coords, neighbors, grid_size):
@@ -62,8 +62,9 @@ def compute_meshgrid(data, quantity, grid_size, neighbors):
     local_pressure = compute_local_sum(sum_grid, grid_size, neighbors)
     return mesh_x, mesh_z, local_pressure
 
+""" VERSION NON PARALLELISEE
 def compute_average_on_grid(files,folder, grid_size, neighbors):
-    """Calculer la moyenne des valeurs sur le meshgrid pour tous les fichiers."""
+    #Calculer la moyenne des valeurs sur le meshgrid pour tous les fichiers
     
     # Création du meshgrid pour la grille globale
     x_vals = np.linspace(-0.5, 0.5, grid_size)
@@ -94,6 +95,41 @@ def compute_average_on_grid(files,folder, grid_size, neighbors):
         count += 1
 
     # Calcul de la moyenne sur tous les fichiers
+    P_N = compute_local_sum(sum_P_N / count, grid_size, neighbors)
+    P_T = compute_local_sum(sum_P_T / count, grid_size, neighbors)
+    
+    return mesh_x, mesh_z, P_N, P_T
+"""
+def process_file(filename, folder, grid_size, neighbors):
+    """Traite un fichier et retourne les grilles calculées pour P_N et P_T."""
+    filepath = os.path.join(folder, filename)
+    data = pd.read_csv(filepath)
+
+    _, _, grid_N = sum_on_meshgrid_scipy(data, "mvz2", grid_size)
+    _, _, grid_T = sum_on_meshgrid_scipy(data, "mvx2", grid_size)
+
+    return grid_N, grid_T
+
+def compute_average_on_grid(files, folder, grid_size, neighbors):
+    """Calculer la moyenne des valeurs sur le meshgrid pour tous les fichiers en parallèle."""
+    
+    # Création du meshgrid pour la grille globale
+    x_vals = np.linspace(-0.5, 0.5, grid_size)
+    z_vals = np.linspace(-0.5, 0.5, grid_size)
+    mesh_x, mesh_z = np.meshgrid(x_vals, z_vals)
+
+    # Utilisation d'un pool de processus pour paralléliser le traitement des fichiers
+    with multiprocessing.Pool() as pool:
+        results = pool.starmap(process_file, [(f, folder, grid_size, neighbors) for f in files])
+
+    # Séparer les résultats en P_N et P_T
+    sum_P_N = np.sum([res[0] for res in results], axis=0)
+    sum_P_T = np.sum([res[1] for res in results], axis=0)
+
+    # Nombre total de fichiers traités
+    count = len(files)
+
+    # Calcul de la moyenne locale en utilisant la convolution
     P_N = compute_local_sum(sum_P_N / count, grid_size, neighbors)
     P_T = compute_local_sum(sum_P_T / count, grid_size, neighbors)
     
