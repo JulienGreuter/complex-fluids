@@ -8,8 +8,8 @@
 ***masse*** : Masse des particules  
 ***taille*** : Taille des particules (initialisée à 0 pour des particules ponctuelles)  
 ***charge*** : Charge électrique des particules (initialisée à 0 pour )  
-***positions*** : Positions des particules  
-***vitesses*** : Vitesses des particules  
+***positions*** : Vecteurs positions des particules  
+***vitesses*** : Vecteurs vitesses des particules  
 
 Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** via la ligne:  
     ```friend class FluideComplexe;```
@@ -50,19 +50,16 @@ Fonction pour appliquer les conditions périodiques à une unique coordonné si 
 
 ### Attributs:
 
-class FluideComplexe {
-private:
-    // Attributs
-    double L_x;                          // Longueur de la boîte en x
-    double L_z;                          // Longueur de la boîte en z
-    double delta_t;                      // Pas de temps pour la discrétisation
-    double kappa;                        // Coefficient de compressibilité isotherme
-    double tau_P;                        // Temps de réponse du barostat
-    double tau_T;                        // Temps de réponse du thermostat
-    double r_c;                          // Rayon de coupure des interactions
-    std::vector<Particules> particules;  // Ensemble des ensembles de particules
-    std::vector<Vec2> forces_interactions;  // Forces d'interactions des particules (indices correspondants à particules)
-    std::string fichier_nom;   // Fichier contenant la description de fluide complexe en termes d'ensemble de particules
+***L_x*** : Longueur de la boîte selon x  
+***L_z*** : Longueur de la boîte selon z  
+***delta_t*** : Pas de temps pour la discrétisation en temps  
+***kappa*** : Coefficient de compressibilité isotherme  
+***tau_P*** : Temps de réponse du barostat  
+***tau_T*** : Temps de réponse du thermostat  
+***r_c*** : Rayon de coupure des intéractions, la distance limite au dessus de laquelle l'on suppose que les particules n'interagissent plus  
+***particules*** : Ensemble des ensembles de particules issue de la classe particules
+***forces_interactions*** :  // Forces d'interactions des particules (indices correspondants à particules)
+***fichier_nom*** :   // Fichier contenant la description de fluide complexe en termes d'ensemble de particules
     
     std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines;
     void initialisation_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire);
