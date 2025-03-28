@@ -34,7 +34,7 @@ Ces deux méthodes ont pour objetifs respectifs de définir la position et la vi
 ### Fonction:
 
 ***Vec2 force_LJ*** : ```E_0i``` ,```E_0j``` ,```di``` ,```dj``` ,```r_ij```  
-Fonction pour calculer la force de Lennard-Jones entre deux particules i et j.
+Fonction pour calculer la force de Lennard-Jones entre deux particules i et j, cela repose sur le produit de ```r_ij``` et un facteur calculé à partir de la moyenne entre les deux paramètres du potentiel de Lennard-Jones et la moyenne .  
 
 ***Vec2 maxwellBoltzmannSample*** : ```T``` ,```masse```  
 Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann centrée et d'écart type ```sigma = std::sqrt(K_B * T / masse)```.  
