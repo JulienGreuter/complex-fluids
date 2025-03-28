@@ -33,19 +33,18 @@ Ces deux méthodes ont pour objetifs respectifs de définir la position et la vi
 ## Fluidecomplexe:
 ### Fonction:
 
-***Vec2 force_LJ*** : ```E_0i```, ```E_0j```, ```di```, ```dj```, ```r_ij```  
-Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann en prenant en compte l'interaction d'une particule j sur une particule i.
+***Vec2 force_LJ*** : ```E_0i``` ,```E_0j``` ,```di``` ,```dj``` ,```r_ij```  
+Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann en prenant en compte l'interaction d'une particule j sur une particule i.  
 
-***Vec2 maxwellBoltzmannSample*** : ```T```, ```masse```
-Fonction pour appliquer la relaxation vers Maxwell-Boltzmann sur une vitesse
+***Vec2 maxwellBoltzmannSample*** : ```T``` ,```masse```  
+Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse, c'est à dire générer un vecteur vitesse selon la distribution de Maxwell centrée et d'écart type ```sigma = std::sqrt(K_B * T / masse)```.  
 
-void relaxationVersMaxwell(Vec2& vitesse, double T, double masse, double alpha);
-// Fonction pour appliquer les conditions périodiques à une coordonné uniquement si nécessaire
+***void relaxationVersMaxwell*** : ```& vitesse``` ,```T``` ,```masse``` ,```alpha```  
 
-double periodic_boundary_if_needed(double coord, double L, bool& modifie);
-// Fonction pour lire les en-tetes
+***double periodic_boundary_if_needed*** : ```coord``` ,```L``` ,```& modifie```  
+Fonction pour appliquer les conditions périodiques à une coordonné uniquement si nécessaire.  
 
-bool extraireEnteteEnsemble(const std::string& ligne, int& N, double& d, double& E_0, double& taille, double& masse);
+***bool extraireEnteteEnsemble*** ```& ligne``` ,```& N``` ,```& d``` ,```& E_0``` ,```& taille``` ,```& masse```  
 
 ### Attributs:
 
