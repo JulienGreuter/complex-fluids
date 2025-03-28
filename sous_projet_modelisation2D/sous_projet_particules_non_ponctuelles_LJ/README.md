@@ -34,15 +34,16 @@ Ces deux méthodes ont pour objetifs respectifs de définir la position et la vi
 ### Fonction:
 
 ***Vec2 force_LJ*** : ```E_0i``` ,```E_0j``` ,```di``` ,```dj``` ,```r_ij```  
-Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann en prenant en compte l'interaction d'une particule j sur une particule i.  
+Fonction pour calculer la force de Lennard-Jones entre deux particules i et j.
 
 ***Vec2 maxwellBoltzmannSample*** : ```T``` ,```masse```  
-Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse, c'est à dire générer un vecteur vitesse selon la distribution de Maxwell centrée et d'écart type ```sigma = std::sqrt(K_B * T / masse)```.  
+Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann centrée et d'écart type ```sigma = std::sqrt(K_B * T / masse)```.  
 
 ***void relaxationVersMaxwell*** : ```& vitesse``` ,```T``` ,```masse``` ,```alpha```  
+Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse.
 
 ***double periodic_boundary_if_needed*** : ```coord``` ,```L``` ,```& modifie```  
-Fonction pour appliquer les conditions périodiques à une coordonné uniquement si nécessaire.  
+Fonction pour appliquer les conditions périodiques à une unique coordonné si nécessaire.
 
 ***bool extraireEnteteEnsemble*** ```& ligne``` ,```& N``` ,```& d``` ,```& E_0``` ,```& taille``` ,```& masse```  
 
