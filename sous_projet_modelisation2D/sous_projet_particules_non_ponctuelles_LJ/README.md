@@ -16,7 +16,7 @@ Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** v
 Cela permet de faciliter l'interaction entre ces deux classes.  
 
 ### Constructeur
-Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```. 
+Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
 Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes. 
  
 initialiserVitesses : ```T```. 
