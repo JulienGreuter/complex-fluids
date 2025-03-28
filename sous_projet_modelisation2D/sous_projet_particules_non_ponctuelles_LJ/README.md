@@ -21,7 +21,8 @@ Nous initialisons certaines constantes des particules, elles sont donc supposés
  
 ##### initialiserVitesses : ```T```  
 Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide. 
- 
+Nous posons alors sigma = std::sqrt(K_B * T / masse)
+
 ##### appliquerConditionsPeriodiques : ```L_x``` ,```L_z```  
 Cette méthode permet de redéfinir les distances calculées lors d'une itération comme un module selon x et z. Cela permet d'appliquer les conditions périodiques aux limites. 
  
