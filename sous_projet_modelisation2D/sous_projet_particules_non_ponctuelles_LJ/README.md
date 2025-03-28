@@ -16,18 +16,18 @@ Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** v
 Cela permet de faciliter l'interaction entre ces deux classes.  
 
 ### Constructeur
-Particules(int N, double E_0, double d, double masse, double taille = 0.0, double charge = 0.0);
-// Pour l'utilisation dans FluideComplexe, positions et vitesses sont initialisés plus tard
+Particules : N ,E_0 ,d ,masse,taille = 0.0 ,charge = 0.0
+    Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes.
 
-// Méthode pour initialiser les vitesses en fonction de la température T
-void initialiserVitesses(double T);
+initialiserVitesses : T
+    Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide.
 
-    // Méthode pour appliquer les conditions périodiques (dépendant de L_x et L_z)
-    void appliquerConditionsPeriodiques(double L_x, double L_z);
+appliquerConditionsPeriodiques : L_x ,L_z
+    Cette méthode permet de redéfinir les distances calculées lors d'une itération comme un module selon x et z. Cela permet d'appliquer les conditions périodiques aux limites.
 
-    // Setter pour positions et vitesses dans le cas d'une utilisation de la classe Particules en dehors de la classe FluideComplexe
-    void setPositions(const std::vector<Vec2>& newPositions);
-    void setVitesses(const std::vector<Vec2>& newVitesses);
+setPositions : newPositions
+setVitesses : newVitesses
+    Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse 
 
     // Getter pour accéder aux attributs privés
     const std::vector<Vec2>& getPositions() const;
