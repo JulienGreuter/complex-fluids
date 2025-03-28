@@ -15,7 +15,7 @@ Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** v
     ```friend class FluideComplexe;```
 Cela permet de faciliter l'interaction entre ces deux classes.  
 
-### Constructeur
+### Constructeur:
 ##### Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
 Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes. 
  
@@ -31,5 +31,6 @@ Cette méthode permet de redéfinir les distances calculées lors d'une itérati
 Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières, ce sont des méthodes non utilisées pour le fluide complexe. Elles servent à tester la classe particules pour tester les différentes modifications qui ont été amenées  
 
 ## Fluidecomplexe:
+### Fonction:
 ### Attributs:
-
+### Constructeur:
