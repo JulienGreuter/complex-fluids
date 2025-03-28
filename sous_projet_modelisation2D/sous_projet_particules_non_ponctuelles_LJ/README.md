@@ -17,17 +17,17 @@ Cela permet de faciliter l'interaction entre ces deux classes.
 
 ### Constructeur
 Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0``` 
-    Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes. 
+Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes. 
  
 initialiserVitesses : ```T``` 
-    Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide. 
+Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide. 
  
 appliquerConditionsPeriodiques : ```L_x``` ,```L_z``` 
-    Cette méthode permet de redéfinir les distances calculées lors d'une itération comme un module selon x et z. Cela permet d'appliquer les conditions périodiques aux limites. 
+Cette méthode permet de redéfinir les distances calculées lors d'une itération comme un module selon x et z. Cela permet d'appliquer les conditions périodiques aux limites. 
  
 setPositions : ```newPositions``` 
 setVitesses : ```newVitesses``` 
-    Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse 
+Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse 
 
     // Getter pour accéder aux attributs privés
     const std::vector<Vec2>& getPositions() const;
