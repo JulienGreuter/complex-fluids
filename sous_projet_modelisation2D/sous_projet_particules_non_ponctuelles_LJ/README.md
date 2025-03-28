@@ -21,15 +21,15 @@ Nous initialisons certaines constantes des particules, elles sont donc supposés
  
 ##### initialiserVitesses : ```T```  
 Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide. 
-Nous posons alors sigma = std::sqrt(K_B * T / masse)
+Nous posons alors ```sigma = std::sqrt(K_B * T / masse)``` l'écart-type de la distribution de Maxwell-Boltzmann, puis nous générons un nombre aléatoire qui va nous permettre de calculer une distribution de position et de vitesse aléatoire et de type maxwellienne centrée et d'écart type ```sigma```.  
+Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initialisé nulle, ce vecteur permet de "normer" les vecteurs vitesses pour que la vitesse du barycentre reste nulle.  
 
 ##### appliquerConditionsPeriodiques : ```L_x``` ,```L_z```  
 Cette méthode permet de redéfinir les distances calculées lors d'une itération comme un module selon x et z. Cela permet d'appliquer les conditions périodiques aux limites. 
  
-##### setPositions : ```newPositions```  
-##### setVitesses : ```newVitesses```  
-Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse 
+##### setPositions : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
+Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières, ce sont des méthodes non utilisées pour le fluide complexe. Elles servent à tester la classe particules pour tester les différentes modifications qui ont été amenées  
 
-    // Getter pour accéder aux attributs privés
-    const std::vector<Vec2>& getPositions() const;
-    const std::vector<Vec2>& getVitesses() const;
+## Fluidecomplexe:
+### Attributs:
+
