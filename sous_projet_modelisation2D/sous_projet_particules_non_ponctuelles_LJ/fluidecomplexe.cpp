@@ -527,6 +527,7 @@ void FluideComplexe::appliquer_thermostat(double T) {
 }
 */
 
+
 void FluideComplexe::appliquer_barostat_local(double P_cible) {
     std::cout << "Application du barostat local...\n";
 
@@ -538,17 +539,27 @@ void FluideComplexe::appliquer_barostat_local(double P_cible) {
         nb_total_particules++;
     }
     double interactions_moy = somme_interactions / nb_total_particules;
-    double seuil = interactions_moy / 4.0;
+    double seuil = interactions_moy / 8.0;
 
     // Calcul de lambda moyen pour ajuster les positions
+
     double somme_lambda = 0.0;
     int nb_particules_modifiees = 0;
+    double somme_P_loc = 0;
 
     for (int i = 0; i < nb_interactions.size(); ++i) {
         if (nb_interactions[i] > seuil) {
             double P_local = Pxx[i] + Pzz[i];
-            double lambda = sqrt(std::max(0.0, 1 - kappa * delta_t * (P_cible - P_local) / tau_P));
+            double lambda = 1 - kappa * delta_t * (P_cible - P_local) / tau_P;
+            if (lambda > 1.010025){
+                           }
+            else if (lambda < 0.990025){
+                    std::cout << "Ecart trop important à 1, lambda vaut : " << lambda << "\n";
+                    lambda = 0.990025;
+            }
+            lambda = std::pow(lambda,1/2.0);
             somme_lambda += lambda;
+            somme_P_loc += P_local;
             nb_particules_modifiees++;
         }
     }
@@ -556,6 +567,7 @@ void FluideComplexe::appliquer_barostat_local(double P_cible) {
     // Appliquer la mise à l'échelle aux positions si nécessaire
     if (nb_particules_modifiees > 0) {
         double lambda_moyen = somme_lambda / nb_particules_modifiees;
+        double P_locale_moyen = somme_P_loc / nb_particules_modifiees;
         int index_particule = 0;
         for (auto& ensemble : particules) {
             for (auto& position : ensemble.positions) {
@@ -563,17 +575,20 @@ void FluideComplexe::appliquer_barostat_local(double P_cible) {
                 index_particule++;
             }
         }
-	// Ajustement de la boîte
+        // Ajustement de la boîte
         L_x *= lambda_moyen;
         L_z *= lambda_moyen;
 
         // Ajustement du rayon de coupure
         r_c *= lambda_moyen;
+            std::cout << "lambda_moyen = " << lambda_moyen <<"\n";
+        std::cout << "nb_interactions = " << interactions_moy << "\n";
+        std::cout << "nb_particules_modifiees = " << nb_particules_modifiees << "\n";
+        std::cout << "P_locale = " << P_locale_moyen << "\n";
     }
     std::cout << "Barostat local appliqué avec lambda moyen : "
               << (nb_particules_modifiees > 0 ? somme_lambda / nb_particules_modifiees : 1.0) << "\n";
 }
-
 
 // Méthode pour calculer la température du fluide  
 double FluideComplexe::calculer_temperature() const {
