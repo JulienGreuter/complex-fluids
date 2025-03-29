@@ -612,9 +612,9 @@ void FluideComplexe::appliquer_barostat_local(double P_cible) {
             double P_local = Pxx[index_i] + Pzz[index_i];
             double lambda_i = std::sqrt(1 - kappa * delta_t * (P_cible - P_local) / tau_P);
 
-            if (lambda_i > 1.01) lambda_i = 1.01;
+            std::cout << "lambda_i = " << lambda_i << " (P_local = " << P_local << ")\n";
+	    if (lambda_i > 1.01) lambda_i = 1.01;
             else if (lambda_i < 0.99) lambda_i = 0.99;
-
             lambdas.push_back(lambda_i);
 
             Vec2 ri = ensemble_i.positions[i];
@@ -627,7 +627,7 @@ void FluideComplexe::appliquer_barostat_local(double P_cible) {
                     for (const auto& v : vecteurs_periodiques) {
                         Vec2 r_ij = (rj + v) - ri;
                         if (r_ij.norme() < r_c) {
-                            ensemble_j.positions[j] += ri * (1 - lambda_i);
+                            ensemble_j.positions[j] = ensemble_j.positions[j]*lambda_i + ri * (1 - lambda_i);
                             break;
                         }
                     }
@@ -648,8 +648,6 @@ void FluideComplexe::appliquer_barostat_local(double P_cible) {
         std::cout << "Barostat local appliqué.\n";
         std::cout << "lambda_moyen = " << lambda_moyen << "\n";
         std::cout << "N = " << lambdas.size() << " particules traitées\n";
-    } else {
-        std::cout << "Aucun lambda calculé, barostat non appliqué.\n";
     }
 }
 
