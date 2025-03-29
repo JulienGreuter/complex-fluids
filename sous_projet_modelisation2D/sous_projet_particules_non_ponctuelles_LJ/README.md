@@ -80,25 +80,25 @@ Cette méthode est assimilable à la précédente, mais l'information sur la ré
 Cette méthode vise à calculer les forces d'interactions entre les particules  
 
 ##### mettre_a_jour_positions : ```P```  
-Méthode pour mettre à jour les positions des particules, il s'agit du principe fondamental de la dynamique discrétisé appliqué à chaque particules en fonctions des forces calculé avec la méthode précédente  
+Méthode pour mettre à jour les positions des particules en fonctions des forces calculé avec la méthode précédente et des conditons limites périodiques  
 
 ##### mettre_a_jour_vitesses : ```T``` ,```& forces_interactions_precedentes```  
-Méthode pour mettre à jour les vitesses des particules   
+Méthode pour mettre à jour les vitesses pour un temps ```t+dt``` des particules en fonctions des forces calculé à un temps ```t``` et un temps ```t+dt```  
     
-    // Méthode pour appliquer les conditions périodiques
-    void appliquer_conditions_periodiques();
+##### appliquer_conditions_periodiques : 
+Cette méthode vise à ramener une particule dans l'espace ```L_x*L_z``` par périodicité de cette boîte  
 
-    // Méthode pour appliquer le thermostat en fonction de la température T
-    void appliquer_thermostat(double T);
+##### appliquer_thermostat : ```T```  
+Pour maintenir un thermostat constament à ```T```, et surtout d'éviter une explosion des vitesses  
 
-    // Méthode pour appliquer le barostat en fonction de la pression P
-    void appliquer_barostat(double P);
+##### appliquer_barostat : ```P```  
+Cette méthode et comme la précédente mais en prenant cette fois ci la pression en compte
 
-    // Méthode pour calculer la température du fluide
-    double calculer_temperature() const;
+##### calculer_temperature :  
+Méthode de calcule de la température du fluide via un calcule statistique sur la vitesse de chaque particules  
 
-    // Méthode pour calculer le tenseur de pression sur une tranche donnée
-    double calculer_tenseur_pression(int alpha, int beta, double Delta_z, double z_k) const;
+##### calculer_tenseur_pression : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
+Cette méthode permet de calculer le tenseur de pression sur une tranche de l'espace selon ```z```  
 
     // Méthode pour faire évoluer le système vers l'état suivant
     void evoluer(double T, double P);
