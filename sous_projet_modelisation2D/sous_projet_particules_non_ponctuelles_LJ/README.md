@@ -62,10 +62,13 @@ Fonction pour lire les en-têtes.
 ***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules
 ***std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
 
-    void initialisation_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire);
-    void traiter_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire);
-
 ### Constructeur:
+
+##### initialisation_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  -----------------------------------------------------
+
+
+##### traiter_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  ------------------------------------------------------------
+
 
 ##### FluideComplexe : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
 Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
@@ -100,11 +103,44 @@ Méthode de calcule de la température du fluide via un calcule statistique sur 
 ##### calculer_tenseur_pression : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
 Cette méthode permet de calculer le tenseur de pression sur une tranche de l'espace selon ```z```  
 
-    // Méthode pour faire évoluer le système vers l'état suivant
-    void evoluer(double T, double P);
+##### evoluer : ```T``` ,```P```  
+Cette méthode est celle qui permet l'évolution global du système avec toutes les méthodes précédentes, c'est pour cela qu'elle demande une température et une pression, ce sera le thermostat et le barostat  
+    
+##### exporterPositionsCSV : ```& fileCSV```  
+Méthode pour exporter les positions des particules vers un fichier CSV  
 
-    // Méthode pour exporter les positions des particules sous CSV
-    void exporterPositionsCSV(const std::string& fileCSV) const;
+##### exporterVitessesCSV : ```& fileCSV```
+Méthode pour exporter les vitesses des particules vers un fichier CSV  
 
-    // Méthode pour exporter les vitesses des particules sous CSV
-    void exporterVitessesCSV(const std::string& fileCSV) const;
+## Case:
+### Attributs:
+***x, z*** : Position du centre de la case
+***ordre_subdivision*** : Ordre de subdivision-----------------------------------------------------------------------------------------------
+***enfants*** : Pointeurs intelligents pour éviter les fuites mémoire------------------------------------------------------------------------***taille_case*** : Taille d'une case
+***est_libre*** : État de la case, pour savoir si elle est vide ou non
+
+### Constructeur:
+
+###### Case : (double x, double z, double taille_case, int ordre_subdivision = 0, bool est_libre = true);
+
+    // Méthode pour subdiviser une case en 4 enfants
+    void subdiviser();
+
+    // Vérifie si la case est un parent
+    bool estParent() const { return !enfants.empty(); }
+
+    // Vérifie si la case est libre
+    bool estLibre() const { return est_libre; }
+
+    // Marque la case comme occupée
+    void marquerOccupee() { est_libre = false; }
+
+    // Affichage des informations de la case
+    void afficher() const;
+
+    // Getter pour accéder aux attributs privés
+    double getX() const { return x; }
+    double getZ() const { return z; }
+    int getOrdreSubdivision() const { return ordre_subdivision; }
+    const std::vector<std::unique_ptr<Case>>& getEnfants() const { return enfants; }
+    double getTaille() const { return taille_case; }
