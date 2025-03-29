@@ -121,7 +121,7 @@ Méthode pour exporter les vitesses des particules vers un fichier CSV
 
 ### Constructeur:
 
-###### Case : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
+##### Case : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
 Initialisation de la classe avec des cases
 
 ##### subdiviser :  
