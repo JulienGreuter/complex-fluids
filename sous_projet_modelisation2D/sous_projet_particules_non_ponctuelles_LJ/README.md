@@ -115,32 +115,30 @@ Méthode pour exporter les vitesses des particules vers un fichier CSV
 ## Case:
 ### Attributs:
 ***x, z*** : Position du centre de la case
-***ordre_subdivision*** : Ordre de subdivision-----------------------------------------------------------------------------------------------
+***ordre_subdivision*** : Ordre de subdivision, le nombre de subdivision à suivre pour être dans cette case
 ***enfants*** : Pointeurs intelligents pour éviter les fuites mémoire------------------------------------------------------------------------***taille_case*** : Taille d'une case
 ***est_libre*** : État de la case, pour savoir si elle est vide ou non
 
 ### Constructeur:
 
-###### Case : (double x, double z, double taille_case, int ordre_subdivision = 0, bool est_libre = true);
+###### Case : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
+Initialisation de la classe avec des cases
 
-    // Méthode pour subdiviser une case en 4 enfants
-    void subdiviser();
+##### subdiviser :  
+Méthode pour subdiviser une case en 4 case enfants de même tailles  
 
-    // Vérifie si la case est un parent
-    bool estParent() const { return !enfants.empty(); }
+##### estParent :  
+Vérifie si la case est un parent, donc si elle admet des case d'ordre plus élevée en elle  
 
-    // Vérifie si la case est libre
-    bool estLibre() const { return est_libre; }
+##### estLibre :  
+Vérifie si la case est libre (non occupée)  
 
-    // Marque la case comme occupée
-    void marquerOccupee() { est_libre = false; }
+##### marquerOccupee :  
+Change l'état de liberté de la case vers occupée  
 
-    // Affichage des informations de la case
-    void afficher() const;
+##### afficher :  
+Affiche des informations de la case  
 
-    // Getter pour accéder aux attributs privés
-    double getX() const { return x; }
-    double getZ() const { return z; }
-    int getOrdreSubdivision() const { return ordre_subdivision; }
-    const std::vector<std::unique_ptr<Case>>& getEnfants() const { return enfants; }
-    double getTaille() const { return taille_case; }
+##### getX , getZ , getOrdreSubdivision , getEnfants et getTaille :  
+Getter pour accéder aux attributs et privés d'une case  
+
