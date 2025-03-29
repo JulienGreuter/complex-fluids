@@ -46,7 +46,7 @@ Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse.
 Fonction pour appliquer les conditions périodiques à une unique coordonné si nécessaire.
 
 ***bool extraireEnteteEnsemble*** ```& ligne``` ,```& N``` ,```& d``` ,```& E_0``` ,```& taille``` ,```& masse```  
-
+Fonction pour lire les en-têtes.  
 
 ### Attributs:
 
