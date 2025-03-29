@@ -527,7 +527,7 @@ void FluideComplexe::appliquer_thermostat(double T) {
 }
 */
 
-
+/*
 void FluideComplexe::appliquer_barostat_local(double P_cible) {
     std::cout << "Application du barostat local...\n";
 
@@ -589,6 +589,71 @@ void FluideComplexe::appliquer_barostat_local(double P_cible) {
     std::cout << "Barostat local appliqué avec lambda moyen : "
               << (nb_particules_modifiees > 0 ? somme_lambda / nb_particules_modifiees : 1.0) << "\n";
 }
+*/
+
+// Barostat local corrigé selon une seconde méthode
+void FluideComplexe::appliquer_barostat_local(double P_cible) {
+    std::cout << "Application du barostat local corrigé...\n";
+
+    std::vector<double> lambdas;
+    int index_i = 0;
+
+    // Vecteurs de translation pour les conditions périodiques
+    std::vector<Vec2> vecteurs_periodiques = {
+        Vec2(0.0, 0.0),
+        Vec2(L_x, 0.0), Vec2(-L_x, 0.0),
+        Vec2(0.0, L_z), Vec2(0.0, -L_z),
+        Vec2(L_x, L_z), Vec2(-L_x, L_z),
+        Vec2(L_x, -L_z), Vec2(-L_x, -L_z)
+    };
+
+    for (auto& ensemble_i : particules) {
+        for (size_t i = 0; i < ensemble_i.positions.size(); ++i) {
+            double P_local = Pxx[index_i] + Pzz[index_i];
+            double lambda_i = std::sqrt(1 - kappa * delta_t * (P_cible - P_local) / tau_P);
+
+            if (lambda_i > 1.01) lambda_i = 1.01;
+            else if (lambda_i < 0.99) lambda_i = 0.99;
+
+            lambdas.push_back(lambda_i);
+
+            Vec2 ri = ensemble_i.positions[i];
+
+            // Appliquer la correction aux voisines j proches de i
+            for (auto& ensemble_j : particules) {
+                for (size_t j = 0; j < ensemble_j.positions.size(); ++j) {
+                    Vec2 rj = ensemble_j.positions[j];
+
+                    for (const auto& v : vecteurs_periodiques) {
+                        Vec2 r_ij = (rj + v) - ri;
+                        if (r_ij.norme() < r_c) {
+                            ensemble_j.positions[j] += ri * (1 - lambda_i);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            ++index_i;
+        }
+    }
+
+    if (!lambdas.empty()) {
+        double lambda_moyen = std::accumulate(lambdas.begin(), lambdas.end(), 0.0) / lambdas.size();
+
+        L_x *= lambda_moyen;
+        L_z *= lambda_moyen;
+        r_c *= lambda_moyen;
+
+        std::cout << "Barostat local appliqué.\n";
+        std::cout << "lambda_moyen = " << lambda_moyen << "\n";
+        std::cout << "N = " << lambdas.size() << " particules traitées\n";
+    } else {
+        std::cout << "Aucun lambda calculé, barostat non appliqué.\n";
+    }
+}
+
+
 
 // Méthode pour calculer la température du fluide  
 double FluideComplexe::calculer_temperature() const {
