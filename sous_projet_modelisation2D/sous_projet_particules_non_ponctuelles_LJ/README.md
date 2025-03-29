@@ -56,33 +56,35 @@ Fonction pour lire les en-têtes.
 ***kappa*** : Coefficient de compressibilité isotherme  
 ***tau_P*** : Temps de réponse du barostat  
 ***tau_T*** : Temps de réponse du thermostat  
-***r_c*** : Rayon de coupure des intéractions, la distance limite au dessus de laquelle l'on suppose que les particules n'interagissent plus  
-***particules*** : Ensemble des ensembles de particules issue de la classe particules
-***forces_interactions*** :  // Forces d'interactions des particules (indices correspondants à particules)
-***fichier_nom*** :   // Fichier contenant la description de fluide complexe en termes d'ensemble de particules
-    
-    std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines;
+***r_c*** : Rayon de coupure des intéractions, la distance limite au dessus de laquelle l'on suppose que les particules n'interagissent plus 
+***particules*** : Ensemble des ensembles de particules issue de la classe particules, il s'agit d'une liste "concaténée" qui contient toutes les particules  
+***forces_interactions*** : Forces d'interactions entre les particules  
+***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules
+***std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
+
     void initialisation_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire);
     void traiter_domaine(double T, const std::string& domaine, std::vector<Particules>& vecteur_intermediaire);
 
 ### Constructeur:
-public:
-    // Constructeur
-    FluideComplexe(double L_x, double L_z, double delta_t, double kappa, double tau_P, double tau_T, double r_c, const std::string fichier_nom);
 
-    // Méthode d'initialisation des positions et vitesses
-    void initialisation(double T);
-    void initialisationViaCSV(const std::string& filePositions, const std::string& fileVitesses);
+##### FluideComplexe : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
+Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
 
-    // Méthode pour calculer les forces d'interactions entre les particules
-    void calculer_forces();
+##### initialisation : ```T```  
+Méthode d'initialisation des positions et vitesses des particules du fluide 
 
-    // Méthode pour mettre à jour les positions des particules
-    void mettre_a_jour_positions(double P);
+##### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
+Cette méthode est assimilable à la précédente, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition.
 
-    // Méthode pour mettre à jour les vitesses des particules
-    void mettre_a_jour_vitesses(double T, const std::vector<Vec2>& forces_interactions_precedentes);
+##### calculer_forces :  
+Cette méthode vise à calculer les forces d'interactions entre les particules  
 
+##### mettre_a_jour_positions : ```P```  
+Méthode pour mettre à jour les positions des particules, il s'agit du principe fondamental de la dynamique discrétisé appliqué à chaque particules en fonctions des forces calculé avec la méthode précédente  
+
+##### mettre_a_jour_vitesses : ```T``` ,```& forces_interactions_precedentes```  
+Méthode pour mettre à jour les vitesses des particules   
+    
     // Méthode pour appliquer les conditions périodiques
     void appliquer_conditions_periodiques();
 
