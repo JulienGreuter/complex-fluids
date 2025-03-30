@@ -20,15 +20,15 @@ De plus le ```main```, demande quatre arguments pour l'éxécution qui sont:
 
 Pour éviter les problèmes plus tard nous commencons par **vérifier** que la température et la pression soient positives et que le fichier d'initialisation peut être ouvert.  
 
-## 2. Instanciation du fluide complexe
+## Instanciation du fluide complexe:
 
-À la ligne 49 du fichier `export_data.cpp`, on instancie un objet `FluideComplexe` comme suit :
+À la ligne 49 du fichier ```export_data.cpp```, nous instancions un objet [```FluideComplexe```](#FC) tel que :
 
 ```cpp
 FluideComplexe fluide = FluideComplexe(LX, LZ, Delta_T, Kappa, tau_P, tau_T, r_c, fichier_ini);
 ```
 
-L'objet `fluide` n'est cependant **pas encore complètement initialisé**. L'initialisation complète s'effectue via la méthode `initialisation(double T)`, où `T` est la température fournie.
+Cependant, cette instanciation n'induit pas directement un objet de type ```fluide```, en effet, ce sera le cas aprés l'uilisation de la méthode [```initialisation(double T)```](#FCini) via la température entrée précédement.  
 
 ## 3. Initialisation des particules
 
@@ -174,7 +174,7 @@ Cette méthode vise à préparer l'ordre des particules dasn chaques domaines, e
 
 #### FluideComplexe : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
 Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
-
+<div id='FCini'/>
 #### initialisation : ```T```  
 Méthode d'initialisation des positions et vitesses des particules du fluide  
 
