@@ -259,7 +259,7 @@ Méthode pour exporter les positions des particules vers un fichier CSV
 Méthode pour exporter les vitesses des particules vers un fichier CSV  
 <div id='CA'/>
 
-## $${\color{red}[Case](#PAxy):}$$
+## $${\color{red}Case:}$$
 
 Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travaill  
 
