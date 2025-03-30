@@ -22,7 +22,7 @@ De plus le ```main```, demande quatre arguments pour l'éxécution qui sont:
 
 Pour éviter les problèmes plus tard nous commencons par **vérifier** que la température et la pression soient positives et que le fichier d'initialisation peut être ouvert.  
 
-## Instanciation du fluide complexe:
+## $${\color{red}Instanciation du fluide complexe:}$$
 
 À la ligne 49 du fichier ```export_data.cpp```, nous instancions un objet [```FluideComplexe```](#FC) tel que :
 
