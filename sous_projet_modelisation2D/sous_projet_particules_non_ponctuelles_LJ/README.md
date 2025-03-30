@@ -185,8 +185,8 @@ Fonction pour lire les en-têtes
 ***particules*** : Ensemble des ensembles de particules issue de la classe particules, il s'agit d'une liste "concaténée" qui contient toutes les particules  
 ***forces_interactions*** : Forces d'interactions entre les particules  
 ***nb_interactions*** : Nombre de voisins d'une particule  
-***Pxx*** : Composante xx du tenseur de pression
-***Pzz*** : Composante zz du tenseur de pression
+***Pxx*** : Composante xx du tenseur de pression  
+***Pzz*** : Composante zz du tenseur de pression  
 ***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules
 ***[std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines](#PAxy)*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
 
