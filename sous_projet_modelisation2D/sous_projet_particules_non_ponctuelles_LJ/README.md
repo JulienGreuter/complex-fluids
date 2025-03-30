@@ -5,7 +5,7 @@ Nous allons ici développer le fonctionnement de manière chronologique du fichi
 <div id='MAINiniFC'/>
   
 ## $${\color{red}Initialisation:}$$
----
+
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
 
 ***L_x, L_z*** : les dimensions de la boîte  
@@ -35,7 +35,7 @@ Cependant, ce constructeur ne permet pas l'instanciation complete, en effet, il 
 ## $${\color{red}Initialisation\ des\ particules\ du\ fluide:}$$
 
 ### $${\color{green}Structure\ du\ fichier\ d'initialisation:}$$
-
+---
 Un fichier d'initialisation contient de haut en bas:  
   
 1. Un en-tête commenté présentant le cadre de la simulation  
@@ -62,7 +62,7 @@ Un fichier d'initialisation contient de haut en bas:
   
 Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```Particules```](#PA), sauf pour leurs positions et vitesses qui seront determinées via la methode d'initialisation de la classe ```FluideComplexe``` . Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via l'utilisation de la classe [```reseau```](#RE) defini par le [```domaines```](#DOM).  
 ### $${\color{green}Placement\ des\ particules:}$$
-
+---
 L'initialisation des positions et vitesses est réalisée par [```initialisation_domaine```](#DOMini), nous retrouvons dans cette méthode:
 
 1. Une Récupèration des bornes du domaine (définies dans [```domaines```](#DOM) lors de l'instanciation de [```FluideComplexe```](#FC))  
@@ -72,7 +72,7 @@ L'initialisation des positions et vitesses est réalisée par [```initialisation
 <div id='POS'/>
 
 ### $${\color{green}Méthode}$$ [```initialisation```](#FCini)$${\color{green}:}$$
-
+---
 Pour mieux comprendre nous allons développer sur la méthode [```initialisation```](#FCini) :  
 
 1. **Lit le fichier d'initialisation** et extrait les données vue précédement  
@@ -121,7 +121,7 @@ De plus chaque évolution du système est enregistrée dans des fichiers CSV pou
 Cette classe décrit des ensembles de particules de même types  
 
 ### $${\color{green}Attributs:}$$
-
+---
 ***N*** : Nombre de particules  
 ***E_0*** : Paramètre du potentiel de Lennard-Jones  
 ***d*** : Paramètre du potentiel de Lennard-Jones  
@@ -136,6 +136,7 @@ Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** v
 Cela permet de faciliter l'interaction entre ces deux classes  
 
 ### $${\color{green}Méthodes:}$$
+---
 #### $${\color{yellow}Particules}$$ : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
 Nous initialisons certaines constantes des particules, elles sont donc supposés par defaut ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
 <div id='PAini'/>
@@ -154,7 +155,7 @@ Ces deux méthodes ont pour objetifs respectifs de définir la position et la vi
 Cette méthode permet de regrouper plusieurs objets ```Particules``` avec l'objet de ```FluideComplexe``` et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
 
 ### $${\color{green}Fonctions:}$$
-
+---
 ***Vec2 force_LJ*** : ```E_0i``` ,```E_0j``` ,```di``` ,```dj``` ,```r_ij```  
 Fonction pour calculer la force de Lennard-Jones entre deux particules i et j, cela repose sur le produit de ```r_ij``` et d'un facteur calculé à partir des quatre paramètres du potentiel de Lennard-Jones  
 
@@ -173,7 +174,7 @@ Fonction pour lire les en-têtes, utile pour l'initialisation d'un objet ```Flui
 <div id='DOM'/>
 
 ### $${\color{green}Attributs:}$$
-
+---
 ***L_x*** : Longueur de la boîte selon x  
 ***L_z*** : Longueur de la boîte selon z  
 ***delta_t*** : Pas de temps pour la discrétisation en temps  
@@ -204,7 +205,7 @@ Fonction pour lire les en-têtes, utile pour l'initialisation d'un objet ```Flui
 <div id='DOMini'/>
 
 ### $${\color{green}Méthodes:}$$
-
+---
 #### [initialisation_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
 Cette initialisation vise à définir les positions et vitesses initiales des particules du fluide  
 
@@ -264,6 +265,7 @@ Cette classe est faite pour faciliter la manipulation des cases qui pave le doma
 C'est ensuite la subdivisation de ce reseau et le remplissage des cases qui permet d'initialiser les positions des particules du fluide 
 
 ### $${\color{green}Attributs:}$$
+---
 ***x, z*** : Position du centre de la case  
 ***ordre_subdivision*** : Ordre de subdivision, le nombre de subdivision à suivre pour être dans cette case  
 ***enfants*** : Pointeurs intelligents pour limiter la taille en mémoire du réseau  
@@ -271,7 +273,7 @@ C'est ensuite la subdivisation de ce reseau et le remplissage des cases qui perm
 ***est_libre*** : État de la case, pour savoir si elle est vide ou non  
 
 ### $${\color{green}Méthodes:}$$
-
+---
 #### $${\color{yellow}Case}$$ : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
 Initialisation de la classe avec des cases  
 
@@ -297,6 +299,7 @@ Getter pour accéder aux attributs d'une case en dehors de la classe
 
 ## $${\color{red}Reseau:}$$
 ### $${\color{green}Attributs:}$$
+---
 ***xmin, xmax, zmin, zmax*** : Les limites de la boîte  
 ***taille_case*** : Tailles des cases du réseau  
 ***n_lignes, n_colonnes*** : nombre de lignes et de colonnes  
@@ -304,7 +307,7 @@ Getter pour accéder aux attributs d'une case en dehors de la classe
 ***cases_libres*** : Ensemble de pointeurs lié à des cases libres
 
 ### $${\color{green}Méthodes:}$$
-
+---
 #### $${\color{yellow}Reseau}$$ : ```xmin``` ,```xmax``` ,```zmin``` ,```zmax``` ,```taille_case```  
 Constructeur de la classe  
 
