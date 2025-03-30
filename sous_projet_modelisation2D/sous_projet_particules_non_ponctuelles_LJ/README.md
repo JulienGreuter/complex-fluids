@@ -297,6 +297,9 @@ Getter pour accéder aux attributs d'une case en dehors de la classe
 <div id='RE'/>
 
 ## $${\color{red}Reseau:}$$
+
+Cette classe permet de découper le domaine de travail en cases  
+
 ### $${\color{green}Attributs:}$$
 ---
 ***xmin, xmax, zmin, zmax*** : Les limites de la boîte  
