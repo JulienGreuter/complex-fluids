@@ -3,7 +3,7 @@
 Nous allons ici développer le fonctionnement de manière chronologique du fichier ```export_data.cpp``` qui permet de générer l'exécutable ```exportdata``` via le **Makefile**. Le tout repose sur l'utilisation de quelques classes mais surtout de la classe [```FluideComplexe```](#FC) qui va nous permettre de simuler le fluide dans un espace défini.  
 
 <div id='MAINiniFC'/>
-  
+
 ## $${\color{red}Initialisation:}$$
 
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
@@ -34,7 +34,7 @@ Cependant, cette instanciation n'induit pas directement un objet de type ```flui
 
 ## $${\color{red}Initialisation des particules du fluide:}$$
 
-### Structure du fichier d'initialisation:
+### $${\color{green}Structure du fichier d'initialisation:}$$
 
 Un fichier d'initialisation contient de haut en bas:  
   
@@ -62,7 +62,7 @@ Un fichier d'initialisation contient de haut en bas:
   
 Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via la classe [```reseau```](#RE) qui utilisera le [```domaines```](#DOM).  
 
-### Placement des particules:
+### $${\color{green}Placement des particules:}$$
 
 L'initialisation des positions et vitesses est réalisée par [```initialisation_domaine```](#DOMini), nous retrouvons dans cette méthode:
 
@@ -72,7 +72,7 @@ L'initialisation des positions et vitesses est réalisée par [```initialisation
 4. Affecte les vitesses aux particules via [```initialiserVitesses```](#PAini)  
 <div id='POS'/>
 
-### Méthode [```initialisation```](#FCini):
+### $${\color{green}Méthode [```initialisation```](#FCini):}$$
 
 Pour mieux comprendre nous allons développer sur la méthode [```initialisation```](#FCini) :  
 
@@ -121,7 +121,7 @@ De plus chaque évolution du système est enregistrée dans des fichiers CSV pou
 
 Cette classe décrit des ensembles de particules de même types  
 
-### Attributs:
+### $${\color{green}Attributs:}$$
 
 ***N*** : Nombre de particules  
 ***E_0*** : Paramètre du potentiel de Lennard-Jones  
@@ -136,7 +136,7 @@ Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** v
     ```friend class FluideComplexe;```
 Cela permet de faciliter l'interaction entre ces deux classes  
 
-### Méthodes:
+### $${\color{green}Méthodes:}$$
 #### Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
 Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
 <div id='PAini'/>
@@ -154,7 +154,7 @@ Ces deux méthodes ont pour objetifs respectifs de définir la position et la vi
 
 Cette méthode permet de regrouper plusieurs objets particules avec l'objet de fluide complexe et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
 
-### Fonction:
+### $${\color{green}Fonction:}$$
 
 ***Vec2 force_LJ*** : ```E_0i``` ,```E_0j``` ,```di``` ,```dj``` ,```r_ij```  
 Fonction pour calculer la force de Lennard-Jones entre deux particules i et j, cela repose sur le produit de ```r_ij``` et d'un facteur calculé à partir des quatre paramètres du potentiel de Lennard-Jones  
@@ -173,7 +173,7 @@ Fonction pour lire les en-têtes
 
 <div id='DOM'/>
 
-### Attributs:
+### $${\color{green}Attributs:}$$
 
 ***L_x*** : Longueur de la boîte selon x  
 ***L_z*** : Longueur de la boîte selon z  
@@ -204,7 +204,7 @@ Fonction pour lire les en-têtes
 
 <div id='DOMini'/>
 
-### Méthodes:
+### $${\color{green}Méthodes:}$$
 
 #### [initialisation_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
 Cette initialisation vise à définir les positions et vitesses initiales des particules du fluide  
@@ -263,14 +263,14 @@ Méthode pour exporter les vitesses des particules vers un fichier CSV
 
 Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travaill  
 
-### Attributs:
+### $${\color{green}Attributs:}$$
 ***x, z*** : Position du centre de la case  
 ***ordre_subdivision*** : Ordre de subdivision, le nombre de subdivision à suivre pour être dans cette case  
 ***enfants*** : Pointeurs intelligents pour limiter la taille en mémoire du réseau  
 ***taille_case*** : Taille d'une case  
 ***est_libre*** : État de la case, pour savoir si elle est vide ou non  
 
-### Méthodes:
+### $${\color{green}Méthodes:}$$
 
 #### Case : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
 Initialisation de la classe avec des cases  
@@ -296,14 +296,17 @@ Getter pour accéder aux attributs et privés d'une case
 <div id='RE'/>
 
 ## $${\color{red}Reseau:}$$
-### Attributs:
+
+Cette classe permet de découper l'espace de travail en cases  
+
+### $${\color{green}Attributs:}$$
 ***xmin, xmax, zmin, zmax*** : Les limites de la boîte  
 ***taille_case*** : Tailles des cases du réseau  
 ***n_lignes, n_colonnes*** : nombre de lignes et de colonnes  
 ***cases*** : Matrice 2D de cases stockées sous forme de pointeurs intelligents  
 ***cases_libres*** : Ensemble de pointeurs lié à des cases libres
 
-### Méthodes:
+### $${\color{green}Méthodes:$$
 
 #### Reseau : ```xmin``` ,```xmax``` ,```zmin``` ,```zmax``` ,```taille_case```  
 Initialisation de la classe  
