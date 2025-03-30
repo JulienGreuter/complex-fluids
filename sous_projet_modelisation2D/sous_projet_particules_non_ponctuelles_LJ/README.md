@@ -8,7 +8,7 @@ Nous allons ici développer le fonctionnement de manière chronologique du fichi
 
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
 
-<span style="color: #26B260">***Lx, Lz***</span> : les dimensions de la boîte  
+[color=#26B260]***Lx, Lz***[/color] : les dimensions de la boîte  
 ***delta_t**** : le pas de temps élémentaire pour l'évolution  
 ***Kappa, tau_P, tau_T*** : les paramètres physiques de la simulation  
 ***r_c*** : rayon de coupure pour les interactions  
