@@ -30,7 +30,7 @@ Pour éviter les problèmes plus tard nous commencons par **vérifier** que la t
 FluideComplexe fluide = FluideComplexe(LX, LZ, Delta_T, Kappa, tau_P, tau_T, r_c, fichier_ini);
 ```
 
-Cependant, cette instanciation n'induit pas directement un objet de type ```fluide```, en effet, ce sera le cas aprés l'uilisation de la méthode [```initialisation(double T)```](#FCini) via la température entrée précédement.  
+Cependant, cette instanciation n'induit pas directement un objet de type ```fluide```, en effet, ce sera le cas aprés l'uilisation de la méthode [```initialisation```](#FCini) via la température entrée précédement.  
 
 ## Initialisation des particules du fluide:
 
@@ -61,25 +61,27 @@ Un fichier d'initialisation contient de haut en bas:
   
 Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via la classe [```reseau```](#RE) qui utilisera le domaine.
 
-### b) Méthode `initialisation(double T)`
+<div id='PAxy'/>
 
-La méthode `initialisation` :
+### Placement des particules:
 
-1. **Lit le fichier d'initialisation** et extrait les données.
-2. **Crée des ensembles de particules** avec les paramètres lus.
-3. **Trie et place les particules** dans leurs domaines respectifs via `traiter_domaine()`.
-4. **Initialise les vitesses** avec `initialiserVitesses(T)`, en suivant une distribution de Maxwell-Boltzmann.
-5. **Exporte les positions et vitesses** (`positions_ini.csv`, `vitesses_ini.csv`).
-6. **Calcule les forces d'interaction initiales** (`calculer_forces()`).
+L'initialisation des positions et vitesses est réalisée par [```initialisation_domaine```](#DOMini), nous retrouvons dans cette méthode:
 
-### c) Placement des particules
-
-L'initialisation des positions et vitesses est réalisée par `initialisation_domaine()`. Cette méthode :
-
-- Récupère les bornes du domaine (définies dans `domaines` lors de l'instanciation de `FluideComplexe`).
+1. Une Récupèration des bornes du domaine (définies dans `domaines` lors de l'instanciation de [```FluideComplexe```](#FC)).
 - Utilise la classe `Reseau` pour subdiviser l’espace en cellules.
 - Place les particules en **taille décroissante** pour optimiser le remplissage.
 - Affecte les vitesses aux particules.
+
+### Méthode [```initialisation```](#FCini):
+
+La méthode [```initialisation```](#FCini) :  
+
+1. **Lit le fichier d'initialisation** et extrait les données vue précédement  
+2. **Crée des ensembles de particules** avec les paramètres lus et un calcul lié au domaine  
+3. **Trie et place les particules** dans leurs domaines respectifs via `traiter_domaine()`  
+4. **Initialise les vitesses** avec `initialiserVitesses(T)`, en suivant une distribution de Maxwell-Boltzmann  
+5. **Exporte les positions et vitesses** (`positions_ini.csv`, `vitesses_ini.csv`)  
+6. **Calcule les forces d'interaction initiales** (`calculer_forces()`)  
 
 ## 4. Évolution du fluide
 
@@ -186,9 +188,11 @@ Fonction pour lire les en-têtes
 ***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules
 ***std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
 
+<div id='DOMini'/>
+
 ### Méthodes:
 
-#### initialisation_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
+#### [initialisation_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
 Cette initialisation vise à définir les positions et vitesses initiales des particules du fluide  
 
 #### traiter_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
