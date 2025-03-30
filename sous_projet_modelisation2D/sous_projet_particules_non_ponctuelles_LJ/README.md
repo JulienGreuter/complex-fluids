@@ -178,7 +178,7 @@ Cette méthode vise à préparer l'ordre des particules dasn chaques domaines, e
 Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
 <div id='FCini'/>
   
-#### initialisation : ```T```  
+#### [initialisation](#MAINini) : ```T```  
 Méthode d'initialisation des positions et vitesses des particules du fluide  
 
 #### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
