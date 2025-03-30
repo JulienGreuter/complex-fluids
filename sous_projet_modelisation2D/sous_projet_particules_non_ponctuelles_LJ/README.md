@@ -30,7 +30,7 @@ Pour éviter les problèmes plus tard nous commencons par **vérifier** que la t
 FluideComplexe fluide = FluideComplexe(L_x, L_z, delta_t, kappa, tau_P, tau_T, r_c, fichier_ini);
 ```
 
-Cependant, ce constructeur ne permet pas l'instanciation complete, en effet, il faut faire appel à la méthode [```initialisation```](#FCini) de la classe, qui depend de la température entrée précédement.  
+Cependant, ce constructeur ne permet pas l'instanciation complète d'un objet, en effet, il faut faire appel à la méthode [```initialisation```](#FCini) de la classe, qui dépend de la température entrée précédement.  
 
 ## $${\color{red}Initialisation\ des\ particules\ du\ fluide:}$$
 
@@ -53,14 +53,14 @@ Un fichier d'initialisation contient de haut en bas:
 5000     0.5    0.2     10     0.0     0.0     D32
 1000     1.0    0.1     10     0.0     0.0     D33
 ```
-  2.1 Le nombre de particules `N`  
-  2.2 l'énergie d’interaction `E_0`  
-  2.3 La distance caractéristique `d`  
+  2.1 Le nombre de particules ```N```  
+  2.2 l'énergie d’interaction ```E_0```  
+  2.3 La distance caractéristique ```d```  
   2.4 La masse, taille et charge des particules  
-  2.5 Le domaine d'affectation decrit par son identifiant id_ini  
+  2.5 Le domaine d'affectation décrit par son identifiant ```id_ini```  
 <div id='PAxy'/>
   
-Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```Particules```](#PA), sauf pour leurs positions et vitesses qui seront determinées via la methode d'initialisation de la classe ```FluideComplexe``` . Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via l'utilisation de la classe [```reseau```](#RE) defini par le [```domaines```](#DOM).  
+Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```Particules```](#PA), sauf pour leurs positions et vitesses qui seront determinées via la methode d'initialisation de la classe ```FluideComplexe``` . Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via l'utilisation de la classe [```reseau```](#RE) défini par le [```domaines```](#DOM).  
 ### $${\color{green}Placement\ des\ particules:}$$
 ---
 L'initialisation des positions et vitesses est réalisée par [```initialisation_domaine```](#DOMini), nous retrouvons dans cette méthode:
@@ -76,7 +76,7 @@ L'initialisation des positions et vitesses est réalisée par [```initialisation
 Pour mieux comprendre nous allons développer sur la méthode [```initialisation```](#FCini) :  
 
 1. **Lit le fichier d'initialisation** et extrait les données vue précédement  
-2. **Crée des ensembles de particules** avec les paramètres lus et un systeme de remplissage des cases du reseau lié au [```domaines```](#DOM)    
+2. **Crée des ensembles de particules** avec les paramètres lus et un système de remplissage des cases du réseau lié au [```domaines```](#DOM)    
 3. **Trie et place les particules** dans leurs domaines respectifs via [```traiter_domaine```](#DOMini)  
 4. **Initialise les vitesses** avec [```initialiserVitesses```](#PAini), en suivant une distribution de Maxwell-Boltzmann  
 5. **Exporte les positions et vitesses** dans les fichiers ```positions_ini.csv```, ```vitesses_ini.csv``` avec [exporterPositionsCSV](#EXP) et [exporterVitessesCSV](#EXP)  
@@ -100,7 +100,7 @@ Nous pouvons retrouver le [nombre d'évolution](#MAINiniFC) défini précédemme
 
 ## $${\color{red}Rôle\ du\ thermostat\ et\ du\ barostat:}$$
 
-De plus nous appliquons un thermostat ainsi qu'un barostat pour controler la temperature et la pression du fluide, nous utilisons pour cela [```appliquer_thermostat```](#BARO) et [```appliquer_barostat_local```](#BARO). Ces ajustements suivent une relaxation définie par [```tau_T```](#DOM) (thermostat) et [```tau_P```](#DOM) (barostat).
+De plus nous appliquons un thermostat ainsi qu'un barostat pour controler la température et la pression du fluide, nous utilisons pour cela [```appliquer_thermostat```](#BARO) et [```appliquer_barostat_local```](#BARO). Ces ajustements suivent une relaxation définie par [```tau_T```](#DOM) (thermostat) et [```tau_P```](#DOM) (barostat).
 
 ## $${\color{red}Conclusion:}$$
 
@@ -138,7 +138,7 @@ Cela permet de faciliter l'interaction entre ces deux classes
 ### $${\color{green}Méthodes:}$$
 ---
 #### $`\texttt{{\color{yellow}Particules}}`$ : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
-Nous initialisons certaines constantes des particules, elles sont donc supposés par defaut ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
+Nous initialisons certaines constantes des particules, elles sont donc supposés par défaut ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
 <div id='PAini'/>
  
 #### [initialiserVitesses](#MAINiniPA) : ```T```  
@@ -169,7 +169,7 @@ Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse, ce q
 Fonction pour appliquer les conditions périodiques à une unique coordonné si nécessaire  
 
 ***bool extraireEnteteEnsemble*** ```& ligne``` ,```& N``` ,```& d``` ,```& E_0``` ,```& taille``` ,```& masse```  
-Fonction pour lire les en-têtes, utile pour l'initialisation d'un objet ```FluideComplexe``` via des fichiers de positions et vitesses precedement obtenues    
+Fonction pour lire les en-têtes, utile pour l'initialisation d'un objet ```FluideComplexe``` via des fichiers de positions et vitesses précédement obtenues    
 
 <div id='DOM'/>
 
@@ -220,7 +220,7 @@ Initialisation du fluide complexe avec les différentes grandeurs qui lui sont c
 Méthode d'initialisation des positions et vitesses des particules du fluide, elle permet de "finir" l'instanciation du fluide en utilisant [initialisation_domaine](#PAxy)  
 
 #### $`\texttt{{\color{yellow}initialisationViaCSV}}`$ : ```& filePositions``` ,```& fileVitesses```  
-Cette méthode est assimilable à la précédente dans son objectif, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition, ces fichiers doivent avoir le meme format que les fichiers generé par les methodes [exporterPositionsCSV](#POS) et [exporterVitessesCSV](#POS)    
+Cette méthode est assimilable à la précédente dans son objectif, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition, ces fichiers doivent avoir le même format que les fichiers généré par les méthodes [exporterPositionsCSV](#POS) et [exporterVitessesCSV](#POS)    
 <div id='CALC'/>
 
 #### [calculer_forces](#POS) :  
@@ -237,7 +237,7 @@ Cette méthode vise à ramener une particule dans l'espace ```L_x*L_z``` par pé
 <div id='BARO'/>
 
 #### [appliquer_thermostat](#STAT) : ```T```  
-Pour ramener la temeperature à ```T```, et éviter une explosion des vitesses  
+Pour ramener la temépérature à ```T```, et éviter une explosion des vitesses  
 
 #### [appliquer_barostat_local](#STAT) : ```P_cible```  
 Cette méthode et comme la précédente mais en prenant cette fois ci la pression en compte  
@@ -261,8 +261,7 @@ Méthode pour exporter les vitesses des particules vers un fichier CSV
 
 ## $${\color{red}Case:}$$
 
-Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travail, elles sont contenu dans un reseau.  
-C'est ensuite la subdivisation de ce reseau et le remplissage des cases qui permet d'initialiser les positions des particules du fluide 
+Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travail, elles sont contenu dans un réseau. C'est ensuite la subdivisation de ce réseau et le remplissage des cases qui permet d'initialiser les positions des particules du fluide  
 
 ### $${\color{green}Attributs:}$$
 ---
@@ -312,7 +311,7 @@ Getter pour accéder aux attributs d'une case en dehors de la classe
 Constructeur de la classe  
 
 #### $`\texttt{{\color{yellow}tirerCaseLibre}}`$ :  
-Méthode pour tirer au hasard une case parmi les cases libres du reseau 
+Méthode pour tirer au hasard une case parmi les cases libres du réseau 
 
 #### $`\texttt{{\color{yellow}subdiviserCase}}`$ : ```case_a_subdiviser```  
 Méthode pour subdiviser une case libre en 4 enfants  
@@ -329,7 +328,7 @@ Méthode pour ajouter les enfants d'une case à ```cases_libres```
 #### $`\texttt{{\color{yellow}afficher}}`$ :  
 Méthode d'affichage du réseau et de ses caractéristiques  
 
-#### $`\texttt{{\color{yellow}afficher_ details}}`$ :  
+#### $`\texttt{{\color{yellow}afficher\_details}}`$ :  
 Méthode pour afficher les statistiques du réseau  
 
 #### $`\texttt{{\color{yellow}exporterCSV}}`$ : ```filename```  
