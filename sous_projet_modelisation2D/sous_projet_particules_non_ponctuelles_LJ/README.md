@@ -128,6 +128,7 @@ Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initia
 #### setPositions : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
 Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières, ce sont des méthodes non utilisées pour le fluide complexe. Elles servent à tester la classe particules pour tester les différentes modifications qui ont été amenées  
 <div id='FC'/>
+
 ## Fluidecomplexe:
 
 Cette méthode permet de regrouper plusieurs objets particules avec l'objet de fluide complexe et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
