@@ -16,40 +16,40 @@ Cette classe décrit des ensembles de particules de même types
 
 Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** via la ligne:  
     ```friend class FluideComplexe;```
-Cela permet de faciliter l'interaction entre ces deux classes.  
+Cela permet de faciliter l'interaction entre ces deux classes  
 
-### Constructeur:
+### Méthodes:
 ##### Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
-Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes. 
+Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
  
 ##### initialiserVitesses : ```T```  
 Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide. 
 Nous posons alors ```sigma = std::sqrt(K_B * T / masse)``` l'écart-type de la distribution de Maxwell-Boltzmann, puis nous générons un nombre aléatoire qui va nous permettre de calculer une distribution de position et de vitesse aléatoire et de type maxwellienne centrée et d'écart type ```sigma```.  
 Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initialisé nulle, ce vecteur permet de "normer" les vecteurs vitesses pour que la vitesse du barycentre reste nulle.  
-
-##### appliquerConditionsPeriodiques : ```L_x``` ,```L_z```  
-Cette méthode permet de redéfinir les distances calculées lors d'une itération comme un module selon x et z. Cela permet d'appliquer les conditions périodiques aux limites. 
  
 ##### setPositions : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
 Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières, ce sont des méthodes non utilisées pour le fluide complexe. Elles servent à tester la classe particules pour tester les différentes modifications qui ont été amenées  
 
 ## Fluidecomplexe:
+
+Cette méthode permet de regrouper plusieurs objets particules avec l'objet de fluide complexe et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
+
 ### Fonction:
 
 ***Vec2 force_LJ*** : ```E_0i``` ,```E_0j``` ,```di``` ,```dj``` ,```r_ij```  
-Fonction pour calculer la force de Lennard-Jones entre deux particules i et j, cela repose sur le produit de ```r_ij``` et d'un facteur calculé à partir des quatre paramètres du potentiel de Lennard-Jones.  
+Fonction pour calculer la force de Lennard-Jones entre deux particules i et j, cela repose sur le produit de ```r_ij``` et d'un facteur calculé à partir des quatre paramètres du potentiel de Lennard-Jones  
 
 ***Vec2 maxwellBoltzmannSample*** : ```T``` ,```masse```  
-Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann centrée et d'écart type ```sigma = std::sqrt(K_B * T / masse)```.  
+Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann centrée et d'écart type ```sigma = std::sqrt(K_B * T / masse)```  
 
 ***void relaxationVersMaxwell*** : ```& vitesse``` ,```T``` ,```masse``` ,```alpha```  
-Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse.
+Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse  
 
 ***double periodic_boundary_if_needed*** : ```coord``` ,```L``` ,```& modifie```  
-Fonction pour appliquer les conditions périodiques à une unique coordonné si nécessaire.
+Fonction pour appliquer les conditions périodiques à une unique coordonné si nécessaire  
 
 ***bool extraireEnteteEnsemble*** ```& ligne``` ,```& N``` ,```& d``` ,```& E_0``` ,```& taille``` ,```& masse```  
-Fonction pour lire les en-têtes.  
+Fonction pour lire les en-têtes  
 
 ### Attributs:
 
@@ -65,19 +65,19 @@ Fonction pour lire les en-têtes.
 ***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules
 ***std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
 
-### Constructeur:
+### Méthodes:
 
-##### initialisation_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  -----------------------------------------------------
+##### initialisation_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
+Cette initialisation vise à définir les positions et vitesses initiales des particules du fluide  
 
-
-##### traiter_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  ------------------------------------------------------------
-
+##### traiter_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
+Cette méthode vise à préparer l'ordre des particules dasn chaques domaines, en effet pour placer les particules initialement nous avons besoin de trier les particules dans l'ordre décroissant des tailles  
 
 ##### FluideComplexe : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
 Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
 
 ##### initialisation : ```T```  
-Méthode d'initialisation des positions et vitesses des particules du fluide 
+Méthode d'initialisation des positions et vitesses des particules du fluide  
 
 ##### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
 Cette méthode est assimilable à la précédente, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition.
@@ -122,7 +122,7 @@ Méthode pour exporter les vitesses des particules vers un fichier CSV
 ***enfants*** : Pointeurs intelligents pour éviter les fuites mémoire------------------------------------------------------------------------***taille_case*** : Taille d'une case
 ***est_libre*** : État de la case, pour savoir si elle est vide ou non
 
-### Constructeur:
+### Méthodes:
 
 ##### Case : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
 Initialisation de la classe avec des cases
