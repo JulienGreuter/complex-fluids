@@ -53,11 +53,11 @@ Un fichier d'initialisation contient de haut en bas:
 5000     0.5    0.2     10     0.0     0.0     D32
 1000     1.0    0.1     10     0.0     0.0     D33
 ```
-  2.1 Le nombre de particules `N`
-  2.2 l'énergie d’interaction `E_0`
-  2.3 La distance caractéristique `d`
-  2.4 La masse, taille et charge des particules
-  2.5 Le domaine d'affectation (ex. : `D1`, `D2`, etc.)
+  2.1 Le nombre de particules `N`  
+  2.2 l'énergie d’interaction `E_0`  
+  2.3 La distance caractéristique `d`  
+  2.4 La masse, taille et charge des particules  
+  2.5 Le domaine d'affectation (ex. : `D1`, `D2`, etc.)   
 
 Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Cette définition ce fera via 
 
