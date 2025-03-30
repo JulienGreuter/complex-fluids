@@ -179,10 +179,10 @@ Initialisation du fluide complexe avec les différentes grandeurs qui lui sont c
 <div id='FCini'/>
   
 #### [initialisation](#MAINini) : ```T```  
-Méthode d'initialisation des positions et vitesses des particules du fluide  
+Méthode d'initialisation des positions et vitesses des particules du fluide, elle permet de "finir" l'instanciation du fluide  
 
 #### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
-Cette méthode est assimilable à la précédente, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition
+Cette méthode est assimilable à la précédente dans son objectif, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition  
 
 #### calculer_forces :  
 Cette méthode vise à calculer les forces d'interactions entre les particules  
