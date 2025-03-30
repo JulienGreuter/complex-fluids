@@ -1,3 +1,101 @@
+# Fonctionnement global:
+
+Nous allons ici développer le fonctionnement de manière chronologique du fichier ```export_data.cpp``` qui permet de générer l'exécutable `exportdata` via le **Makefile**. Le tout repose sur l'utilisation de quelques classes mais surtout de la classe [```FluideComplexe```](#FC) qui va nous permettre de simuler le fluide dans un espace défini.  
+
+## Initialisation:
+
+Pour instancier ```FluideComplexe``` nous posons en amon:  
+
+***Lx, Lz*** : les dimensions de la boîte  
+***delta_t**** : le pas de temps élémentaire pour l'évolution  
+***Kappa, tau_P, tau_T*** : les paramètres physiques de la simulation  
+***r_c*** : rayon de coupure pour les interactions  
+
+Dans `main()`, quatre arguments sont récupérés à l'exécution :
+
+1. Un **fichier d'initialisation**
+2. Une **température**
+3. Une **pression**
+4. Un **nombre d'évolutions**
+
+Le programme commence par **vérifier** que la température et la pression sont positives, puis s'assure que le fichier d'initialisation peut être ouvert.
+
+## 2. Instanciation du fluide complexe
+
+À la ligne 49 du fichier `export_data.cpp`, on instancie un objet `FluideComplexe` comme suit :
+
+```cpp
+FluideComplexe fluide = FluideComplexe(LX, LZ, Delta_T, Kappa, tau_P, tau_T, r_c, fichier_ini);
+```
+
+L'objet `fluide` n'est cependant **pas encore complètement initialisé**. L'initialisation complète s'effectue via la méthode `initialisation(double T)`, où `T` est la température fournie.
+
+## 3. Initialisation des particules
+
+### a) Structure du fichier d'initialisation
+
+Le fichier d'initialisation contient :
+- Un en-tête commenté
+- Une ligne par **ensemble de particules** contenant :
+  - Nombre de particules `N`
+  - Énergie d’interaction `E0`
+  - Distance caractéristique `D`
+  - Masse, taille et charge des particules
+  - Domaine d'affectation (ex. : `D1`, `D2`, etc.)
+
+### b) Méthode `initialisation(double T)`
+
+La méthode `initialisation` :
+
+1. **Lit le fichier d'initialisation** et extrait les données.
+2. **Crée des ensembles de particules** avec les paramètres lus.
+3. **Trie et place les particules** dans leurs domaines respectifs via `traiter_domaine()`.
+4. **Initialise les vitesses** avec `initialiserVitesses(T)`, en suivant une distribution de Maxwell-Boltzmann.
+5. **Exporte les positions et vitesses** (`positions_ini.csv`, `vitesses_ini.csv`).
+6. **Calcule les forces d'interaction initiales** (`calculer_forces()`).
+
+### c) Placement des particules
+
+L'initialisation des positions et vitesses est réalisée par `initialisation_domaine()`. Cette méthode :
+
+- Récupère les bornes du domaine (définies dans `domaines` lors de l'instanciation de `FluideComplexe`).
+- Utilise la classe `Reseau` pour subdiviser l’espace en cellules.
+- Place les particules en **taille décroissante** pour optimiser le remplissage.
+- Affecte les vitesses aux particules.
+
+## 4. Évolution du fluide
+
+Dans `export_data.cpp`, après l'initialisation, une boucle `for` exécute un nombre donné d’évolutions :
+
+```cpp
+for (int i = 0; i < nombre_d_evolutions; i++) {
+    fluide.evoluer(Température, Pression);
+}
+```
+
+La méthode `evoluer(T, P)` fait évoluer le fluide en mettant à jour :
+
+1. **Les positions** en fonction des vitesses et forces (`mettre_a_jour_positions(P)`).
+2. **Les forces d'interaction** (`calculer_forces()`).
+3. **Les vitesses** selon l'algorithme de Verlet (`mettre_a_jour_vitesses(T, forces_t, forces_t+dt)`).
+
+## 5. Rôle du thermostat et du barostat
+
+- `appliquer_thermostat(T)` ajuste les vitesses pour **maintenir la température cible**.
+- `appliquer_barostat(P)` modifie les positions pour **ajuster la pression**.
+
+Ces ajustements suivent une relaxation définie par `tau_T` (thermostat) et `tau_P` (barostat).
+
+## 6. Conclusion
+
+Le programme `exportdata` permet de :
+
+1. **Initialiser** un fluide complexe en lisant un fichier d'initialisation.
+2. **Faire évoluer le système** en mettant à jour positions, vitesses et forces.
+3. **Réguler la température et la pression** à l’aide d’un thermostat et d’un barostat.
+
+Chaque évolution du système est enregistrée dans des fichiers CSV pour analyse ultérieure.
+
 # Les Classes:
 ## Particules:
 
@@ -29,7 +127,7 @@ Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initia
  
 #### setPositions : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
 Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières, ce sont des méthodes non utilisées pour le fluide complexe. Elles servent à tester la classe particules pour tester les différentes modifications qui ont été amenées  
-
+<div id='FC'/>
 ## Fluidecomplexe:
 
 Cette méthode permet de regrouper plusieurs objets particules avec l'objet de fluide complexe et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
