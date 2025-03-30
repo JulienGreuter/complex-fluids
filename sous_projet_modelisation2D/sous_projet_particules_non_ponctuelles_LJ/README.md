@@ -67,8 +67,8 @@ Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet
 
 L'initialisation des positions et vitesses est réalisée par [```initialisation_domaine```](#DOMini), nous retrouvons dans cette méthode:
 
-1. Une Récupèration des bornes du domaine (définies dans [```domaines```](#DOM) lors de l'instanciation de [```FluideComplexe```](#FC)).
-- Utilise la classe [```reseau```](#RE) pour subdiviser l’espace en cellules.
+1. Une Récupèration des bornes du domaine (définies dans [```domaines```](#DOM) lors de l'instanciation de [```FluideComplexe```](#FC))  
+2. Utilisation de la classe [```reseau```](#RE) pour subdiviser l’espace en cellules liée à la classe [```Case```](#CA)
 - Place les particules en **taille décroissante** pour optimiser le remplissage.
 - Affecte les vitesses aux particules.
 
@@ -242,8 +242,9 @@ Méthode pour exporter les positions des particules vers un fichier CSV
 
 #### exporterVitessesCSV : ```& fileCSV```
 Méthode pour exporter les vitesses des particules vers un fichier CSV  
+<div id='CA'/>
 
-## Case:
+## [Case](#PAxy):
 
 Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travaill  
 
