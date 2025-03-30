@@ -40,7 +40,7 @@ Un fichier d'initialisation contient de haut en bas:
   
 1. Une en-tête commenté présentant le cadre de la simulation  
   
-2. Une ligne par **ensemble de particules** contenant:
+2. Une ligne par **ensemble de particules** contenant:<div id='MAINiniPA'/>
 ```
   # Format : 
 
@@ -58,9 +58,8 @@ Un fichier d'initialisation contient de haut en bas:
   2.3 La distance caractéristique `d`  
   2.4 La masse, taille et charge des particules  
   2.5 Le domaine d'affectation (ex. : `D1`, `D2`, etc.)   
-<div id='MAINiniPA'/>
 
-Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```particules```](#PAini) 
+Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini) 
 
 ### b) Méthode `initialisation(double T)`
 
