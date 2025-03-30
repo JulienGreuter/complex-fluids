@@ -22,7 +22,7 @@ De plus le ```main```, demande quatre arguments pour l'éxécution qui sont:
 
 Pour éviter les problèmes plus tard nous commencons par **vérifier** que la température et la pression soient positives et que le fichier d'initialisation puisse être ouvert.  
 
-## $${\color{red}Instanciation du fluide complexe:}$$
+## $${\color{red}Instanciation\ du\ fluide\ complexe:}$$
 
 À la ligne 49 du fichier ```export_data.cpp```, nous instancions un objet [```FluideComplexe```](#FC) tel que :
 
@@ -32,7 +32,7 @@ FluideComplexe fluide = FluideComplexe(L_x, L_z, delta_t, kappa, tau_P, tau_T, r
 
 Cependant, ce constructeur ne permet pas l'instanciation complete, en effet, il faut faire appel à la méthode [```initialisation```](#FCini) de la classe, qui depend de la température entrée précédement.  
 
-## $${\color{red}Initialisation des particules du fluide:}$$
+## $${\color{red}Initialisation\ des\ particules\ du\ fluide:}$$
 
 ### $${\color{green}Structure du fichier d'initialisation:}$$
 
