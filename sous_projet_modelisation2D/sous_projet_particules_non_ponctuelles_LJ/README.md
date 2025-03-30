@@ -6,6 +6,8 @@ Nous allons ici développer le fonctionnement de manière chronologique du fichi
   
 ## Initialisation:
 
+<font color='red'>un texte en rouge</font>
+
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
 
 ***Lx, Lz*** : les dimensions de la boîte  
