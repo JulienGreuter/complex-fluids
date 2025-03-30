@@ -34,7 +34,7 @@ Cependant, ce constructeur ne permet pas l'instanciation complete, en effet, il 
 
 ## $${\color{red}Initialisation\ des\ particules\ du\ fluide:}$$
 
-### $${\color{green}Structure du fichier d'initialisation:}$$
+### $${\color{green}Structure\ du\ fichier\ d'initialisation:}$$
 
 Un fichier d'initialisation contient de haut en bas:  
   
@@ -61,7 +61,7 @@ Un fichier d'initialisation contient de haut en bas:
 <div id='PAxy'/>
   
 Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```Particules```](#PA), sauf pour leurs positions et vitesses qui seront determinées via la methode d'initialisation de la classe ```FluideComplexe``` . Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via l'utilisation de la classe [```reseau```](#RE) defini par le [```domaines```](#DOM).  
-### Placement des particules:
+### $${\color{green}Placement\ des\ particules:}$$
 
 L'initialisation des positions et vitesses est réalisée par [```initialisation_domaine```](#DOMini), nous retrouvons dans cette méthode:
 
@@ -83,7 +83,7 @@ Pour mieux comprendre nous allons développer sur la méthode [```initialisation
 6. **Calcule les forces d'interaction initiales** avec la méthode [```calculer_forces```](#CALC)  
 <div id='EVO'/>
 
-## $${\color{red}Évolution du fluide:}$$
+## $${\color{red}Évolution\ du\ fluide:}$$
 
 Aprés l'initialisation nous faisons évoluer notre système via les lignes :   
 ```cpp
@@ -98,7 +98,7 @@ Nous pouvons retrouver le [nombre d'évolution](#MAINiniFC) défini précédemme
 3. **Les vitesses** selon l'algorithme de Verlet décrite dans la méthode [```mettre_a_jour_vitesses```](#CALC)  
 <div id='STAT'/>
 
-## $${\color{red}Rôle du thermostat et du barostat:}$$
+## $${\color{red}Rôle\ du\ thermostat\ et\ du\ barostat:}$$
 
 De plus nous appliquons un thermostat ainsi qu'un barostat pour controler la temperature et la pression du fluide, nous utilisons pour cela [```appliquer_thermostat```](#BARO) et [```appliquer_barostat_local```](#BARO). Ces ajustements suivent une relaxation définie par [```tau_T```](#DOM) (thermostat) et [```tau_P```](#DOM) (barostat).
 
