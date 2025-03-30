@@ -194,11 +194,9 @@ Dans cette variable nous avons une liste de mot clés qui va induire une forme d
 | ***id_ini*** | ***xmin*** | ***xmax*** | ***zmin*** | ***zmax*** | 
 | D1 | -L_x / 2 | L_x / 2 | -L_z / 2 | L_z / 2 | 
 | D2 | -L_x / 2 | L_x / 2 | -L_z / 4 | L_z / 4 | 
-|---|---|---|---|---| 
 | D31 | -L_x / 2 | L_x / 2 | -L_z / 2 | L_z / 4 | 
 | D32 | -L_x / 2 | L_x / 2 | -L_z / 4 | L_z / 4 | 
 | D33 | -L_x / 2 | L_x / 2 | L_z / 4 | L_z / 2 | 
-|---|---|---|---|---| 
 | DFG | -L_x / 2 | L_x / 2 | -L_z / 2 | -L_z / 20 | 
 | DFM | -L_x / 2 | L_x / 2 | -L_z / 20 | L_z / 20 | 
 | DFD | -L_x / 2 | L_x / 2 | L_z / 20 | L_z / 2 | 
