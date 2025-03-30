@@ -59,7 +59,7 @@ Un fichier d'initialisation contient de haut en bas:
   2.4 La masse, taille et charge des particules  
   2.5 Le domaine d'affectation (ex. : `D1`, `D2`, etc.)   
 
-Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini) 
+Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via la classe [```reseau```](#RE)
 
 ### b) Méthode `initialisation(double T)`
 
@@ -270,6 +270,8 @@ Affiche des informations de la case
 
 #### getX , getZ , getOrdreSubdivision , getEnfants et getTaille :  
 Getter pour accéder aux attributs et privés d'une case  
+
+<div id='RE'/>
 
 ## Reseau:
 ### Attributs:
