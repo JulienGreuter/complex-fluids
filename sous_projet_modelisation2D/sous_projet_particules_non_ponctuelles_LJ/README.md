@@ -14,7 +14,7 @@ Cette classe décrit des ensembles de particules de même types
 ***positions*** : Vecteurs positions des particules  
 ***vitesses*** : Vecteurs vitesses des particules  
 
-Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** via la ligne:  
+Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** via la ligne: 
     ```friend class FluideComplexe;```
 Cela permet de faciliter l'interaction entre ces deux classes  
 
