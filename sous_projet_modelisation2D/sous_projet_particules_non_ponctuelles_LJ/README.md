@@ -137,7 +137,7 @@ Cela permet de faciliter l'interaction entre ces deux classes
 
 ### $${\color{green}Méthodes:}$$
 ---
-#### $${\color{yellow}Particules}$$ : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
+#### $`\texttt{{\color{yellow}Particules}}`$ : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
 Nous initialisons certaines constantes des particules, elles sont donc supposés par defaut ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
 <div id='PAini'/>
  
@@ -146,7 +146,7 @@ Cette méthode vise à statistiquement définir une vitesse pour chaque particul
 Nous posons alors ```sigma = std::sqrt(K_B * T / masse)``` l'écart-type de la distribution de Maxwell-Boltzmann, puis nous générons un nombre aléatoire qui va nous permettre de calculer une distribution de position et de vitesse aléatoire et de type maxwellienne centrée et d'écart type ```sigma```.  
 Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initialisé nulle, ce vecteur permet de "normer" les vecteurs vitesses pour que la vitesse du barycentre reste nulle  
  
-#### $${\color{yellow}setPositions}$$ : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
+#### $`\texttt{{\color{yellow}setPositions}}`$ : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
 Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières en dehors de la classe, ce sont des méthodes non utilisées pour le fluide complexe du fait de la relation entre ```Particules``` et ```FluideComplexe```. Elles peuvent servir notament à tester la classe ```Particules``` en dehors de son utlisation dans un objet de type fluide complexe.  
 <div id='FC'/>
 
@@ -212,14 +212,14 @@ Cette initialisation vise à définir les positions et vitesses initiales des pa
 #### [traiter_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
 Cette méthode vise à préparer l'ordre des particules dans chaques domaines, en effet pour placer les particules initialement nous avons besoin de trier les particules par tailles croissante  
 
-#### $${\color{yellow}FluideComplexe}$$ : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
+#### $`\texttt{{\color{yellow}FluideComplexe}}`$ : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
 Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
 <div id='FCini'/>
   
 #### [initialisation](#MAINiniFC) : ```T```  
 Méthode d'initialisation des positions et vitesses des particules du fluide, elle permet de "finir" l'instanciation du fluide en utilisant [initialisation_domaine](#PAxy)  
 
-#### $${\color{yellow}initialisationViaCSV}$$ : ```& filePositions``` ,```& fileVitesses```  
+#### $`\texttt{{\color{yellow}initialisationViaCSV}}`$ : ```& filePositions``` ,```& fileVitesses```  
 Cette méthode est assimilable à la précédente dans son objectif, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition, ces fichiers doivent avoir le meme format que les fichiers generé par les methodes [exporterPositionsCSV](#POS) et [exporterVitessesCSV](#POS)    
 <div id='CALC'/>
 
@@ -242,10 +242,10 @@ Pour ramener la temeperature à ```T```, et éviter une explosion des vitesses
 #### [appliquer_barostat_local](#STAT) : ```P_cible```  
 Cette méthode et comme la précédente mais en prenant cette fois ci la pression en compte  
 
-#### $${\color{yellow}calculer_temperature}$$ :  
+#### $`\texttt{{\color{yellow}calculer_temperature}}`$ :  
 Méthode de calcule de la température du fluide via un calcul statistique sur la vitesse de chaque particules  
 
-#### $${\color{yellow}calculer_tenseur_pression}$$ : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
+#### $`\texttt{{\color{yellow}calculer_tenseur_pression}}`$ : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
 Cette méthode permet de calculer le tenseur de pression sur une tranche de l'espace selon ```z```  
 <div id='EXP'/>
 
@@ -274,25 +274,25 @@ C'est ensuite la subdivisation de ce reseau et le remplissage des cases qui perm
 
 ### $${\color{green}Méthodes:}$$
 ---
-#### $${\color{yellow}Case}$$ : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
+#### $`\texttt{{\color{yellow}Case}}`$ : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
 Initialisation de la classe avec des cases  
 
-#### $${\color{yellow}subdiviser}$$ :  
+#### $`\texttt{{\color{yellow}subdiviser}}`$ :  
 Méthode pour subdiviser une case en 4 case enfants de même tailles  
 
-#### $${\color{yellow}estParent}$$ :  
+#### $`\texttt{{\color{yellow}estParent}}`$ :  
 Vérifie si la case est un parent, donc si elle admet des case d'ordre plus élevée en elle  
 
-#### $${\color{yellow}estLibre}$$ :  
+#### $`\texttt{{\color{yellow}estLibre}}`$ :  
 Vérifie si la case est libre (non occupée)  
 
-#### $${\color{yellow}marquerOccupee}$$ :  
+#### $`\texttt{{\color{yellow}marquerOccupee}}`$ :  
 Change l'état de liberté de la case vers occupée  
 
-#### $${\color{yellow}afficher}$$ :  
+#### $`\texttt{{\color{yellow}afficher}}`$ :  
 Affiche des informations de la case  
 
-#### $${\color{yellow}getX}$$ , $${\color{yellow}getZ}$$ , $${\color{yellow}getOrdreSubdivision}$$ , $${\color{yellow}getEnfants}$$ et $${\color{yellow}getTaille}$$ :  
+#### $`\texttt{{\color{yellow}getX}}`$ , $`\texttt{{\color{yellow}getZ}}`$ , $`\texttt{{\color{yellow}getOrdreSubdivision}}`$ , $`\texttt{{\color{yellow}getEnfants}}`$ et $`\texttt{{\color{yellow}getTaille}}`$ :  
 Getter pour accéder aux attributs d'une case en dehors de la classe 
 
 <div id='RE'/>
@@ -308,33 +308,33 @@ Getter pour accéder aux attributs d'une case en dehors de la classe
 
 ### $${\color{green}Méthodes:}$$
 ---
-#### $${\color{yellow}Reseau}$$ : ```xmin``` ,```xmax``` ,```zmin``` ,```zmax``` ,```taille_case```  
+#### $`\texttt{{\color{yellow}Reseau}}`$ : ```xmin``` ,```xmax``` ,```zmin``` ,```zmax``` ,```taille_case```  
 Constructeur de la classe  
 
-#### $${\color{yellow}tirerCaseLibre}$$ :  
+#### $`\texttt{{\color{yellow}tirerCaseLibre}}`$ :  
 Méthode pour tirer au hasard une case parmi les cases libres du reseau 
 
-#### $${\color{yellow}subdiviserCase}$$ : ```case_a_subdiviser```  
+#### $`\texttt{{\color{yellow}subdiviserCase}}`$ : ```case_a_subdiviser```  
 Méthode pour subdiviser une case libre en 4 enfants  
 
-#### $${\color{yellow}subdiviser}$$ : ```ordre```  
+#### $`\texttt{{\color{yellow}subdiviser}}`$ : ```ordre```  
 Méthode pour subdiviser toutes les cases libres du reseau pour un ordre de subdivision donné  
 
-#### $${\color{yellow}retirerCaseLibre}$$ : ```case_a_retirer```  
+#### $`\texttt{{\color{yellow}retirerCaseLibre}}`$ : ```case_a_retirer```  
 Cette méthode permet de retirer une case de l'ensemble des cases libres  
 
-#### $${\color{yellow}ajouterEnfantsCasesLibres}$$ : ```case_parent```  
+#### $`\texttt{{\color{yellow}ajouterEnfantsCasesLibres}}`$ : ```case_parent```  
 Méthode pour ajouter les enfants d'une case à ```cases_libres```  
 
-#### $${\color{yellow}afficher}$$ :  
+#### $`\texttt{{\color{yellow}afficher}}`$ :  
 Méthode d'affichage du réseau et de ses caractéristiques  
 
-#### $${\color{yellow}afficher_ details}$$ :  
+#### $`\texttt{{\color{yellow}afficher_ details}}`$ :  
 Méthode pour afficher les statistiques du réseau  
 
-#### $${\color{yellow}exporterCSV}$$ : ```filename```  
+#### $`\texttt{{\color{yellow}exporterCSV}}`$ : ```filename```  
 Méthode pour exporter le réseau et ses caractéristiques sous CSV  
 
-#### $${\color{yellow}getCases}$$ , $${\color{yellow}getCasesLibres}$$ :  
+#### $`\texttt{{\color{yellow}getCases}}`$ , $`\texttt{{\color{yellow}getCasesLibres}}`$ :  
 Méthode pour accéder aux grandeurs misent en ```private```  
 
