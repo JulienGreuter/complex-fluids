@@ -77,8 +77,8 @@ L'initialisation des positions et vitesses est réalisée par [```initialisation
 La méthode [```initialisation```](#FCini) :  
 
 1. **Lit le fichier d'initialisation** et extrait les données vue précédement  
-2. **Crée des ensembles de particules** avec les paramètres lus et un calcul lié au domaine  
-3. **Trie et place les particules** dans leurs domaines respectifs via `traiter_domaine()`  
+2. **Crée des ensembles de particules** avec les paramètres lus et un calcul lié au [```domaines```](#DOM)    
+3. **Trie et place les particules** dans leurs domaines respectifs via [```traiter_domaine```](#DOM)  
 4. **Initialise les vitesses** avec `initialiserVitesses(T)`, en suivant une distribution de Maxwell-Boltzmann  
 5. **Exporte les positions et vitesses** (`positions_ini.csv`, `vitesses_ini.csv`)  
 6. **Calcule les forces d'interaction initiales** (`calculer_forces()`)  
