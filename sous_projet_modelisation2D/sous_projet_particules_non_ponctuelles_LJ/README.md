@@ -6,8 +6,6 @@ Nous allons ici développer le fonctionnement de manière chronologique du fichi
   
 ## Initialisation:
 
-<font color='red'>un texte en rouge</font>
-
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
 
 ***Lx, Lz*** : les dimensions de la boîte  
@@ -191,6 +189,19 @@ Fonction pour lire les en-têtes
 ***Pzz*** : Composante zz du tenseur de pression  
 ***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules
 ***[std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines](#PAxy)*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
+Dans cette variable nous avons une liste de mot clés qui va induire une forme de domaine:  
+
+| ***id_ini*** | ***xmin*** | ***xmax*** | ***zmin*** | ***zmax*** | 
+| D1 | -L_x / 2 | L_x / 2 | -L_z / 2 | L_z / 2 | 
+| D2 | -L_x / 2 | L_x / 2 | -L_z / 4 | L_z / 4 | 
+|---|---|---|---|---| 
+| D31 | -L_x / 2 | L_x / 2 | -L_z / 2 | L_z / 4 | 
+| D32 | -L_x / 2 | L_x / 2 | -L_z / 4 | L_z / 4 | 
+| D33 | -L_x / 2 | L_x / 2 | L_z / 4 | L_z / 2 | 
+|---|---|---|---|---| 
+| DFG | -L_x / 2 | L_x / 2 | -L_z / 2 | -L_z / 20 | 
+| DFM | -L_x / 2 | L_x / 2 | -L_z / 20 | L_z / 20 | 
+| DFD | -L_x / 2 | L_x / 2 | L_z / 20 | L_z / 2 | 
 
 <div id='DOMini'/>
 
