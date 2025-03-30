@@ -97,14 +97,12 @@ Nous pouvons retrouver le [nombre d'évolution](#MAINiniFC) défini précédemme
 
 1. **Les positions** en fonction des vitesses et forces via la méthode [```mettre_a_jour_positions```](#CALC)  
 2. **Les forces d'interaction** avec la méthode [```calculer_forces```](#CALC)  
-3. **Les vitesses** selon l'algorithme de Verlet [```mettre_a_jour_vitesses```](#CALC)  
+3. **Les vitesses** selon l'algorithme de Verlet décrite dans la méthode [```mettre_a_jour_vitesses```](#CALC)  
+<div id='STAT'/>
 
-## 5. Rôle du thermostat et du barostat
+## Rôle du thermostat et du barostat:
 
-- `appliquer_thermostat(T)` ajuste les vitesses pour **maintenir la température cible**.
-- `appliquer_barostat(P)` modifie les positions pour **ajuster la pression**.
-
-Ces ajustements suivent une relaxation définie par `tau_T` (thermostat) et `tau_P` (barostat).
+De plus nous appliquons un thermostat ainsi qu'un barostat pour maintenir ces grandeurs constante dans notre objectif de simuler un fluide à la température T et à pression P, nous utilisons pour cela nous utilisons [```appliquer_thermostat```](#BARO) et [```appliquer_barostat_local```](#BARO). Ces ajustements suivent une relaxation définie par [```tau_T```](#DOM) (thermostat) et [```tau_P```](#DOM) (barostat).
 
 ## 6. Conclusion
 
@@ -182,8 +180,8 @@ Fonction pour lire les en-têtes
 ***L_z*** : Longueur de la boîte selon z  
 ***delta_t*** : Pas de temps pour la discrétisation en temps  
 ***kappa*** : Coefficient de compressibilité isotherme  
-***tau_P*** : Temps de réponse du barostat  
-***tau_T*** : Temps de réponse du thermostat  
+***[tau_P](#STAT)*** : Temps de réponse du barostat  
+***[tau_T](#STAT)*** : Temps de réponse du thermostat  
 ***r_c*** : Rayon de coupure des intéractions, la distance limite au dessus de laquelle l'on suppose que les particules n'interagissent plus 
 ***particules*** : Ensemble des ensembles de particules issue de la classe particules, il s'agit d'une liste "concaténée" qui contient toutes les particules  
 ***forces_interactions*** : Forces d'interactions entre les particules  
@@ -222,12 +220,13 @@ Méthode pour mettre à jour les vitesses pour un temps ```t+dt``` des particule
     
 #### appliquer_conditions_periodiques : 
 Cette méthode vise à ramener une particule dans l'espace ```L_x*L_z``` par périodicité de cette boîte  
+<div id='BARO'/>
 
-#### appliquer_thermostat : ```T```  
+#### [appliquer_thermostat](#STAT) : ```T```  
 Pour maintenir un thermostat constament à ```T```, et surtout d'éviter une explosion des vitesses  
 
-#### appliquer_barostat : ```P```  
-Cette méthode et comme la précédente mais en prenant cette fois ci la pression en compte
+#### [appliquer_barostat_local](#STAT) : ```P_cible```  
+Cette méthode et comme la précédente mais en prenant cette fois ci la pression en compte  
 
 #### calculer_temperature :  
 Méthode de calcule de la température du fluide via un calcule statistique sur la vitesse de chaque particules  
