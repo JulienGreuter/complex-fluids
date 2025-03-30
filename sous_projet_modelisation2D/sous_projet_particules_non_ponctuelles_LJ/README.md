@@ -1,24 +1,24 @@
 # Fonctionnement global:
 
-Nous allons ici développer le fonctionnement de manière chronologique du fichier ```export_data.cpp``` qui permet de générer l'exécutable `exportdata` via le **Makefile**. Le tout repose sur l'utilisation de quelques classes mais surtout de la classe [```FluideComplexe```](#FC) qui va nous permettre de simuler le fluide dans un espace défini.  
+Nous allons ici développer le fonctionnement de manière chronologique du fichier ```export_data.cpp``` qui permet de générer l'exécutable ```exportdata``` via le **Makefile**. Le tout repose sur l'utilisation de quelques classes mais surtout de la classe [```FluideComplexe```](#FC) qui va nous permettre de simuler le fluide dans un espace défini.  
 
 ## Initialisation:
 
-Pour instancier ```FluideComplexe``` nous posons en amon:  
+Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
 
 ***Lx, Lz*** : les dimensions de la boîte  
 ***delta_t**** : le pas de temps élémentaire pour l'évolution  
 ***Kappa, tau_P, tau_T*** : les paramètres physiques de la simulation  
 ***r_c*** : rayon de coupure pour les interactions  
 
-Dans `main()`, quatre arguments sont récupérés à l'exécution :
+De plus le ```main```, demande quatre arguments pour l'éxécution qui sont:  
 
-1. Un **fichier d'initialisation**
-2. Une **température**
-3. Une **pression**
-4. Un **nombre d'évolutions**
+1. Un **fichier d'initialisation**  
+2. Une **température**  
+3. Une **pression**  
+4. Un **nombre d'évolutions**  
 
-Le programme commence par **vérifier** que la température et la pression sont positives, puis s'assure que le fichier d'initialisation peut être ouvert.
+Pour éviter les problèmes plus tard nous commencons par **vérifier** que la température et la pression soient positives et que le fichier d'initialisation peut être ouvert.  
 
 ## 2. Instanciation du fluide complexe
 
