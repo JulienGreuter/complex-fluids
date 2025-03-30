@@ -4,7 +4,7 @@ Nous allons ici développer le fonctionnement de manière chronologique du fichi
 
 <div id='MAINiniFC'/>
   
-## Initialisation:
+## $${\color{red}Initialisation:}$$
 
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
 
@@ -334,4 +334,4 @@ Méthode pour exporter le réseau et ses caractéristiques sous CSV
 
 #### getCases , getCasesLibres :  
 Méthode pour accéder aux grandeurs misent en ```private```  
-$${\color{red}Red}$$
+
