@@ -8,9 +8,9 @@ Nous allons ici développer le fonctionnement de manière chronologique du fichi
 
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
 
-***Lx, Lz*** : les dimensions de la boîte  
-***delta_t**** : le pas de temps élémentaire pour l'évolution  
-***Kappa, tau_P, tau_T*** : les paramètres physiques de la simulation  
+***L_x, L_z*** : les dimensions de la boîte  
+***delta_t*** : le pas de temps élémentaire pour l'évolution  
+***kappa, tau_P, tau_T*** : les paramètres physiques de la simulation  
 ***r_c*** : rayon de coupure pour les interactions  
 
 De plus le ```main```, demande quatre arguments pour l'éxécution qui sont:  
@@ -20,17 +20,17 @@ De plus le ```main```, demande quatre arguments pour l'éxécution qui sont:
 3. Une **pression**  
 4. Un [**nombre d'évolutions**](#EVO)  
 
-Pour éviter les problèmes plus tard nous commencons par **vérifier** que la température et la pression soient positives et que le fichier d'initialisation peut être ouvert.  
+Pour éviter les problèmes plus tard nous commencons par **vérifier** que la température et la pression soient positives et que le fichier d'initialisation puisse être ouvert.  
 
 ## $${\color{red}Instanciation du fluide complexe:}$$
 
 À la ligne 49 du fichier ```export_data.cpp```, nous instancions un objet [```FluideComplexe```](#FC) tel que :
 
 ```cpp
-FluideComplexe fluide = FluideComplexe(LX, LZ, Delta_T, Kappa, tau_P, tau_T, r_c, fichier_ini);
+FluideComplexe fluide = FluideComplexe(L_x, L_z, delta_t, kappa, tau_P, tau_T, r_c, fichier_ini);
 ```
 
-Cependant, cette instanciation n'induit pas directement un objet de type ```fluide```, en effet, ce sera le cas aprés l'uilisation de la méthode [```initialisation```](#FCini) via la température entrée précédement.  
+Cependant, ce constructeur ne permet pas l'instanciation complete, en effet, il faut faire appel à la méthode [```initialisation```](#FCini) de la classe, qui depend de la température entrée précédement.  
 
 ## $${\color{red}Initialisation des particules du fluide:}$$
 
@@ -38,7 +38,7 @@ Cependant, cette instanciation n'induit pas directement un objet de type ```flui
 
 Un fichier d'initialisation contient de haut en bas:  
   
-1. Une en-tête commenté présentant le cadre de la simulation  
+1. Un en-tête commenté présentant le cadre de la simulation  
   
 2. Une ligne par **ensemble de particules** contenant:<div id='MAINiniPA'/>
 ```
@@ -57,18 +57,17 @@ Un fichier d'initialisation contient de haut en bas:
   2.2 l'énergie d’interaction `E_0`  
   2.3 La distance caractéristique `d`  
   2.4 La masse, taille et charge des particules  
-  2.5 Le domaine d'affectation  
+  2.5 Le domaine d'affectation decrit par son identifiant id_ini  
 <div id='PAxy'/>
   
-Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via la classe [```reseau```](#RE) qui utilisera le [```domaines```](#DOM).  
-
+Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```Particules```](#PA), sauf pour leurs positions et vitesses qui seront determinées via la methode d'initialisation de la classe ```FluideComplexe``` . Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via l'utilisation de la classe [```reseau```](#RE) defini par le [```domaines```](#DOM).  
 ### Placement des particules:
 
 L'initialisation des positions et vitesses est réalisée par [```initialisation_domaine```](#DOMini), nous retrouvons dans cette méthode:
 
 1. Une Récupèration des bornes du domaine (définies dans [```domaines```](#DOM) lors de l'instanciation de [```FluideComplexe```](#FC))  
 2. Utilisation de la classe [```reseau```](#RE) pour subdiviser l’espace en cellules liée à la classe [```Case```](#CA)
-3. Place les particules en [taille décroissante](#DOMini) pour optimiser le remplissage  
+3. Place les particules par [taille décroissante](#DOMini) pour optimiser le remplissage  
 4. Affecte les vitesses aux particules via [```initialiserVitesses```](#PAini)  
 <div id='POS'/>
 
@@ -77,10 +76,10 @@ L'initialisation des positions et vitesses est réalisée par [```initialisation
 Pour mieux comprendre nous allons développer sur la méthode [```initialisation```](#FCini) :  
 
 1. **Lit le fichier d'initialisation** et extrait les données vue précédement  
-2. **Crée des ensembles de particules** avec les paramètres lus et un calcul lié au [```domaines```](#DOM)    
+2. **Crée des ensembles de particules** avec les paramètres lus et un systeme de remplissage des cases du reseau lié au [```domaines```](#DOM)    
 3. **Trie et place les particules** dans leurs domaines respectifs via [```traiter_domaine```](#DOMini)  
 4. **Initialise les vitesses** avec [```initialiserVitesses```](#PAini), en suivant une distribution de Maxwell-Boltzmann  
-5. **Exporte les positions et vitesses** dans les fichier ```positions_ini.csv```, ```vitesses_ini.csv``` avec [exporterPositionsCSV](#EXP) et [exporterVitessesCSV](#EXP)  
+5. **Exporte les positions et vitesses** dans les fichiers ```positions_ini.csv```, ```vitesses_ini.csv``` avec [exporterPositionsCSV](#EXP) et [exporterVitessesCSV](#EXP)  
 6. **Calcule les forces d'interaction initiales** avec la méthode [```calculer_forces```](#CALC)  
 <div id='EVO'/>
 
@@ -101,7 +100,7 @@ Nous pouvons retrouver le [nombre d'évolution](#MAINiniFC) défini précédemme
 
 ## $${\color{red}Rôle du thermostat et du barostat:}$$
 
-De plus nous appliquons un thermostat ainsi qu'un barostat pour maintenir ces grandeurs constante dans notre objectif de simuler un fluide à la température T et à pression P, nous utilisons pour cela nous utilisons [```appliquer_thermostat```](#BARO) et [```appliquer_barostat_local```](#BARO). Ces ajustements suivent une relaxation définie par [```tau_T```](#DOM) (thermostat) et [```tau_P```](#DOM) (barostat).
+De plus nous appliquons un thermostat ainsi qu'un barostat pour controler la temperature et la pression du fluide, nous utilisons pour cela [```appliquer_thermostat```](#BARO) et [```appliquer_barostat_local```](#BARO). Ces ajustements suivent une relaxation définie par [```tau_T```](#DOM) (thermostat) et [```tau_P```](#DOM) (barostat).
 
 ## $${\color{red}Conclusion:}$$
 
@@ -138,7 +137,7 @@ Cela permet de faciliter l'interaction entre ces deux classes
 
 ### Méthodes:
 #### Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
-Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
+Nous initialisons certaines constantes des particules, elles sont donc supposés par defaut ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
 <div id='PAini'/>
  
 #### [initialiserVitesses](#MAINiniPA) : ```T```  
@@ -147,12 +146,12 @@ Nous posons alors ```sigma = std::sqrt(K_B * T / masse)``` l'écart-type de la d
 Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initialisé nulle, ce vecteur permet de "normer" les vecteurs vitesses pour que la vitesse du barycentre reste nulle  
  
 #### setPositions : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
-Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières, ce sont des méthodes non utilisées pour le fluide complexe. Elles servent à tester la classe particules pour tester les différentes modifications qui ont été amenées  
+Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières en dehors de la classe, ce sont des méthodes non utilisées pour le fluide complexe du fait de la relation entre ```Particules``` et ```FluideComplexe```. Elles peuvent servir notament à tester la classe ```Particules``` en dehors de son utlisation dans un objet de type fluide complexe.  
 <div id='FC'/>
 
 ## $${\color{red}Fluidecomplexe:}$$
 
-Cette méthode permet de regrouper plusieurs objets particules avec l'objet de fluide complexe et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
+Cette méthode permet de regrouper plusieurs objets ```Particules``` avec l'objet de ```FluideComplexe``` et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
 
 ### Fonction:
 
@@ -163,13 +162,13 @@ Fonction pour calculer la force de Lennard-Jones entre deux particules i et j, c
 Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann centrée et d'écart type ```sigma = std::sqrt(K_B * T / masse)```  
 
 ***void relaxationVersMaxwell*** : ```& vitesse``` ,```T``` ,```masse``` ,```alpha```  
-Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse  
+Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse, ce qui correspond à une moyenne pondéré par alpha   
 
 ***double periodic_boundary_if_needed*** : ```coord``` ,```L``` ,```& modifie```  
 Fonction pour appliquer les conditions périodiques à une unique coordonné si nécessaire  
 
 ***bool extraireEnteteEnsemble*** ```& ligne``` ,```& N``` ,```& d``` ,```& E_0``` ,```& taille``` ,```& masse```  
-Fonction pour lire les en-têtes  
+Fonction pour lire les en-têtes, utile pour l'initialisation d'un objet ```FluideComplexe``` via des fichiers de positions et vitesses precedement obtenues    
 
 <div id='DOM'/>
 
@@ -182,12 +181,12 @@ Fonction pour lire les en-têtes
 ***[tau_P](#STAT)*** : Temps de réponse du barostat  
 ***[tau_T](#STAT)*** : Temps de réponse du thermostat  
 ***r_c*** : Rayon de coupure des intéractions, la distance limite au dessus de laquelle l'on suppose que les particules n'interagissent plus 
-***particules*** : Ensemble des ensembles de particules issue de la classe particules, il s'agit d'une liste "concaténée" qui contient toutes les particules  
+***particules*** : Ensemble des ensembles de particules issue de la classe Particules, il s'agit d'une liste "concaténée" qui contient toutes les particules  
 ***forces_interactions*** : Forces d'interactions entre les particules  
 ***nb_interactions*** : Nombre de voisins d'une particule  
 ***Pxx*** : Composante xx du tenseur de pression  
 ***Pzz*** : Composante zz du tenseur de pression  
-***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules 
+***fichier_nom*** : nom du fichier d'initialisation contenant la description initiale de fluide complexe en termes d'ensemble de particules 
 ***[std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines](#PAxy)*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```. Dans cette variable nous avons une liste de mot clés qui va induire une forme de domaine:  
 
 | ***id_ini*** | ***xmin*** | ***xmax*** | ***zmin*** | ***zmax*** | 
@@ -210,17 +209,17 @@ Fonction pour lire les en-têtes
 Cette initialisation vise à définir les positions et vitesses initiales des particules du fluide  
 
 #### [traiter_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
-Cette méthode vise à préparer l'ordre des particules dasn chaques domaines, en effet pour placer les particules initialement nous avons besoin de trier les particules dans l'ordre décroissant des tailles  
+Cette méthode vise à préparer l'ordre des particules dans chaques domaines, en effet pour placer les particules initialement nous avons besoin de trier les particules par tailles croissante  
 
 #### FluideComplexe : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
 Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
 <div id='FCini'/>
   
 #### [initialisation](#MAINiniFC) : ```T```  
-Méthode d'initialisation des positions et vitesses des particules du fluide, elle permet de "finir" l'instanciation du fluide  
+Méthode d'initialisation des positions et vitesses des particules du fluide, elle permet de "finir" l'instanciation du fluide en utilisant [initialisation_domaine](#PAxy)  
 
 #### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
-Cette méthode est assimilable à la précédente dans son objectif, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition  
+Cette méthode est assimilable à la précédente dans son objectif, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition, ces fichiers doivent avoir le meme format que les fichiers generé par les methodes [exporterPositionsCSV](#POS) et [exporterVitessesCSV](#POS)    
 <div id='CALC'/>
 
 #### [calculer_forces](#POS) :  
@@ -237,13 +236,13 @@ Cette méthode vise à ramener une particule dans l'espace ```L_x*L_z``` par pé
 <div id='BARO'/>
 
 #### [appliquer_thermostat](#STAT) : ```T```  
-Pour maintenir un thermostat constament à ```T```, et surtout d'éviter une explosion des vitesses  
+Pour ramener la temeperature à ```T```, et éviter une explosion des vitesses  
 
 #### [appliquer_barostat_local](#STAT) : ```P_cible```  
 Cette méthode et comme la précédente mais en prenant cette fois ci la pression en compte  
 
 #### calculer_temperature :  
-Méthode de calcule de la température du fluide via un calcule statistique sur la vitesse de chaque particules  
+Méthode de calcule de la température du fluide via un calcul statistique sur la vitesse de chaque particules  
 
 #### calculer_tenseur_pression : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
 Cette méthode permet de calculer le tenseur de pression sur une tranche de l'espace selon ```z```  
@@ -261,7 +260,8 @@ Méthode pour exporter les vitesses des particules vers un fichier CSV
 
 ## $${\color{red}Case:}$$
 
-Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travaill  
+Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travail, elles sont contenu dans un reseau.  
+C'est ensuite la subdivisation de ce reseau et le remplissage des cases qui permet d'initialiser les positions des particules du fluide 
 
 ### Attributs:
 ***x, z*** : Position du centre de la case  
@@ -291,7 +291,7 @@ Change l'état de liberté de la case vers occupée
 Affiche des informations de la case  
 
 #### getX , getZ , getOrdreSubdivision , getEnfants et getTaille :  
-Getter pour accéder aux attributs et privés d'une case  
+Getter pour accéder aux attributs d'une case en dehors de la classe 
 
 <div id='RE'/>
 
@@ -306,10 +306,10 @@ Getter pour accéder aux attributs et privés d'une case
 ### Méthodes:
 
 #### Reseau : ```xmin``` ,```xmax``` ,```zmin``` ,```zmax``` ,```taille_case```  
-Initialisation de la classe  
+Constructeur de la classe  
 
 #### tirerCaseLibre :  
-Méthode pour tirer au hasard une case parmi les cases libres  
+Méthode pour tirer au hasard une case parmi les cases libres du reseau 
 
 #### subdiviserCase : ```case_a_subdiviser```  
 Méthode pour subdiviser une case libre en 4 enfants  
