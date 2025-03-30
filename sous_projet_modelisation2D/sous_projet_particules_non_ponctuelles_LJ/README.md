@@ -232,7 +232,7 @@ Méthode pour mettre à jour les positions des particules en fonctions des force
 #### [mettre_a_jour_vitesses](#EVO) : ```T``` ,```& forces_interactions_precedentes```  
 Méthode pour mettre à jour les vitesses pour un temps ```t+dt``` des particules en fonctions des forces calculé à un temps ```t``` et un temps ```t+dt```  
     
-#### $${\color{yellow}appliquer_conditions_periodiques}$$ : 
+#### $${\color{yellow}appliquer_ conditions_ periodiques}$$ : 
 Cette méthode vise à ramener une particule dans l'espace ```L_x*L_z``` par périodicité de cette boîte  
 <div id='BARO'/>
 
@@ -329,7 +329,7 @@ Méthode pour ajouter les enfants d'une case à ```cases_libres```
 #### $${\color{yellow}afficher}$$ :  
 Méthode d'affichage du réseau et de ses caractéristiques  
 
-#### $${\color{yellow}afficher_details}$$ :  
+#### $${\color{yellow}afficher_ details}$$ :  
 Méthode pour afficher les statistiques du réseau  
 
 #### $${\color{yellow}exporterCSV}$$ : ```filename```  
