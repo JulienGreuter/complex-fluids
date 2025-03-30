@@ -32,18 +32,34 @@ FluideComplexe fluide = FluideComplexe(LX, LZ, Delta_T, Kappa, tau_P, tau_T, r_c
 
 Cependant, cette instanciation n'induit pas directement un objet de type ```fluide```, en effet, ce sera le cas aprés l'uilisation de la méthode [```initialisation(double T)```](#FCini) via la température entrée précédement.  
 
-## 3. Initialisation des particules
+## Initialisation des particules du fluide:
 
-### a) Structure du fichier d'initialisation
+### Structure du fichier d'initialisation:
 
-Le fichier d'initialisation contient :
-- Un en-tête commenté
-- Une ligne par **ensemble de particules** contenant :
-  - Nombre de particules `N`
-  - Énergie d’interaction `E0`
-  - Distance caractéristique `D`
-  - Masse, taille et charge des particules
-  - Domaine d'affectation (ex. : `D1`, `D2`, etc.)
+Un fichier d'initialisation contient de haut en bas:  
+  
+1. Une en-tête commenté présentant le cadre de la simulation  
+  
+2. Une ligne par **ensemble de particules** contenant:
+```
+  # Format : 
+
+#N      E_0     d     masse   taille charge id_ini
+1000     1.0    0.1     10     0.0     0.0     D31
+2000     1.2    0.4     30     0.0     0.0     D32
+5000     1.0    0.1     10     0.0     0.0     D32
+300      0.1    0.8     100    0.3     0.0     D32
+100      0.2    0.7     300    0.9     0.0     D32
+5000     0.5    0.2     10     0.0     0.0     D32
+1000     1.0    0.1     10     0.0     0.0     D33
+```
+  2.1 Le nombre de particules `N`
+  2.2 l'énergie d’interaction `E_0`
+  2.3 La distance caractéristique `d`
+  2.4 La masse, taille et charge des particules
+  2.5 Le domaine d'affectation (ex. : `D1`, `D2`, etc.)
+
+Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Cette définition ce fera via 
 
 ### b) Méthode `initialisation(double T)`
 
@@ -99,6 +115,9 @@ Le programme `exportdata` permet de :
 Chaque évolution du système est enregistrée dans des fichiers CSV pour analyse ultérieure.
 
 # Les Classes:
+
+<div id='PA'/>
+
 ## Particules:
 
 Cette classe décrit des ensembles de particules de même types  
