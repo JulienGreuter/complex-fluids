@@ -187,9 +187,8 @@ Fonction pour lire les en-têtes
 ***nb_interactions*** : Nombre de voisins d'une particule  
 ***Pxx*** : Composante xx du tenseur de pression  
 ***Pzz*** : Composante zz du tenseur de pression  
-***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules
-***[std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines](#PAxy)*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
-Dans cette variable nous avons une liste de mot clés qui va induire une forme de domaine:  
+***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules 
+***[std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines](#PAxy)*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```. Dans cette variable nous avons une liste de mot clés qui va induire une forme de domaine:  
 
 | ***id_ini*** | ***xmin*** | ***xmax*** | ***zmin*** | ***zmax*** | 
 |---|---|---|---|---| 
