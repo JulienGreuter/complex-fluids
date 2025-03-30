@@ -34,7 +34,7 @@ Cependant, ce constructeur ne permet pas l'instanciation complete, en effet, il 
 
 ## $${\color{red}Initialisation des particules du fluide:}$$
 
-### Structure du fichier d'initialisation:
+### $${\color{green}Structure du fichier d'initialisation:}$$
 
 Un fichier d'initialisation contient de haut en bas:  
   
