@@ -71,7 +71,7 @@ L'initialisation des positions et vitesses est réalisée par [```initialisation
 4. Affecte les vitesses aux particules via [```initialiserVitesses```](#PAini)  
 <div id='POS'/>
 
-### $${\color{green}Méthode [```initialisation```](#FCini):}$$
+### $${\color{green}Méthode}$$ [```initialisation```](#FCini)$${\color{green}:}$$
 
 Pour mieux comprendre nous allons développer sur la méthode [```initialisation```](#FCini) :  
 
