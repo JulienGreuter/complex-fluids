@@ -58,10 +58,9 @@ Un fichier d'initialisation contient de haut en bas:
   2.3 La distance caractéristique `d`  
   2.4 La masse, taille et charge des particules  
   2.5 Le domaine d'affectation  
-  
-Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via la classe [```reseau```](#RE) qui utilisera le domaine.
-
 <div id='PAxy'/>
+  
+Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via la classe [```reseau```](#RE) qui utilisera le [```domaines```](#DOM).  
 
 ### Placement des particules:
 
@@ -104,15 +103,15 @@ Nous pouvons retrouver le [nombre d'évolution](#MAINiniFC) défini précédemme
 
 De plus nous appliquons un thermostat ainsi qu'un barostat pour maintenir ces grandeurs constante dans notre objectif de simuler un fluide à la température T et à pression P, nous utilisons pour cela nous utilisons [```appliquer_thermostat```](#BARO) et [```appliquer_barostat_local```](#BARO). Ces ajustements suivent une relaxation définie par [```tau_T```](#DOM) (thermostat) et [```tau_P```](#DOM) (barostat).
 
-## 6. Conclusion
+## Conclusion:
 
-Le programme `exportdata` permet de :
+Le programme ```exportdata``` permet :  
 
-1. **Initialiser** un fluide complexe en lisant un fichier d'initialisation.
-2. **Faire évoluer le système** en mettant à jour positions, vitesses et forces.
-3. **Réguler la température et la pression** à l’aide d’un thermostat et d’un barostat.
+1. **D'initialiser** un fluide complexe en lisant un fichier d'initialisation  
+2. **De faire évoluer le système** en mettant à jour positions, vitesses et forces au cours du temps  
+3. **De réguler la température et la pression** à l’aide d’un thermostat et d’un barostat défini par l'utilisateur  
 
-Chaque évolution du système est enregistrée dans des fichiers CSV pour analyse ultérieure.
+De plus chaque évolution du système est enregistrée dans des fichiers CSV pour permettre une analyse ultérieure.  
 
 # Les Classes:
 
@@ -185,6 +184,9 @@ Fonction pour lire les en-têtes
 ***r_c*** : Rayon de coupure des intéractions, la distance limite au dessus de laquelle l'on suppose que les particules n'interagissent plus 
 ***particules*** : Ensemble des ensembles de particules issue de la classe particules, il s'agit d'une liste "concaténée" qui contient toutes les particules  
 ***forces_interactions*** : Forces d'interactions entre les particules  
+***nb_interactions*** : Nombre de voisins d'une particule  
+***Pxx*** : Composante xx du tenseur de pression
+***Pzz*** : Composante zz du tenseur de pression
 ***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules
 ***[std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines](#PAxy)*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
 
