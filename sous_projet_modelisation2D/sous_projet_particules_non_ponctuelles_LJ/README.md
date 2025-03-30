@@ -242,10 +242,10 @@ Pour ramener la temeperature à ```T```, et éviter une explosion des vitesses
 #### [appliquer_barostat_local](#STAT) : ```P_cible```  
 Cette méthode et comme la précédente mais en prenant cette fois ci la pression en compte  
 
-#### $`\texttt{{\color{yellow}calculer_temperature}}`$ :  
+#### $`\texttt{{\color{yellow}calculer\_temperature}}`$ :  
 Méthode de calcule de la température du fluide via un calcul statistique sur la vitesse de chaque particules  
 
-#### $`\texttt{{\color{yellow}calculer_tenseur_pression}}`$ : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
+#### $`\texttt{{\color{yellow}calculer\_tenseur\_pression}}`$ : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
 Cette méthode permet de calculer le tenseur de pression sur une tranche de l'espace selon ```z```  
 <div id='EXP'/>
 
