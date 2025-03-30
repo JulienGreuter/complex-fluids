@@ -334,11 +334,4 @@ Méthode pour exporter le réseau et ses caractéristiques sous CSV
 
 #### getCases , getCasesLibres :  
 Méthode pour accéder aux grandeurs misent en ```private```  
-
-```diff
-- text in red
-+ text in green
-! text in orange
-# text in gray
-@@ text in purple (and bold)@@
-```
+$${\color{red}Red}$$
