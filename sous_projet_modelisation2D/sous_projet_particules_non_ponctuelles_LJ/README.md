@@ -67,8 +67,8 @@ Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet
 
 L'initialisation des positions et vitesses est réalisée par [```initialisation_domaine```](#DOMini), nous retrouvons dans cette méthode:
 
-1. Une Récupèration des bornes du domaine (définies dans `domaines` lors de l'instanciation de [```FluideComplexe```](#FC)).
-- Utilise la classe `Reseau` pour subdiviser l’espace en cellules.
+1. Une Récupèration des bornes du domaine (définies dans [```domaines```](#DOM) lors de l'instanciation de [```FluideComplexe```](#FC)).
+- Utilise la classe [```reseau```](#RE) pour subdiviser l’espace en cellules.
 - Place les particules en **taille décroissante** pour optimiser le remplissage.
 - Affecte les vitesses aux particules.
 
@@ -174,6 +174,8 @@ Fonction pour appliquer les conditions périodiques à une unique coordonné si 
 ***bool extraireEnteteEnsemble*** ```& ligne``` ,```& N``` ,```& d``` ,```& E_0``` ,```& taille``` ,```& masse```  
 Fonction pour lire les en-têtes  
 
+<div id='DOM'/>
+
 ### Attributs:
 
 ***L_x*** : Longueur de la boîte selon x  
@@ -186,7 +188,7 @@ Fonction pour lire les en-têtes
 ***particules*** : Ensemble des ensembles de particules issue de la classe particules, il s'agit d'une liste "concaténée" qui contient toutes les particules  
 ***forces_interactions*** : Forces d'interactions entre les particules  
 ***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules
-***std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
+***[std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines](#PAxy)*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```  
 
 <div id='DOMini'/>
 
