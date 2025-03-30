@@ -5,7 +5,7 @@ Nous allons ici développer le fonctionnement de manière chronologique du fichi
 <div id='MAINiniFC'/>
   
 ## Initialisation:
-<span style="color:red">
+<span style="color:red"> 
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
 </span>
 ***Lx, Lz*** : les dimensions de la boîte  
