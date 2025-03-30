@@ -32,7 +32,7 @@ FluideComplexe fluide = FluideComplexe(LX, LZ, Delta_T, Kappa, tau_P, tau_T, r_c
 
 Cependant, cette instanciation n'induit pas directement un objet de type ```fluide```, en effet, ce sera le cas aprés l'uilisation de la méthode [```initialisation```](#FCini) via la température entrée précédement.  
 
-## Initialisation des particules du fluide:
+## $${\color{red}Initialisation des particules du fluide:}$$
 
 ### Structure du fichier d'initialisation:
 
@@ -84,7 +84,7 @@ Pour mieux comprendre nous allons développer sur la méthode [```initialisation
 6. **Calcule les forces d'interaction initiales** avec la méthode [```calculer_forces```](#CALC)  
 <div id='EVO'/>
 
-## Évolution du fluide:
+## $${\color{red}Évolution du fluide:}$$
 
 Aprés l'initialisation nous faisons évoluer notre système via les lignes :   
 ```cpp
@@ -99,11 +99,11 @@ Nous pouvons retrouver le [nombre d'évolution](#MAINiniFC) défini précédemme
 3. **Les vitesses** selon l'algorithme de Verlet décrite dans la méthode [```mettre_a_jour_vitesses```](#CALC)  
 <div id='STAT'/>
 
-## Rôle du thermostat et du barostat:
+## $${\color{red}Rôle du thermostat et du barostat:}$$
 
 De plus nous appliquons un thermostat ainsi qu'un barostat pour maintenir ces grandeurs constante dans notre objectif de simuler un fluide à la température T et à pression P, nous utilisons pour cela nous utilisons [```appliquer_thermostat```](#BARO) et [```appliquer_barostat_local```](#BARO). Ces ajustements suivent une relaxation définie par [```tau_T```](#DOM) (thermostat) et [```tau_P```](#DOM) (barostat).
 
-## Conclusion:
+## $${\color{red}Conclusion:}$$
 
 Le programme ```exportdata``` permet :  
 
@@ -117,7 +117,7 @@ De plus chaque évolution du système est enregistrée dans des fichiers CSV pou
 
 <div id='PA'/>
 
-## Particules:
+## $${\color{red}Particules:}$$
 
 Cette classe décrit des ensembles de particules de même types  
 
@@ -150,7 +150,7 @@ Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initia
 Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières, ce sont des méthodes non utilisées pour le fluide complexe. Elles servent à tester la classe particules pour tester les différentes modifications qui ont été amenées  
 <div id='FC'/>
 
-## Fluidecomplexe:
+## $${\color{red}Fluidecomplexe:}$$
 
 Cette méthode permet de regrouper plusieurs objets particules avec l'objet de fluide complexe et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
 
@@ -259,7 +259,7 @@ Méthode pour exporter les positions des particules vers un fichier CSV
 Méthode pour exporter les vitesses des particules vers un fichier CSV  
 <div id='CA'/>
 
-## [Case](#PAxy):
+## $${\color{red}[Case](#PAxy):}
 
 Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travaill  
 
@@ -295,7 +295,7 @@ Getter pour accéder aux attributs et privés d'une case
 
 <div id='RE'/>
 
-## Reseau:
+## $${\color{red}Reseau:}$$
 ### Attributs:
 ***xmin, xmax, zmin, zmax*** : Les limites de la boîte  
 ***taille_case*** : Tailles des cases du réseau  
