@@ -19,15 +19,15 @@ Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** v
 Cela permet de faciliter l'interaction entre ces deux classes  
 
 ### Méthodes:
-##### Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
+#### Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
 Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
  
-##### initialiserVitesses : ```T```  
+#### initialiserVitesses : ```T```  
 Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide. 
 Nous posons alors ```sigma = std::sqrt(K_B * T / masse)``` l'écart-type de la distribution de Maxwell-Boltzmann, puis nous générons un nombre aléatoire qui va nous permettre de calculer une distribution de position et de vitesse aléatoire et de type maxwellienne centrée et d'écart type ```sigma```.  
 Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initialisé nulle, ce vecteur permet de "normer" les vecteurs vitesses pour que la vitesse du barycentre reste nulle.  
  
-##### setPositions : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
+#### setPositions : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
 Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières, ce sont des méthodes non utilisées pour le fluide complexe. Elles servent à tester la classe particules pour tester les différentes modifications qui ont été amenées  
 
 ## Fluidecomplexe:
@@ -67,52 +67,52 @@ Fonction pour lire les en-têtes
 
 ### Méthodes:
 
-##### initialisation_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
+#### initialisation_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
 Cette initialisation vise à définir les positions et vitesses initiales des particules du fluide  
 
-##### traiter_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
+#### traiter_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
 Cette méthode vise à préparer l'ordre des particules dasn chaques domaines, en effet pour placer les particules initialement nous avons besoin de trier les particules dans l'ordre décroissant des tailles  
 
-##### FluideComplexe : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
+#### FluideComplexe : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
 Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
 
-##### initialisation : ```T```  
+#### initialisation : ```T```  
 Méthode d'initialisation des positions et vitesses des particules du fluide  
 
-##### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
+#### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
 Cette méthode est assimilable à la précédente, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition.
 
-##### calculer_forces :  
+#### calculer_forces :  
 Cette méthode vise à calculer les forces d'interactions entre les particules  
 
-##### mettre_a_jour_positions : ```P```  
+#### mettre_a_jour_positions : ```P```  
 Méthode pour mettre à jour les positions des particules en fonctions des forces calculé avec la méthode précédente et des conditons limites périodiques  
 
-##### mettre_a_jour_vitesses : ```T``` ,```& forces_interactions_precedentes```  
+#### mettre_a_jour_vitesses : ```T``` ,```& forces_interactions_precedentes```  
 Méthode pour mettre à jour les vitesses pour un temps ```t+dt``` des particules en fonctions des forces calculé à un temps ```t``` et un temps ```t+dt```  
     
-##### appliquer_conditions_periodiques : 
+#### appliquer_conditions_periodiques : 
 Cette méthode vise à ramener une particule dans l'espace ```L_x*L_z``` par périodicité de cette boîte  
 
-##### appliquer_thermostat : ```T```  
+#### appliquer_thermostat : ```T```  
 Pour maintenir un thermostat constament à ```T```, et surtout d'éviter une explosion des vitesses  
 
-##### appliquer_barostat : ```P```  
+#### appliquer_barostat : ```P```  
 Cette méthode et comme la précédente mais en prenant cette fois ci la pression en compte
 
-##### calculer_temperature :  
+#### calculer_temperature :  
 Méthode de calcule de la température du fluide via un calcule statistique sur la vitesse de chaque particules  
 
-##### calculer_tenseur_pression : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
+#### calculer_tenseur_pression : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
 Cette méthode permet de calculer le tenseur de pression sur une tranche de l'espace selon ```z```  
 
-##### evoluer : ```T``` ,```P```  
+#### evoluer : ```T``` ,```P```  
 Cette méthode est celle qui permet l'évolution global du système avec toutes les méthodes précédentes, c'est pour cela qu'elle demande une température et une pression, ce sera le thermostat et le barostat  
     
-##### exporterPositionsCSV : ```& fileCSV```  
+#### exporterPositionsCSV : ```& fileCSV```  
 Méthode pour exporter les positions des particules vers un fichier CSV  
 
-##### exporterVitessesCSV : ```& fileCSV```
+#### exporterVitessesCSV : ```& fileCSV```
 Méthode pour exporter les vitesses des particules vers un fichier CSV  
 
 ## Case:
@@ -124,24 +124,24 @@ Méthode pour exporter les vitesses des particules vers un fichier CSV
 
 ### Méthodes:
 
-##### Case : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
+#### Case : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
 Initialisation de la classe avec des cases
 
-##### subdiviser :  
+#### subdiviser :  
 Méthode pour subdiviser une case en 4 case enfants de même tailles  
 
-##### estParent :  
+#### estParent :  
 Vérifie si la case est un parent, donc si elle admet des case d'ordre plus élevée en elle  
 
-##### estLibre :  
+#### estLibre :  
 Vérifie si la case est libre (non occupée)  
 
-##### marquerOccupee :  
+#### marquerOccupee :  
 Change l'état de liberté de la case vers occupée  
 
-##### afficher :  
+#### afficher :  
 Affiche des informations de la case  
 
-##### getX , getZ , getOrdreSubdivision , getEnfants et getTaille :  
+#### getX , getZ , getOrdreSubdivision , getEnfants et getTaille :  
 Getter pour accéder aux attributs et privés d'une case  
 
