@@ -69,8 +69,8 @@ L'initialisation des positions et vitesses est réalisée par [```initialisation
 
 1. Une Récupèration des bornes du domaine (définies dans [```domaines```](#DOM) lors de l'instanciation de [```FluideComplexe```](#FC))  
 2. Utilisation de la classe [```reseau```](#RE) pour subdiviser l’espace en cellules liée à la classe [```Case```](#CA)
-- Place les particules en **taille décroissante** pour optimiser le remplissage.
-- Affecte les vitesses aux particules.
+3. Place les particules en [taille décroissante](#DOMini) pour optimiser le remplissage  
+4. Affecte les vitesses aux particules via [```initialiserVitesses```](#PAini)  
 
 ### Méthode [```initialisation```](#FCini):
 
@@ -197,7 +197,7 @@ Fonction pour lire les en-têtes
 #### [initialisation_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
 Cette initialisation vise à définir les positions et vitesses initiales des particules du fluide  
 
-#### traiter_domaine : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
+#### [traiter_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
 Cette méthode vise à préparer l'ordre des particules dasn chaques domaines, en effet pour placer les particules initialement nous avons besoin de trier les particules dans l'ordre décroissant des tailles  
 
 #### FluideComplexe : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
@@ -290,7 +290,8 @@ Getter pour accéder aux attributs et privés d'une case
 
 ### Méthodes:
 
-Reseau(double xmin, double xmax, double zmin, double zmax, double taille_case);
+#### Reseau : ```xmin``` ,```xmax``` ,```zmin``` ,```zmax``` ,```taille_case```  
+Initialisation de la classe  
 
 #### tirerCaseLibre :  
 Méthode pour tirer au hasard une case parmi les cases libres  
