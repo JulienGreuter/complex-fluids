@@ -190,7 +190,6 @@ Fonction pour lire les en-têtes
 ***fichier_nom*** : Fichier contenant la description initiale de fluide complexe en termes d'ensemble de particules 
 ***[std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines](#PAxy)*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```. Dans cette variable nous avons une liste de mot clés qui va induire une forme de domaine:  
 
-[center]
 | ***id_ini*** | ***xmin*** | ***xmax*** | ***zmin*** | ***zmax*** | 
 |---|---|---|---|---| 
 | D1 | -L_x / 2 | L_x / 2 | -L_z / 2 | L_z / 2 | 
@@ -201,7 +200,7 @@ Fonction pour lire les en-têtes
 | DFG | -L_x / 2 | L_x / 2 | -L_z / 2 | -L_z / 20 | 
 | DFM | -L_x / 2 | L_x / 2 | -L_z / 20 | L_z / 20 | 
 | DFD | -L_x / 2 | L_x / 2 | L_z / 20 | L_z / 2 | 
-[/center]
+
 
 <div id='DOMini'/>
 
@@ -336,3 +335,10 @@ Méthode pour exporter le réseau et ses caractéristiques sous CSV
 #### getCases , getCasesLibres :  
 Méthode pour accéder aux grandeurs misent en ```private```  
 
+```diff
+- text in red
++ text in green
+! text in orange
+# text in gray
+@@ text in purple (and bold)@@
+```
