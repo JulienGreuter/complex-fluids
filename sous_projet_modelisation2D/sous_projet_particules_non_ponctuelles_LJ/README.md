@@ -3,8 +3,8 @@
 Nous allons ici développer le fonctionnement de manière chronologique du fichier ```export_data.cpp``` qui permet de générer l'exécutable ```exportdata``` via le **Makefile**. Le tout repose sur l'utilisation de quelques classes mais surtout de la classe [```FluideComplexe```](#FC) qui va nous permettre de simuler le fluide dans un espace défini.  
 
 <div id='MAINiniFC'/>
-
-## <span style="color: #26B260">Initialisation:</span>
+<span style="color: #26B260">
+## Initialisation:</span>
 
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
 
