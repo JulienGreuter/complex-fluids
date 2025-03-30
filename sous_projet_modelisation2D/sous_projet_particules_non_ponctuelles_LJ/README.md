@@ -192,6 +192,7 @@ Fonction pour lire les en-têtes
 Dans cette variable nous avons une liste de mot clés qui va induire une forme de domaine:  
 
 | ***id_ini*** | ***xmin*** | ***xmax*** | ***zmin*** | ***zmax*** | 
+|---|---|---|---|---| 
 | D1 | -L_x / 2 | L_x / 2 | -L_z / 2 | L_z / 2 | 
 | D2 | -L_x / 2 | L_x / 2 | -L_z / 4 | L_z / 4 | 
 | D31 | -L_x / 2 | L_x / 2 | -L_z / 2 | L_z / 4 | 
