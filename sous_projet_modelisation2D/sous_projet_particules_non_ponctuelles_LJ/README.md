@@ -2,7 +2,7 @@
 
 Nous allons ici développer le fonctionnement de manière chronologique du fichier ```export_data.cpp``` qui permet de générer l'exécutable ```exportdata``` via le **Makefile**. Le tout repose sur l'utilisation de quelques classes mais surtout de la classe [```FluideComplexe```](#FC) qui va nous permettre de simuler le fluide dans un espace défini.  
 
-<div id='MAINini'/>
+<div id='MAINiniFC'/>
 
 ## Initialisation:
 
@@ -58,8 +58,9 @@ Un fichier d'initialisation contient de haut en bas:
   2.3 La distance caractéristique `d`  
   2.4 La masse, taille et charge des particules  
   2.5 Le domaine d'affectation (ex. : `D1`, `D2`, etc.)   
+<div id='MAINiniPA'/>
 
-Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Cette définition ce fera via 
+Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```particules```](#PA), sauf pour leurs positions et vitesses. Pour la vitesse, nous pourrons utiliser la méthode [```particules```](#PAini) 
 
 ### b) Méthode `initialisation(double T)`
 
@@ -140,8 +141,9 @@ Cela permet de faciliter l'interaction entre ces deux classes
 ### Méthodes:
 #### Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
 Nous initialisons certaines constantes des particules, elles sont donc supposés ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
+<div id='PAini'/>
  
-#### initialiserVitesses : ```T```  
+#### [initialiserVitesses](#MAINiniPA) : ```T```  
 Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide. 
 Nous posons alors ```sigma = std::sqrt(K_B * T / masse)``` l'écart-type de la distribution de Maxwell-Boltzmann, puis nous générons un nombre aléatoire qui va nous permettre de calculer une distribution de position et de vitesse aléatoire et de type maxwellienne centrée et d'écart type ```sigma```.  
 Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initialisé nulle, ce vecteur permet de "normer" les vecteurs vitesses pour que la vitesse du barycentre reste nulle  
@@ -197,7 +199,7 @@ Cette méthode vise à préparer l'ordre des particules dasn chaques domaines, e
 Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
 <div id='FCini'/>
   
-#### [initialisation](#MAINini) : ```T```  
+#### [initialisation](#MAINiniFC) : ```T```  
 Méthode d'initialisation des positions et vitesses des particules du fluide, elle permet de "finir" l'instanciation du fluide  
 
 #### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
