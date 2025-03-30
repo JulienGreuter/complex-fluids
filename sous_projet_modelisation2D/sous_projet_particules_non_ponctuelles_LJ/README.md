@@ -18,7 +18,7 @@ De plus le ```main```, demande quatre arguments pour l'éxécution qui sont:
 1. Un **fichier d'initialisation**  
 2. Une **température**  
 3. Une **pression**  
-4. Un **nombre d'évolutions**  
+4. Un [**nombre d'évolutions**](#EVO)  
 
 Pour éviter les problèmes plus tard nous commencons par **vérifier** que la température et la pression soient positives et que le fichier d'initialisation peut être ouvert.  
 
@@ -71,33 +71,33 @@ L'initialisation des positions et vitesses est réalisée par [```initialisation
 2. Utilisation de la classe [```reseau```](#RE) pour subdiviser l’espace en cellules liée à la classe [```Case```](#CA)
 3. Place les particules en [taille décroissante](#DOMini) pour optimiser le remplissage  
 4. Affecte les vitesses aux particules via [```initialiserVitesses```](#PAini)  
+<div id='POS'/>
 
 ### Méthode [```initialisation```](#FCini):
 
-La méthode [```initialisation```](#FCini) :  
+Pour mieux comprendre nous allons développer sur la méthode [```initialisation```](#FCini) :  
 
 1. **Lit le fichier d'initialisation** et extrait les données vue précédement  
 2. **Crée des ensembles de particules** avec les paramètres lus et un calcul lié au [```domaines```](#DOM)    
-3. **Trie et place les particules** dans leurs domaines respectifs via [```traiter_domaine```](#DOM)  
-4. **Initialise les vitesses** avec `initialiserVitesses(T)`, en suivant une distribution de Maxwell-Boltzmann  
-5. **Exporte les positions et vitesses** (`positions_ini.csv`, `vitesses_ini.csv`)  
-6. **Calcule les forces d'interaction initiales** (`calculer_forces()`)  
+3. **Trie et place les particules** dans leurs domaines respectifs via [```traiter_domaine```](#DOMini)  
+4. **Initialise les vitesses** avec [```initialiserVitesses```](#PAini), en suivant une distribution de Maxwell-Boltzmann  
+5. **Exporte les positions et vitesses** dans les fichier ```positions_ini.csv```, ```vitesses_ini.csv``` avec [exporterPositionsCSV](#EXP) et [exporterVitessesCSV](#EXP)  
+6. **Calcule les forces d'interaction initiales** avec la méthode [```calculer_forces```](#CALC)  
+<div id='EVO'/>
 
-## 4. Évolution du fluide
+## Évolution du fluide:
 
-Dans `export_data.cpp`, après l'initialisation, une boucle `for` exécute un nombre donné d’évolutions :
-
+Aprés l'initialisation nous faisons évoluer notre système via les lignes :   
 ```cpp
 for (int i = 0; i < nombre_d_evolutions; i++) {
     fluide.evoluer(Température, Pression);
 }
 ```
+Nous pouvons retrouver le [nombre d'évolution](#MAINiniFC) défini précédemment qui limite l'évolution dans le temps, nous trouvons aussi la méthode [```evoluer```](#EXP) fait évoluer le fluide en mettant à jour :
 
-La méthode `evoluer(T, P)` fait évoluer le fluide en mettant à jour :
-
-1. **Les positions** en fonction des vitesses et forces (`mettre_a_jour_positions(P)`).
-2. **Les forces d'interaction** (`calculer_forces()`).
-3. **Les vitesses** selon l'algorithme de Verlet (`mettre_a_jour_vitesses(T, forces_t, forces_t+dt)`).
+1. **Les positions** en fonction des vitesses et forces via la méthode [```mettre_a_jour_positions```](#CALC)  
+2. **Les forces d'interaction** avec la méthode [```calculer_forces```](#CALC)  
+3. **Les vitesses** selon l'algorithme de Verlet [```mettre_a_jour_vitesses```](#CALC)  
 
 ## 5. Rôle du thermostat et du barostat
 
@@ -209,14 +209,15 @@ Méthode d'initialisation des positions et vitesses des particules du fluide, el
 
 #### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
 Cette méthode est assimilable à la précédente dans son objectif, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition  
+<div id='CALC'/>
 
-#### calculer_forces :  
+#### [calculer_forces](#POS) :  
 Cette méthode vise à calculer les forces d'interactions entre les particules  
 
-#### mettre_a_jour_positions : ```P```  
+#### [mettre_a_jour_positions](#EVO) : ```P```  
 Méthode pour mettre à jour les positions des particules en fonctions des forces calculé avec la méthode précédente et des conditons limites périodiques  
 
-#### mettre_a_jour_vitesses : ```T``` ,```& forces_interactions_precedentes```  
+#### [mettre_a_jour_vitesses](#EVO) : ```T``` ,```& forces_interactions_precedentes```  
 Méthode pour mettre à jour les vitesses pour un temps ```t+dt``` des particules en fonctions des forces calculé à un temps ```t``` et un temps ```t+dt```  
     
 #### appliquer_conditions_periodiques : 
@@ -233,14 +234,15 @@ Méthode de calcule de la température du fluide via un calcule statistique sur 
 
 #### calculer_tenseur_pression : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
 Cette méthode permet de calculer le tenseur de pression sur une tranche de l'espace selon ```z```  
+<div id='EXP'/>
 
-#### evoluer : ```T``` ,```P```  
+#### [evoluer](#EVO) : ```T``` ,```P```  
 Cette méthode est celle qui permet l'évolution global du système avec toutes les méthodes précédentes, c'est pour cela qu'elle demande une température et une pression, ce sera le thermostat et le barostat  
     
-#### exporterPositionsCSV : ```& fileCSV```  
+#### [exporterPositionsCSV](#POS) : ```& fileCSV```  
 Méthode pour exporter les positions des particules vers un fichier CSV  
 
-#### exporterVitessesCSV : ```& fileCSV```
+#### [exporterVitessesCSV](#POS) : ```& fileCSV```
 Méthode pour exporter les vitesses des particules vers un fichier CSV  
 <div id='CA'/>
 
