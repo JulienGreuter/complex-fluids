@@ -4,11 +4,10 @@ Nous allons ici développer le fonctionnement de manière chronologique du fichi
 
 <div id='MAINiniFC'/>
   
-<span style="color:red">
 ## Initialisation:
-</span>
+<span style="color:red">
 Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
-
+</span>
 ***Lx, Lz*** : les dimensions de la boîte  
 ***delta_t**** : le pas de temps élémentaire pour l'évolution  
 ***Kappa, tau_P, tau_T*** : les paramètres physiques de la simulation  
