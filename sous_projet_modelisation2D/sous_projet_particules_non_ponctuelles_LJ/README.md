@@ -25,7 +25,7 @@ Nous initialisons certaines constantes des particules, elles sont donc supposés
 #### initialiserVitesses : ```T```  
 Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide. 
 Nous posons alors ```sigma = std::sqrt(K_B * T / masse)``` l'écart-type de la distribution de Maxwell-Boltzmann, puis nous générons un nombre aléatoire qui va nous permettre de calculer une distribution de position et de vitesse aléatoire et de type maxwellienne centrée et d'écart type ```sigma```.  
-Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initialisé nulle, ce vecteur permet de "normer" les vecteurs vitesses pour que la vitesse du barycentre reste nulle.  
+Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initialisé nulle, ce vecteur permet de "normer" les vecteurs vitesses pour que la vitesse du barycentre reste nulle  
  
 #### setPositions : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
 Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières, ce sont des méthodes non utilisées pour le fluide complexe. Elles servent à tester la classe particules pour tester les différentes modifications qui ont été amenées  
@@ -80,7 +80,7 @@ Initialisation du fluide complexe avec les différentes grandeurs qui lui sont c
 Méthode d'initialisation des positions et vitesses des particules du fluide  
 
 #### initialisationViaCSV : ```& filePositions``` ,```& fileVitesses```  
-Cette méthode est assimilable à la précédente, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition.
+Cette méthode est assimilable à la précédente, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition
 
 #### calculer_forces :  
 Cette méthode vise à calculer les forces d'interactions entre les particules  
@@ -116,16 +116,20 @@ Méthode pour exporter les positions des particules vers un fichier CSV
 Méthode pour exporter les vitesses des particules vers un fichier CSV  
 
 ## Case:
+
+Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travaill  
+
 ### Attributs:
-***x, z*** : Position du centre de la case
-***ordre_subdivision*** : Ordre de subdivision, le nombre de subdivision à suivre pour être dans cette case
-***enfants*** : Pointeurs intelligents pour éviter les fuites mémoire------------------------------------------------------------------------***taille_case*** : Taille d'une case
-***est_libre*** : État de la case, pour savoir si elle est vide ou non
+***x, z*** : Position du centre de la case  
+***ordre_subdivision*** : Ordre de subdivision, le nombre de subdivision à suivre pour être dans cette case  
+***enfants*** : Pointeurs intelligents pour limiter la taille en mémoire du réseau  
+***taille_case*** : Taille d'une case  
+***est_libre*** : État de la case, pour savoir si elle est vide ou non  
 
 ### Méthodes:
 
 #### Case : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
-Initialisation de la classe avec des cases
+Initialisation de la classe avec des cases  
 
 #### subdiviser :  
 Méthode pour subdiviser une case en 4 case enfants de même tailles  
@@ -144,4 +148,43 @@ Affiche des informations de la case
 
 #### getX , getZ , getOrdreSubdivision , getEnfants et getTaille :  
 Getter pour accéder aux attributs et privés d'une case  
+
+## Reseau:
+### Attributs:
+***xmin, xmax, zmin, zmax*** : Les limites de la boîte  
+***taille_case*** : Tailles des cases du réseau  
+***n_lignes, n_colonnes*** : nombre de lignes et de colonnes  
+***cases*** : Matrice 2D de cases stockées sous forme de pointeurs intelligents  
+***cases_libres*** : Ensemble de pointeurs lié à des cases libres
+
+### Méthodes:
+
+Reseau(double xmin, double xmax, double zmin, double zmax, double taille_case);
+
+#### tirerCaseLibre :  
+Méthode pour tirer au hasard une case parmi les cases libres  
+
+#### subdiviserCase : ```case_a_subdiviser```  
+Méthode pour subdiviser une case libre en 4 enfants  
+
+#### subdiviser : ```ordre```  
+Méthode pour subdiviser toutes les cases libres du reseau pour un ordre de subdivision donné  
+
+#### retirerCaseLibre : ```case_a_retirer```  
+Cette méthode permet de retirer une case de l'ensemble des cases libres  
+
+#### ajouterEnfantsCasesLibres : ```case_parent```  
+Méthode pour ajouter les enfants d'une case à ```cases_libres```  
+
+#### afficher :  
+Méthode d'affichage du réseau et de ses caractéristiques  
+
+#### afficher_details :  
+Méthode pour afficher les statistiques du réseau  
+
+#### exporterCSV : ```filename```  
+Méthode pour exporter le réseau et ses caractéristiques sous CSV  
+
+#### getCases , getCasesLibres :  
+Méthode pour accéder aux grandeurs misent en ```private```  
 
