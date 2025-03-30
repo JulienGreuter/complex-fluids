@@ -1,5 +1,8 @@
 # Les Classes:
 ## Particules:
+
+Cette classe décrit des ensembles de particules de même types  
+
 ### Attributs:
 
 ***N*** : Nombre de particules  
