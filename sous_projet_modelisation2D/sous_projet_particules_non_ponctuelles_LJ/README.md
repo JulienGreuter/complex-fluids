@@ -175,6 +175,7 @@ Cette méthode vise à préparer l'ordre des particules dasn chaques domaines, e
 #### FluideComplexe : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
 Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
 <div id='FCini'/>
+  
 #### initialisation : ```T```  
 Méthode d'initialisation des positions et vitesses des particules du fluide  
 
