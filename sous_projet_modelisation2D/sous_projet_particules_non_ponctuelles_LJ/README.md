@@ -120,7 +120,7 @@ De plus chaque évolution du système est enregistrée dans des fichiers CSV pou
 
 Cette classe décrit des ensembles de particules de même types  
 
-### Attributs:
+### $${\color{green}Attributs:}$$
 
 ***N*** : Nombre de particules  
 ***E_0*** : Paramètre du potentiel de Lennard-Jones  
@@ -135,7 +135,7 @@ Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** v
     ```friend class FluideComplexe;```
 Cela permet de faciliter l'interaction entre ces deux classes  
 
-### Méthodes:
+### $${\color{green}Méthodes:}$$
 #### Particules : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
 Nous initialisons certaines constantes des particules, elles sont donc supposés par defaut ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
 <div id='PAini'/>
@@ -153,7 +153,7 @@ Ces deux méthodes ont pour objetifs respectifs de définir la position et la vi
 
 Cette méthode permet de regrouper plusieurs objets ```Particules``` avec l'objet de ```FluideComplexe``` et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
 
-### Fonction:
+### $${\color{green}Fonction:}$$
 
 ***Vec2 force_LJ*** : ```E_0i``` ,```E_0j``` ,```di``` ,```dj``` ,```r_ij```  
 Fonction pour calculer la force de Lennard-Jones entre deux particules i et j, cela repose sur le produit de ```r_ij``` et d'un facteur calculé à partir des quatre paramètres du potentiel de Lennard-Jones  
@@ -172,7 +172,7 @@ Fonction pour lire les en-têtes, utile pour l'initialisation d'un objet ```Flui
 
 <div id='DOM'/>
 
-### Attributs:
+### $${\color{green}Attributs:}$$
 
 ***L_x*** : Longueur de la boîte selon x  
 ***L_z*** : Longueur de la boîte selon z  
@@ -203,7 +203,7 @@ Fonction pour lire les en-têtes, utile pour l'initialisation d'un objet ```Flui
 
 <div id='DOMini'/>
 
-### Méthodes:
+### $${\color{green}Méthodes:}$$
 
 #### [initialisation_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
 Cette initialisation vise à définir les positions et vitesses initiales des particules du fluide  
@@ -263,14 +263,14 @@ Méthode pour exporter les vitesses des particules vers un fichier CSV
 Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travail, elles sont contenu dans un reseau.  
 C'est ensuite la subdivisation de ce reseau et le remplissage des cases qui permet d'initialiser les positions des particules du fluide 
 
-### Attributs:
+### $${\color{green}Attributs:}$$
 ***x, z*** : Position du centre de la case  
 ***ordre_subdivision*** : Ordre de subdivision, le nombre de subdivision à suivre pour être dans cette case  
 ***enfants*** : Pointeurs intelligents pour limiter la taille en mémoire du réseau  
 ***taille_case*** : Taille d'une case  
 ***est_libre*** : État de la case, pour savoir si elle est vide ou non  
 
-### Méthodes:
+### $${\color{green}Méthodes:}$$
 
 #### Case : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
 Initialisation de la classe avec des cases  
@@ -296,14 +296,14 @@ Getter pour accéder aux attributs d'une case en dehors de la classe
 <div id='RE'/>
 
 ## $${\color{red}Reseau:}$$
-### Attributs:
+### $${\color{green}Attributs:}$$
 ***xmin, xmax, zmin, zmax*** : Les limites de la boîte  
 ***taille_case*** : Tailles des cases du réseau  
 ***n_lignes, n_colonnes*** : nombre de lignes et de colonnes  
 ***cases*** : Matrice 2D de cases stockées sous forme de pointeurs intelligents  
 ***cases_libres*** : Ensemble de pointeurs lié à des cases libres
 
-### Méthodes:
+### $${\color{green}Méthodes:}$$
 
 #### Reseau : ```xmin``` ,```xmax``` ,```zmin``` ,```zmax``` ,```taille_case```  
 Constructeur de la classe  
