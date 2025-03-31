@@ -5,7 +5,7 @@ from matplotlib.animation import FuncAnimation
 import argparse
 
 # Parser les arguments de la ligne de commande
-parser = argparse.ArgumentParser(description="Génère une animation d'un ensemble de particules avec traînée à partir d'un dossier de fichiers CSV positions_i.csv")
+parser = argparse.ArgumentParser(description="Génère une animation d'un ensemble de particules (avec traînée) à partir d'un dossier de fichiers CSV positions_i.csv")
 parser.add_argument('--input-folder', type=str, required=True, help="Chemin du dossier contenant les fichiers CSV")
 parser.add_argument('--trail-length', type=int, default=1, help="Nombre de frames affichées pour la traînée")
 parser.add_argument('--fps', type=int, default=3, help="Images par seconde de l'animation")

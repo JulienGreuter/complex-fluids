@@ -32,7 +32,6 @@ private:
     double r_c;                          // Rayon de coupure des interactions
     std::vector<Particules> particules;  // Ensemble des ensembles de particules
     std::vector<Vec2> forces_interactions;  // Forces d'interactions des particules (indices correspondants à particules)
-    std::vector<int> nb_interactions;    // Nombre de voisins d'une particule
     std::vector<double> Pxx;             // Composante xx du tenseur de pression
     std::vector<double> Pzz;             // Composante zz du tenseur de pression
     std::string fichier_nom;             // Fichier contenant la description de fluide complexe en termes d'ensemble de particules
@@ -50,7 +49,7 @@ public:
     void initialisationViaCSV(const std::string& filePositions, const std::string& fileVitesses);
 
     // Méthode pour calculer les forces d'interactions entre les particules
-    void calculer_forces();
+    void calculer_forces_et_pressions();
 
     // Méthode pour mettre à jour les positions des particules
     void mettre_a_jour_positions(double P);
@@ -64,17 +63,11 @@ public:
     // Méthode pour appliquer le thermostat en fonction de la température T
     void appliquer_thermostat(double T);
 
-    // Méthode pour appliquer le barostat en fonction de la pression P
-//    void appliquer_barostat(double P);
-
-    // Méthode pour appliquer le barostat en fonction de la pression locale Pxx et Pzz
-    void appliquer_barostat_local(double P_cible);
+    // Méthode pour appliquer le barostat en fonction de la pression P cible et des pressions locale Pxx et Pzz
+    void appliquer_barostat_local(double P);
 
     // Méthode pour calculer la température du fluide
     double calculer_temperature() const;
-
-    // Méthode pour calculer le tenseur de pression sur une tranche donnée
-    double calculer_tenseur_pression(int alpha, int beta, double Delta_z, double z_k) const;
 
     // Méthode pour faire évoluer le système vers l'état suivant
     void evoluer(double T, double P);

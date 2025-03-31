@@ -1,16 +1,16 @@
 # Description :
 
-#la boite de simulation est constitué du domaine D1.
+#la boite de simulation est constitué du domaine D2.
 #   type Ar : E_0 = 1.19e-21, d = 3.3e-10, masse = 6.63e-26 ,  taille = 3.99e-10, charge = 0.0     # (en USI)
 
 #   les particules de type Ar sont presentent dans toute la boite :
-#        15 600 dans D1
+#        660 dans D2
 
-# Cette situation initiale correspond à de l'argon liquide pur à 87K si la boite est tel que L_x * L_z = N * taille * taille. ( basé sur une densité de l'Ar de 1394 kg/m3 à 87K )
+# Cette situation initiale correspond à une interface argon liquide pur / vide à 87K, si la boite est tel que L_x * L_z = N * taille * taille. ( basé sur une densité de l'Ar de 1394 kg/m3 à 87K )
 # Soit pour ces valeurs de N et taille, 
 
-#   L_x = 500e-10
-#   L_z = 500e-10 
+#   L_x = 150e-10
+#   L_z = 150e-10 mais seul [-L_z/4 , L_z/4] est occupé par les particules initialement
 
 # Dans ces conditions la force initiale subit par une particules est de l'ordre de 2.5e-10
 # Pour garantir des deplacements initiaux par pas de temps, au plus de l'ordre de (taille - d), on doit prendre delta_t = 5e-14 s
@@ -19,8 +19,7 @@
 #    delta_v ~ f_ini * delta_t / m                  = 94 (m/s)
 
 
-
 # Format : 
 
 #N          E_0             d               masse           taille      charge      id_ini
-15600        1.19e-21        3.3e-10         6.63e-26        3.99e-10       0.0         D1
+660        1.19e-21         3.3e-10         6.63e-26        3.99e-10       0.0         D2

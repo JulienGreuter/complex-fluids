@@ -10,7 +10,6 @@ Particules::Particules(int N, double E_0, double d, double masse, double taille,
     : N(N), E_0(E_0), d(d), masse(masse), taille(taille), charge(charge) {}
     // Initialisation des positions et vitesses sera faite plus tard (via setters ou FluideComplexe)
 
-
 // Méthode pour initialiser les vitesses en fonction de la température T
 void Particules::initialiserVitesses(double T) { 
     vitesses.clear();  // On vide d'abord le vecteur existant de vitesses
@@ -39,10 +38,6 @@ void Particules::initialiserVitesses(double T) {
         vitesses[i] -= sommeVitesses * (1/N);    
     }
 } 
-
-// Méthode pour appliquer les conditions périodiques (dépendant de L_x et L_z)
-void Particules::appliquerConditionsPeriodiques(double L_x, double L_z) {
-}
 
 // Setter 
 void Particules::setPositions(const std::vector<Vec2>& newPositions) {

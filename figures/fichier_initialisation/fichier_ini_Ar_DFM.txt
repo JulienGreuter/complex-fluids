@@ -4,13 +4,13 @@
 #   type Ar : E_0 = 1.19e-21, d = 3.3e-10, masse = 6.63e-26 ,  taille = 3.99e-10, charge = 0.0     # (en USI)
 
 #   les particules de type Ar sont presentent dans toute la boite :
-#        5200 dans D2
+#        1320 dans DFM
 
 # Cette situation initiale correspond à une interface argon liquide pur / vide à 87K, si la boite est tel que L_x * L_z = N * taille * taille. ( basé sur une densité de l'Ar de 1394 kg/m3 à 87K )
 # Soit pour ces valeurs de N et taille, 
 
-#   L_x = 300e-10
-#   L_z = 600e-10 mais seul [-L_z/4 , L_z/4] est occupé par les particules initialement
+#   L_x = 150e-10
+#   L_z = 1500e-10 mais seul [-L_z/20 , L_z/20] est occupé par les particules initialement soit 150e-10 x 150e-10
 
 # Dans ces conditions la force initiale subit par une particules est de l'ordre de 2.5e-10
 # Pour garantir des deplacements initiaux par pas de temps, au plus de l'ordre de (taille - d), on doit prendre delta_t = 5e-14 s
@@ -22,4 +22,4 @@
 # Format : 
 
 #N          E_0             d               masse           taille      charge      id_ini
-5200       1.19e-21        3.3e-10         6.63e-26        3.99e-10       0.0         D2
+1320       1.19e-21        3.3e-10         6.63e-26        3.99e-10       0.0         DFM

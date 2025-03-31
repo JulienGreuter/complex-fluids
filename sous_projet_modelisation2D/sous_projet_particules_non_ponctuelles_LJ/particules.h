@@ -27,9 +27,6 @@ public:
     // Méthode pour initialiser les vitesses en fonction de la température T
     void initialiserVitesses(double T);
 
-    // Méthode pour appliquer les conditions périodiques (dépendant de L_x et L_z)
-    void appliquerConditionsPeriodiques(double L_x, double L_z);
-
     // Setter pour positions et vitesses dans le cas d'une utilisation de la classe Particules en dehors de la classe FluideComplexe
     void setPositions(const std::vector<Vec2>& newPositions);
     void setVitesses(const std::vector<Vec2>& newVitesses);

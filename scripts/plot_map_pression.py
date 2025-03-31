@@ -62,44 +62,6 @@ def compute_meshgrid(data, quantity, grid_size, neighbors):
     local_pressure = compute_local_sum(sum_grid, grid_size, neighbors)
     return mesh_x, mesh_z, local_pressure
 
-""" VERSION NON PARALLELISEE
-def compute_average_on_grid(files,folder, grid_size, neighbors):
-    #Calculer la moyenne des valeurs sur le meshgrid pour tous les fichiers
-    
-    # Création du meshgrid pour la grille globale
-    x_vals = np.linspace(-0.5, 0.5, grid_size)
-    z_vals = np.linspace(-0.5, 0.5, grid_size)
-    mesh_x, mesh_z = np.meshgrid(x_vals, z_vals)
-
-    # Initialisation des sommes des quantités
-    sum_P_N = np.zeros_like(mesh_x)
-    sum_P_T = np.zeros_like(mesh_x)
-    count = 0
-
-    # Processus pour chaque fichier
-    for filename in files:
-        filepath = os.path.join(folder, filename)
-        print(f"Traitement de {filename}...")
-
-        # Chargement des données du fichier
-        data = pd.read_csv(filepath)
-
-        # Interpolation des valeurs sur le meshgrid global
-        _,_,grid_N = sum_on_meshgrid_scipy(data, "mvz2", grid_size)
-        _,_,grid_T = sum_on_meshgrid_scipy(data, "mvx2", grid_size)
-
-        # Mise à jour des sommes
-        sum_P_N += grid_N
-        sum_P_T += grid_T
-
-        count += 1
-
-    # Calcul de la moyenne sur tous les fichiers
-    P_N = compute_local_sum(sum_P_N / count, grid_size, neighbors)
-    P_T = compute_local_sum(sum_P_T / count, grid_size, neighbors)
-    
-    return mesh_x, mesh_z, P_N, P_T
-"""
 def process_file(filename, folder, grid_size, neighbors):
     """Traite un fichier et retourne les grilles calculées pour P_N et P_T."""
     filepath = os.path.join(folder, filename)
@@ -175,7 +137,15 @@ def plot_scatter(data, title, save, filename):
     plt.title(f"Scatter Plot - {title}")
     if save:
         plt.savefig(filename, dpi=300)
-    
+
+def flatten_along_x(mesh_x, mesh_z, grid):
+    """Effectue la moyenne de la quantité sur l'axe x"""
+    flat_values = np.mean(grid, axis=0)  # Moyenne selon x
+    return mesh_z[:, 0], flat_values  # On retourne z (1D) et les valeurs moyennées
+
+def plot_flatgrid(z_vals, flat_values, legend):
+    """Affiche la moyenne de la quantité sur x en fonction de z."""
+    plt.plot(z_vals, flat_values, linestyle='-', label=legend)   
 
 """ANIMATION"""
 def create_animation(averages, mesh_x, mesh_z, quantity, folder, fps=5):
@@ -250,7 +220,7 @@ def compute_average_in_chunks(files, folder, grid_size, neighbors, chunk_size, q
 def main():
     parser = argparse.ArgumentParser(description="Analyse des données de simulation")
     
-    parser.add_argument("--folder", required=True, help="Dossier contenant les fichiers ensemble_i.csv")
+    parser.add_argument("--input-folder", required=True, help="Dossier contenant les fichiers ensemble_i.csv")
     parser.add_argument("--i", type=int, help="Afficher les résultats pour le fichier i")
     parser.add_argument("--mean", action="store_true", help="Afficher la moyenne de tous les fichiers")
     parser.add_argument("--neighbors", type=int, default=2, help="Nombre de voisins à prendre en compte")
@@ -260,6 +230,7 @@ def main():
     parser.add_argument("--save", action="store_true", help="Sauvegarde le plot généré sous un fichier image")
     parser.add_argument("--anim", type=int, help="Nombre de fichiers à traiter pour chaque tranche (animation)")
     parser.add_argument("--fps", type=int, default=5, help="Frames par seconde pour l'animation")
+    parser.add_argument("--flat", action="store_true", help="Affiche la moyenne sur l'axe x")
 
     
     parser.add_argument("--P-N", action="store_true", help="Affiche P_N (zz)")
@@ -270,16 +241,16 @@ def main():
     args = parser.parse_args()
     
     # Vérifier la validité du dossier
-    if not os.path.isdir(args.folder):
-        print(f"Erreur : le dossier '{args.folder}' n'existe pas.")
+    if not os.path.isdir(args.input_folder):
+        print(f"Erreur : le dossier '{args.input_folder}' n'existe pas.")
         return
 
-    files = sorted([f for f in os.listdir(args.folder) if f.startswith("ensemble_") and f.endswith(".csv")])
+    files = sorted([f for f in os.listdir(args.input_folder) if f.startswith("ensemble_") and f.endswith(".csv")])
     
     if args.i is not None:
         # Cas où l'on affiche un fichier spécifique
         filename = f"ensemble_{args.i}.csv"
-        filepath = os.path.join(args.folder, filename)
+        filepath = os.path.join(args.input_folder, filename)
 
         if not os.path.exists(filepath):
             print(f"Erreur : fichier '{filename}' introuvable.")
@@ -314,7 +285,7 @@ def main():
     if args.mean:
         # Calcul de la moyenne sur tous les fichiers du dossier
         print("Calcul de la moyenne sur tous les fichiers...")
-        mesh_x, mesh_z, avg_P_N, avg_P_T = compute_average_on_grid(files, args.folder, args.grid, args.neighbors)
+        mesh_x, mesh_z, avg_P_N, avg_P_T = compute_average_on_grid(files, args.input_folder, args.grid, args.neighbors)
 
         # Affichage des résultats
         if args.P_N:
@@ -329,6 +300,36 @@ def main():
         if args.P:
             plot_meshgrid(mesh_x, mesh_z, (avg_P_N + avg_P_T)/2, r"(P_N + P_T)/2", args.log, args.save, f"P_{args.i}.png")
 
+    if args.flat:
+        # Calcul de la moyenne sur tous les fichiers du dossier
+        print("Calcul de la moyenne sur tous les fichiers...")
+        mesh_x, mesh_z, avg_P_N, avg_P_T = compute_average_on_grid(files, args.input_folder, args.grid, args.neighbors)
+    
+        # Affichage des résultats
+        if args.P_N:
+            z_vals, flat_values = flatten_along_x(mesh_x, mesh_z, avg_P_N)
+            plot_flatgrid(z_vals, flat_values, r"Moyenne P_N (zz)")
+
+        if args.P_T:
+            z_vals, flat_values = flatten_along_x(mesh_x, mesh_z, avg_P_T)
+            plot_flatgrid(z_vals, flat_values, r"Moyenne P_T (xx)")
+
+        if args.diff:
+            z_vals, flat_values = flatten_along_x(mesh_x, mesh_z, avg_P_N - avg_P_T)
+            plot_flatgrid(z_vals, flat_values, r"P_N - P_T")
+        
+        if args.P:
+            z_vals, flat_values = flatten_along_x(mesh_x, mesh_z, (avg_P_N + avg_P_T)/2)
+            plot_flatgrid(z_vals, flat_values,  r"(P_N + P_T)/2")
+        
+        plt.xlabel("z")
+        plt.ylabel("Moyenne sur x")
+        plt.title("Évolution des quantités moyennées sur x")
+        plt.legend()
+        plt.show()
+        if args.save:
+            plt.savefig("flat_plot.png", dpi=300)
+    
     if args.anim:
 
         if args.P_N:
@@ -344,11 +345,11 @@ def main():
 
         # Si --anim est fourni, créer l'animation sur les tranches
         print(f"Calcul de la moyenne par tranche de {args.anim} fichiers...")
-        averages = compute_average_in_chunks(files, args.folder, args.grid, args.neighbors, args.anim, quantity)
+        averages = compute_average_in_chunks(files, args.input_folder, args.grid, args.neighbors, args.anim, quantity)
 
         # Créer l'animation
-        mesh_x, mesh_z, _ = compute_meshgrid(pd.read_csv(os.path.join(args.folder, files[0])), "mvx2", args.grid, args.neighbors)
-        create_animation(averages, mesh_x, mesh_z, quantity, args.folder, args.fps)
+        mesh_x, mesh_z, _ = compute_meshgrid(pd.read_csv(os.path.join(args.input_folder, files[0])), "mvx2", args.grid, args.neighbors)
+        create_animation(averages, mesh_x, mesh_z, quantity, args.input_folder, args.fps)
         return
 
 if __name__ == "__main__":

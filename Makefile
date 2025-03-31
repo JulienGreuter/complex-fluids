@@ -17,11 +17,11 @@ COMMON_SRC = $(SRC_DIR)/fluidecomplexe.cpp \
 COMMON_OBJ = $(COMMON_SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 # Fichiers principaux (chaque exécutable a son propre fichier source principal)
-MAIN_SRC = $(SRC_DIR)/test_FluideComplexe.cpp $(SRC_DIR)/pressions.cpp $(SRC_DIR)/pressions_via_fichiers.cpp $(SRC_DIR)/export_data.cpp
+MAIN_SRC = $(SRC_DIR)/test_FluideComplexe.cpp  $(SRC_DIR)/export_data.cpp
 MAIN_OBJ = $(MAIN_SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 # Exécutables cibles
-TARGETS = $(BIN_DIR)/test_FluideComplexe $(BIN_DIR)/pressions $(BIN_DIR)/pressions_via_fichiers $(BIN_DIR)/export_data
+TARGETS = $(BIN_DIR)/test_FluideComplexe  $(BIN_DIR)/export_data
 
 # Vérification des fichiers sources
 $(info Fichiers sources communs : $(COMMON_SRC))
@@ -33,16 +33,6 @@ all: $(TARGETS)
 # Règle pour générer chaque exécutable
 $(BIN_DIR)/test_FluideComplexe: $(OBJ_DIR)/test_FluideComplexe.o $(COMMON_OBJ)
 	@echo "Création de l'exécutable test_FluideComplexe..."
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $^ -o $@ $(LDFLAGS)
-
-$(BIN_DIR)/pressions: $(OBJ_DIR)/pressions.o $(COMMON_OBJ)
-	@echo "Création de l'exécutable pressions..."
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $^ -o $@ $(LDFLAGS)
-
-$(BIN_DIR)/pressions_via_fichiers: $(OBJ_DIR)/pressions_via_fichiers.o $(COMMON_OBJ)
-	@echo "Création de l'exécutable pressions_via_fichiers..."
 	@mkdir -p $(BIN_DIR)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 

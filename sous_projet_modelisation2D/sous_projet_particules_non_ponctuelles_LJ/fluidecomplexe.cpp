@@ -143,7 +143,7 @@ void FluideComplexe::initialisation_domaine(double T, const std::string& domaine
         }
     }
     // visualisation du reseau 
-    reseau.afficher_details(); // decommenter c.afficher() dans reseau.cpp si besoin;
+    reseau.afficher_details(); 
     //reseau.exporterCSV(domaine);
     for (auto& ensemble : vecteur_intermediaire) {
         ensemble.initialiserVitesses(T);
@@ -211,7 +211,7 @@ void FluideComplexe::initialisation(double T) {
     exporterPositionsCSV("positions_ini.csv");
     exporterVitessesCSV("vitesses_ini.csv");
     // Initialisation de forces_interactions
-    calculer_forces();
+    calculer_forces_et_pressions();
 }
 
 void FluideComplexe::initialisationViaCSV(const std::string& filePositions, const std::string& fileVitesses) {
@@ -303,19 +303,17 @@ void FluideComplexe::initialisationViaCSV(const std::string& filePositions, cons
     exporterVitessesCSV("vitesses_ini.csv");
 
     /*** INITIALISATION DES FORCES ***/
-    calculer_forces();
+    calculer_forces_et_pressions();
 }
 
-
-// Méthode pour calculer les forces d'interactions entre les particules
-void FluideComplexe::calculer_forces() {
+// Méthode pour calculer les forces d'interactions entre les particules et les pressions locales autour de celles ci
+void FluideComplexe::calculer_forces_et_pressions() {
     std::cout << "--------------------------------------------------\n";
     std::cout << "Appel de calculer_forces()\n";
     // Nettoyer le vecteur des forces d'interaction avant de recalculer
     forces_interactions.clear();
     Pxx.clear();
     Pzz.clear();
-    nb_interactions.clear();
 
     double surface_locale = M_PI * r_c * r_c;
     // Vecteurs de translation pour appliquer les conditions périodiques
@@ -341,8 +339,8 @@ void FluideComplexe::calculer_forces() {
         // Boucle sur chaque position i dans l'ensemble de particules i
         for (size_t i = 0; i < ensemble_i.positions.size(); ++i) {
             int k = 0;
-	    double Pxx_local = ensemble_i.masse*std::pow(ensemble_i.vitesses[i].x,2.0);
-	    double Pzz_local = ensemble_i.masse*std::pow(ensemble_i.vitesses[i].z,2.0);
+	        double Pxx_local = ensemble_i.masse*std::pow(ensemble_i.vitesses[i].x,2.0);
+	        double Pzz_local = ensemble_i.masse*std::pow(ensemble_i.vitesses[i].z,2.0);
             Vec2 position_i = ensemble_i.positions[i];
 
             // Initialiser la force totale subie par la particule i
@@ -350,7 +348,7 @@ void FluideComplexe::calculer_forces() {
 
             // Boucle sur chaque ensemble de particules j
             for (auto& ensemble_j : particules) {
-		    double m = ensemble_j.masse;
+		        double m = ensemble_j.masse;
                 // Boucle sur chaque position j dans l'ensemble de particules j
                 for (size_t j = 0; j < ensemble_j.positions.size(); ++j) {
                     Vec2 position_j = ensemble_j.positions[j];
@@ -377,26 +375,27 @@ void FluideComplexe::calculer_forces() {
                         if (r_ij.norme() < r_c) {
                             k += 1; // conteur pour determiner le nombre moyen d'interactions
                             f_ij = force_LJ(ensemble_i.E_0, ensemble_j.E_0, ensemble_i.d, ensemble_j.d, r_ij);
+                            Pxx_local += m * ensemble_j.vitesses[j].x * ensemble_j.vitesses[j].x;
+                            Pzz_local += m * ensemble_j.vitesses[j].z * ensemble_j.vitesses[j].z;
+                            //std::cerr << "k " << k << "Pxx_local = " << Pxx_local << std::endl; 
                             break;  // Par construction (r_c correctement choisi), une particule i n'interagit qu'avec une des 9 particules j 
                         }
-                        Pxx_local += m * ensemble_j.vitesses[j].x * ensemble_j.vitesses[j].x;
-                        Pzz_local += m * ensemble_j.vitesses[j].z * ensemble_j.vitesses[j].z;
+                        
                     }
 
                     // Ajouter la force d'interaction f_ij à la force totale
                     force_totale += f_ij;
                 }
             }
-            // Stocker le nombre d'interactions et les pressions locales
-            nb_interactions.push_back(k);
-	    Pxx.push_back(Pxx_local / surface_locale);
-	    Pzz.push_back(Pzz_local / surface_locale);
+            // Stocker les pressions locales
+	        Pxx.push_back(Pxx_local / surface_locale);
+	        Pzz.push_back(Pzz_local / surface_locale);
             moyenne_k += k;
             // Ajouter la force totale pour cette particule au vecteur des forces d'interactions
             forces_interactions.push_back(force_totale);
         }
         moyenne_k /= ensemble_i.N;
-        std::cout << moyenne_k << "interactions en moyenne sur les particules de l'ensemble\n";
+        std::cout << "N_int = " << moyenne_k << " : interactions en moyenne sur les particules de l'ensemble\n";
     }
     std::cout << "Fin de calculer_forces()\n";
     std::cout << "--------------------------------------------------\n";
@@ -424,13 +423,12 @@ void FluideComplexe::mettre_a_jour_positions(double P) {
     // Application des conditions periodiques
     appliquer_conditions_periodiques();
     // Aplication du barostat local pour tenir compte de la pression fixée P, modifie les positions des particules
-    // appliquer_barostat(P);
     appliquer_barostat_local(P);
 
-    double Pxx_tranchecentrale = calculer_tenseur_pression(0,0,L_z/4.0,0);
-    double Pzz_tranchecentrale = calculer_tenseur_pression(1,1,L_z/4.0,0);
-    std::cout << "Pxx = " << Pxx_tranchecentrale << " Pa.m\n";
-    std::cout << "Pzz = " << Pzz_tranchecentrale << " Pa.m\n";
+    double Pxx_moy = std::accumulate(Pxx.begin(), Pxx.end(), 0.0) / Pxx.size();
+    double Pzz_moy = std::accumulate(Pzz.begin(), Pzz.end(), 0.0) / Pzz.size();
+    std::cout << "Pxx = " << Pxx_moy << " Pa.m\n";
+    std::cout << "Pzz = " << Pzz_moy << " Pa.m\n";
 
     std::cout << "Fin de mise à jour des positions.\n";
     std::cout << "--------------------------------------------------\n";
@@ -481,9 +479,8 @@ void FluideComplexe::appliquer_thermostat(double T) {
     std::cout << "Calcul de T...\n";
     double T_mes = calculer_temperature();
     std::cout << "T = " << T_mes << " K\n";
-    //double alpha = 0.5;
     double lambda = std::sqrt( 1 + delta_t * (T/T_mes -1) / tau_T ); 
-    std::cout << "lambda : " << lambda << std::endl;
+    std::cout << "lambda_T = " << lambda << std::endl;
     // Parcours de chaque ensemble de particules
     for (auto& ensemble : particules) {
         double v_ODG = std::pow(K_B*T/ensemble.masse, 0.5);
@@ -494,7 +491,7 @@ void FluideComplexe::appliquer_thermostat(double T) {
                 vitesse = maxwellBoltzmannSample(T, ensemble.masse);
             }
             vitesse = vitesse * lambda; 
-            //relaxationVersMaxwell(vitesse, 3*T, ensemble.masse, alpha); // version provisoire du controle de temperature
+            //relaxationVersMaxwell(vitesse, 3*T, ensemble.masse, alpha = 0.5); // version provisoire du controle de temperature
             
         }
     }
@@ -504,99 +501,14 @@ void FluideComplexe::appliquer_thermostat(double T) {
     
 }
 
-// Méthode pour appliquer le barostat en fonction de la pression P
-/*void FluideComplexe::appliquer_barostat(double P) {
-    std::cout << "Calcul de P...\n";
-    double P_mes = (calculer_tenseur_pression(0,0,L_z/4.0,0) + calculer_tenseur_pression(1,1,L_z/4.0,0)) / 2.0; //calc pression au centres
-    std::cout << "P = " << P_mes << " Pa\n";
-    double lambda = std::pow(1 - kappa * delta_t * (P - P_mes) / tau_P, 1/2.0);
-    std::cout << "lambda : " << lambda << std::endl; 
-    L_x = lambda * L_x;
-    //L_x = lambda * (1-lambda/1000) * L_x;
-    //L_z = lambda * (1+lambda/1000) * L_z;
-    r_c = lambda * r_c;
+// Méthode pour appliquer le barostat en fonction de la presion P
+void FluideComplexe::appliquer_barostat_local(double P) { 
+    std::cout << "Application du barostat local rapide \n";
 
-    // Parcours de chaque ensemble de particules
+    std::vector<std::vector<bool>> modifie; // Marqueur pour chaque ensemble de particules
     for (auto& ensemble : particules) {
-        for (auto& position : ensemble.positions) {
-            position = position * lambda;
-            //position.z = position.z * lambda;
-        }
+        modifie.emplace_back(ensemble.positions.size(), false);
     }
-    std::cout << "Barostat appliqué.\n";
-}
-*/
-
-/*
-void FluideComplexe::appliquer_barostat_local(double P_cible) {
-    std::cout << "Application du barostat local...\n";
-
-    // Calcul de la moyenne des interactions par particule
-    double somme_interactions = 0.0;
-    int nb_total_particules = 0;
-    for (int i = 0; i < nb_interactions.size(); ++i) {
-        somme_interactions += nb_interactions[i];
-        nb_total_particules++;
-    }
-    double interactions_moy = somme_interactions / nb_total_particules;
-    double seuil = interactions_moy / 8.0;
-
-    // Calcul de lambda moyen pour ajuster les positions
-
-    double somme_lambda = 0.0;
-    int nb_particules_modifiees = 0;
-    double somme_P_loc = 0;
-
-    for (int i = 0; i < nb_interactions.size(); ++i) {
-        if (nb_interactions[i] > seuil) {
-            double P_local = Pxx[i] + Pzz[i];
-            double lambda = 1 - kappa * delta_t * (P_cible - P_local) / tau_P;
-            if (lambda > 1.010025){
-                           }
-            else if (lambda < 0.990025){
-                    std::cout << "Ecart trop important à 1, lambda vaut : " << lambda << "\n";
-                    lambda = 0.990025;
-            }
-            lambda = std::pow(lambda,1/2.0);
-            somme_lambda += lambda;
-            somme_P_loc += P_local;
-            nb_particules_modifiees++;
-        }
-    }
-
-    // Appliquer la mise à l'échelle aux positions si nécessaire
-    if (nb_particules_modifiees > 0) {
-        double lambda_moyen = somme_lambda / nb_particules_modifiees;
-        double P_locale_moyen = somme_P_loc / nb_particules_modifiees;
-        int index_particule = 0;
-        for (auto& ensemble : particules) {
-            for (auto& position : ensemble.positions) {
-                position = position * lambda_moyen;
-                index_particule++;
-            }
-        }
-        // Ajustement de la boîte
-        L_x *= lambda_moyen;
-        L_z *= lambda_moyen;
-
-        // Ajustement du rayon de coupure
-        r_c *= lambda_moyen;
-            std::cout << "lambda_moyen = " << lambda_moyen <<"\n";
-        std::cout << "nb_interactions = " << interactions_moy << "\n";
-        std::cout << "nb_particules_modifiees = " << nb_particules_modifiees << "\n";
-        std::cout << "P_locale = " << P_locale_moyen << "\n";
-    }
-    std::cout << "Barostat local appliqué avec lambda moyen : "
-              << (nb_particules_modifiees > 0 ? somme_lambda / nb_particules_modifiees : 1.0) << "\n";
-}
-*/
-
-// Barostat local corrigé selon une seconde méthode
-void FluideComplexe::appliquer_barostat_local(double P_cible) {
-    std::cout << "Application du barostat local corrigé...\n";
-
-    std::vector<double> lambdas;
-    int index_i = 0;
 
     // Vecteurs de translation pour les conditions périodiques
     std::vector<Vec2> vecteurs_periodiques = {
@@ -607,51 +519,69 @@ void FluideComplexe::appliquer_barostat_local(double P_cible) {
         Vec2(L_x, -L_z), Vec2(-L_x, -L_z)
     };
 
-    for (auto& ensemble_i : particules) {
-        for (size_t i = 0; i < ensemble_i.positions.size(); ++i) {
-            double P_local = Pxx[index_i] + Pzz[index_i];
-            double lambda_i = std::sqrt(1 - kappa * delta_t * (P_cible - P_local) / tau_P);
+    std::vector<double> lambdas;
+    int index_i = 0;
+    int conteur_operations = 0;
 
-            std::cout << "lambda_i = " << lambda_i << " (P_local = " << P_local << ")\n";
-	    if (lambda_i > 1.01) lambda_i = 1.01;
+    for (size_t ens_i = 0; ens_i < particules.size(); ++ens_i) {
+        auto& ensemble_i = particules[ens_i];
+        for (size_t i = 0; i < ensemble_i.positions.size(); ++i) {
+            if (modifie[ens_i][i]) continue; // Ne pas traiter une particule déjà modifiée
+
+            double P_local = (Pxx[index_i] + Pzz[index_i]) / 2;
+            double lambda_i = std::sqrt(1 - kappa * delta_t * (P - P_local) / tau_P);
+            if (lambda_i > 1.01) lambda_i = 1.01;
             else if (lambda_i < 0.99) lambda_i = 0.99;
             lambdas.push_back(lambda_i);
 
             Vec2 ri = ensemble_i.positions[i];
 
-            // Appliquer la correction aux voisines j proches de i
-            for (auto& ensemble_j : particules) {
+            for (size_t ens_j = 0; ens_j < particules.size(); ++ens_j) {
+                auto& ensemble_j = particules[ens_j];
                 for (size_t j = 0; j < ensemble_j.positions.size(); ++j) {
+                    if (modifie[ens_j][j]) continue; // Ne pas modifier une particule déjà traitée
+
                     Vec2 rj = ensemble_j.positions[j];
 
                     for (const auto& v : vecteurs_periodiques) {
                         Vec2 r_ij = (rj + v) - ri;
                         if (r_ij.norme() < r_c) {
-                            ensemble_j.positions[j] = ensemble_j.positions[j]*lambda_i + ri * (1 - lambda_i);
-                            break;
+                            // Appliquer la correction UNE SEULE FOIS
+                            ensemble_j.positions[j] = ensemble_j.positions[j] * lambda_i + ri * (1 - lambda_i);
+                            modifie[ens_j][j] = true; // Marquer comme modifiée
+                            conteur_operations++;
+                            break; 
                         }
                     }
                 }
             }
 
-            ++index_i;
+            index_i++;
         }
     }
-
+    std::cout << "conteur_operations = " << conteur_operations << std::endl;
     if (!lambdas.empty()) {
         double lambda_moyen = std::accumulate(lambdas.begin(), lambdas.end(), 0.0) / lambdas.size();
+        if (lambda_moyen > 1.0) {
+            lambda_moyen = 1 + (lambda_moyen - 1)*3;
+            L_x *= lambda_moyen;
+            L_z *= lambda_moyen;
+        }
+        if (lambda_moyen < 1.0) {
+            L_z *= lambda_moyen;
+            lambda_moyen = 1 - (1 - lambda_moyen)*3;
+            L_x *= lambda_moyen;
+        }
 
-        L_x *= lambda_moyen;
-        L_z *= lambda_moyen;
         r_c *= lambda_moyen;
 
         std::cout << "Barostat local appliqué.\n";
-        std::cout << "lambda_moyen = " << lambda_moyen << "\n";
+        std::cout << "lambda_moyen_P = " << lambda_moyen << "\n";
         std::cout << "N = " << lambdas.size() << " particules traitées\n";
     }
+
+    std::cout << "Barostat rapide appliqué avec " << conteur_operations << " opérations.\n";
 }
-
-
 
 // Méthode pour calculer la température du fluide  
 double FluideComplexe::calculer_temperature() const {
@@ -664,102 +594,9 @@ double FluideComplexe::calculer_temperature() const {
             T_mes += ensemble.masse * std::pow(vitesse.norme(), 2); 
         }
     }
-    std::cout << "Smv2 " << T_mes << std::endl;
     T_mes /= (2 * N_tot * K_B); // 3 -> 2 pour essayer de tenir compte du passage 3D -> 2D
     return T_mes;
 }
-
-// Méthode pour calculer le tenseur de pression sur une tranche donnée
-double FluideComplexe::calculer_tenseur_pression(int alpha, int beta, double Delta_z, double z_k) const {
-    std::vector<Vec2> vecteurs_periodiques = {
-        Vec2(0.0, 0.0),
-        Vec2(L_x, 0.0), Vec2(-L_x, 0.0),
-        Vec2(0.0, L_z), Vec2(0.0, -L_z),
-        Vec2(L_x, L_z), Vec2(-L_x, L_z),
-        Vec2(L_x, -L_z), Vec2(-L_x, -L_z)
-    };
-    
-    // Définition des bornes du domaine avec conditions périodiques
-    double z_min = z_k - Delta_z / 2;
-    double z_max = z_k + Delta_z / 2;
-    
-    // Prise en compte des conditions périodiques
-    if (z_min < -L_z / 2) z_min += L_z;
-    if (z_max > L_z / 2) z_max -= L_z;
-    
-    // Liste des particules dans le domaine actuel
-    std::vector<std::pair<const Particules*, size_t>> particules_domaine;
-    
-    // Sélectionner les particules qui appartiennent au domaine [z_min, z_max]
-    for (const auto& ensemble : particules) {
-        for (size_t i = 0; i < ensemble.positions.size(); ++i) {
-            double zi = ensemble.positions[i].z;
-            
-            // Vérifier si la particule est dans la tranche avec conditions périodiques
-            if ((zi >= z_min && zi <= z_max) || (z_min > z_max && (zi >= z_min || zi <= z_max))) {
-                particules_domaine.emplace_back(&ensemble, i);
-            }
-        }
-    }
-    
-    // Calcul du tenseur de pression
-    double P_alpha_beta = 0.0;
-    
-    // Boucle sur les particules i du domaine
-    for (const auto& [ensemble_i, i] : particules_domaine) {
-        Vec2 position_i = ensemble_i->positions[i];
-        Vec2 v_i = ensemble_i->vitesses[i];
-        double m_i = ensemble_i->masse;
-        // Ajouter la contribution au tenseur de pression des termes cinetiques
-        // Contribution au tenseur de pression
-        double contribution = 0.0;
-             if (alpha == 0 && beta == 0) contribution = m_i * v_i.x * v_i.x;
-        else if (alpha == 0 && beta == 1) contribution = m_i * v_i.x * v_i.z;
-        else if (alpha == 1 && beta == 0) contribution = m_i * v_i.z * v_i.x;
-        else if (alpha == 1 && beta == 1) contribution = m_i * v_i.z * v_i.z;
-
-        P_alpha_beta += contribution;
-        
-        /*
-        // Boucle sur toutes les particules j (dans et hors du domaine)
-        for (const auto& ensemble_j : particules) {
-            for (size_t j = 0; j < ensemble_j.positions.size(); ++j) {
-                Vec2 position_j = ensemble_j.positions[j];
-                
-                // Éviter le calcul avec soi-même
-                if (ensemble_i == &ensemble_j && i == j) continue;
-                
-                // Gérer les conditions périodiques
-                Vec2 f_ij(0.0, 0.0);
-                Vec2 r_ij(0.0, 0.0);
-
-                for (const auto& vecteur : vecteurs_periodiques) {
-                    r_ij = position_j - position_i + vecteur;
-
-                    if (r_ij.norme() < r_c) {
-                        f_ij = force_LJ(ensemble_i->E_0, ensemble_j.E_0, ensemble_i->d, ensemble_j.d, r_ij) * (-1);//test car probleme sur les pressions (signe)
-                        break;
-                    }
-                }
-                
-                // Ajouter la contribution au tenseur de pression
-                // Contribution au tenseur de pression
-                double contribution = 0.0;
-                     if (alpha == 0 && beta == 0) contribution = f_ij.x * r_ij.x;
-                else if (alpha == 0 && beta == 1) contribution = f_ij.x * r_ij.z;
-                else if (alpha == 1 && beta == 0) contribution = f_ij.z * r_ij.x;
-                else if (alpha == 1 && beta == 1) contribution = f_ij.z * r_ij.z;
-
-                P_alpha_beta += contribution;
-            }
-        }
-    */        
-    }
-    
-    // Normalisation par la surface du domaine (L_x * Delta_z), correspond à des Pa.m !
-    return P_alpha_beta / (L_x * Delta_z);
-}
-
 
 // Méthode pour faire évoluer le système vers l'état suivant
 void FluideComplexe::evoluer(double T, double P) {
@@ -767,7 +604,7 @@ void FluideComplexe::evoluer(double T, double P) {
     std::cout << "Evolution du fluide complexe...\n";
     std::vector<Vec2> forces_interactions_precedentes = forces_interactions;  // Forces d'interactions des particules à t
     mettre_a_jour_positions(P);
-    calculer_forces();
+    calculer_forces_et_pressions();
     mettre_a_jour_vitesses(T, forces_interactions_precedentes);
     std::cout << "Fin de l'evolution du fluide complexe.\n";
     std::cout << "--------------------------------------------------\n";
@@ -802,7 +639,7 @@ void FluideComplexe::exporterPositionsCSV(const std::string& fileCSV) const {
     std::cout << "Exportation vers " << fileCSV << " réussie." << std::endl;
 }
 
-// Méthode pour exporter les positions des particules sous CSV en tenant compte du changement de metrique induit par le barostat
+// Méthode pour exporter les positions des particules sous CSV en tenant compte du <<changement de metrique>> induit par le barostat
 void FluideComplexe::exporterPositionsNormaliseesCSV(const std::string& fileCSV) const {
     std::cout << "Exportation des positions des particules...\n";
     std::ofstream fichier(fileCSV);
@@ -858,7 +695,7 @@ void FluideComplexe::exporterVitessesCSV(const std::string& fileCSV) const {
     std::cout << "Exportation vers " << fileCSV << " réussie." << std::endl;
 }
 
-// Méthode pour exporter les données necessaire pour le calcul des pressions sous CSV en tenant compte du changement de metrique induit par le barostat
+// Méthode pour exporter les données necessaire pour le calcul des pressions sous CSV en tenant compte du <<changement de metrique>> induit par le barostat
 void FluideComplexe::exporterDataNormaliseesCSV(const std::string& fileCSV) const {
     std::cout << "Exportation des données des particules...\n";
     std::ofstream fichier(fileCSV);
