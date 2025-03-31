@@ -1,135 +1,123 @@
-#  **Installing Ubuntu via WSL, Git, and GitHub Workflow for Beginners**
+# **Modélisation Numérique des Fluides Complexes**  
 
-This tutorial will guide you through:
+## **Présentation du projet**  
 
-1. Installing **Ubuntu** using **WSL (Windows Subsystem for Linux)**.
-2. Installing **Git** and configuring it.
-3. Setting up **SSH** for GitHub.
-4. Cloning a GitHub repository.
-5. Following a simple **Git workflow** (avoiding direct changes to `main` and using branches and pull requests).
+Ce projet vise à modéliser numériquement les fluides complexes en utilisant une approche de dynamique moléculaire. L'objectif est d'étudier les interfaces entre phases (liquide-gaz, liquide-liquide, etc.) en simulant les interactions intermoléculaires via un potentiel de Lennard-Jones.  
+
+Le code est écrit en **C++** pour les simulations et l'exportation des données, tandis que **Python** est utilisé pour l'analyse et la visualisation des résultats. L'architecture du projet permet une évolution future avec des outils modulaires pour explorer diverses propriétés physiques, notamment la pression interfaciale et la tension de surface.  
 
 ---
 
-##  **Table of Contents**
+## **Organisation du projet**  
 
-1. [Enable Virtualization in BIOS](#1-enable-virtualization-in-bios)
-2. [Install WSL and Ubuntu](#2-install-wsl-and-ubuntu)
-3. [Update Ubuntu](#3-update-ubuntu)
-4. [Install Git on Ubuntu](#4-install-git-on-ubuntu)
-5. [Set Up SSH for GitHub](#5-set-up-ssh-for-github)
-6. [Clone the Repository](#6-clone-the-repository)
-7. [Git Workflow](#7-git-workflow)
-8. [Summary](#8-summary)
-
----
-
-## 1️⃣ **Enable Virtualization in BIOS**
-
-1. **Restart your computer**.
-2. While booting, press **`DEL`** or **`F2`** (this depends on your motherboard manufacturer) to enter BIOS settings.
-3. Look for an option called **"Virtualization," "Intel VT-x," "AMD-V," or "SVM Mode."**
-4. **Enable** this option.
-5. Save changes and **exit BIOS** (usually by pressing `F10`).
-
----
-
-## 2️⃣ **Install WSL and Ubuntu**
-
-1. **Open Command Prompt as Administrator**:
-
-   - Click **Start**, type **`cmd`**, right-click **"Command Prompt"**, and select **"Run as Administrator."**
-
-2. **Install WSL** by running this command:
-
-   ```bash
-   wsl --install
-   ```
-3. **Restart your computer**
-
-4. **Launch Ubuntu**
-
-5. **Create User Account**
-
----
-
-## 3️⃣   **Update Ubuntu**
-
-**Open Ubuntu terminal** and run :
-   ```bash
-   sudo apt-get update
-   sudo apt-get upgrade
-   ```
-## 4️⃣   **Install Git on Ubuntu**
-1. **Run**:
-   ```bash
-   sudo apt-get install git
-   ```
-2. **Check installation** with:
-   ```bash
-   git --version
-   ```
-3. **Configure Git** with your user information:
-   ```bash
-   git config --global user.name "Your Name"
-   git config --global user.email "your.email@example.qqch"
-   ```
----
-
-## 5️⃣   **Set Up SSH for GitHub**
-
-1. **Generate an SSH key**
-   ```bash
-   ssh-keygen -t ed25519 -C "your.mail@example.qqch"
-   ```
-2. **Display the Public Key**
-   ```bash
-   cat ~/.shh/id_ed25519.pub
-   ```
-3. **Add the SSH Key to GitHub**
-- Copy the SSH key.
-- Go to GitHub > Settings > SSH and GPG keys > New SSH key.
-- Paste the key and click "Add SSH key."
+```plaintext
+.
+├── Makefile
+├── README.md
+├── bin/
+│   └── sous_projet_modelisation2D/
+│       └── sous_projet_particules_non_ponctuelles_LJ/
+│           ├── export_data
+│           └── test_FluideComplexe
+├── build/
+│   └── sous_projet_modelisation2D/
+│       └── sous_projet_particules_non_ponctuelles_LJ/
+│           ├── case.o
+│           ├── export_data.o
+│           ├── fluidecomplexe.o
+│           ├── particules.o
+│           ├── reseau.o
+│           └── test_FluideComplexe.o
+├── docs/                                   *(Documentation du projet)*
+│   ├── architecture.md
+│   ├── figures_discussions.md
+│   ├── sous_projet_discussions.md
+│   ├── GIT.md                              *(pour prendre en main GIT)*
+│   ├── WSL.md                              *(pour utiliser linux sur une machine windows)*
+│   └── utilisations.md                     *(pour un guide détaillé sur l'utilisation)*
+├── figures/  *(Fichiers d'initialisation et visualisations)*
+│   ├── datas/
+|   ├── runs/                               *(pour effectuer des tests, dossier non suivie par GIT)*
+│   ├── fichier_initialisation/
+│   └── visualisations/
+├── scripts/                                *(Scripts Python & Shell pour l'analyse et le post-traitement)*
+│   ├── anim.py
+│   ├── evolution.py
+│   ├── force_LJ.py
+│   ├── plot_map_pression.py
+│   ├── plot_reseau2D.py
+│   ├── plot_vitesses.py
+│   ├── split_files.sh
+│   └── test_auto_Reseau.sh
+├── sous_projet_modelisation2D/             *(Code source de la simulation)*
+│   ├── sous_projet_particules_non_ponctuelles_LJ/
+│   │   ├── README.md                       *(Explication du sous projet)*
+│   │   ├── case.cpp
+│   │   ├── case.h
+│   │   ├── export_data.cpp
+│   │   ├── fluidecomplexe.cpp
+│   │   ├── fluidecomplexe.h
+│   │   ├── particules.cpp
+│   │   ├── particules.h
+│   │   ├── reseau.cpp
+│   │   ├── reseau.h
+│   │   └── test_FluideComplexe.cpp
+│   └── vec2.h
+└── tests/                                  *(Fichiers de test)*
+```
 
 ---
 
-## 6️⃣   **Clone the Repository**
+## **Installation et Compilation**  
 
-1. Go to the repository on GitHub
-2. Click **Code** and copy the SSH URL (e.g.,`git@github.com:username/repository.git`).
-3. In the Ubuntu terminal, run:
-   ```bash
-   git clone "the SSH URL"
-   ```
+### **1. Compilation du projet**  
+
+```bash
+make
+```
+
+pour un guide sur l'utilisation du projet : voir [`docs/utilisations.md`](docs/utilisations.md)
+
+### **2. Installation des dépendances Python**
+
+Il est recommandé de créer un environnement virtuel pour ce projet. Voici comment procéder :
+
+1. Créez un environnement virtuel :
+    ```
+    python -m venv mon_env
+    ```
+
+2. Activez l'environnement virtuel :
+    ```bash
+    $ . PATHS/mon_env/bin/activate
+    ```
+
+3. Installez les dépendances Python requises :
+    ```
+    (mon_env) $ pip install numpy pandas scipy matplotlib argparse
+    ```
+
+Cela installera toutes les bibliothèques nécessaires pour exécuter les programmes Python de ce projet.
+
+
+## **Évolution du Projet**  
+
+Les axes d’amélioration envisagés incluent :  
+- L’optimisation des performances de la simulation.  
+- L’extension à des modèles de particules plus complexe.  
+- L’ajout de nouvelles métriques d’analyse.  
+- Passage en 3D
+
 ---
 
-## 7️⃣   **Git Workflow**
+## **Contributeurs et Contact**  
 
-**Avoid Direct Changes to** `main`
-Follow this worflow to keep `main` clean:
+Merci de contacter les développeurs via les *issues* sur GitHub pour toute question ou suggestion.
 
-**Step-by-Step Workfow**
-1. **Update** `main`:
-   ```bash
-   git pull origin main
-   ```
-2. **Create a New Branch**:
-   ```bash
-   git checkout -b new_branch_name
-   ```
-3. **Make Changes**
-4. **Stage and Commit Changes**:
-   ```bash
-   git add .
-   git commit -m "describe the commit"
-   ```
-5. **Push the Branch**:
-   ```bash
-   git push origin new_branch_name
-   ```
-6. **Create a Pull Request on GitHub**:
-- Go to your repository on GitHub.
-- Click "Compare & pull request."
-- Add a title and description, then click "Create pull request."
+Des espaces de discussions sont également disponibles dans le répertoire `docs/` :
 
+- **architecture.md** : Discussion sur l'architecture du projet.
+- **figures_discussions.md** : Discussion sur les besoins et les méthodes pour obtenir des figures.
+- **sous_projet_discussions.md** : Discussion sur la nature des sous-projets.
 
-
+N'hésitez pas à participer et à échanger vos idées pour améliorer ce projet !
