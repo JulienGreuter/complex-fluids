@@ -1,3 +1,331 @@
-description specifique du sous projet
+# Fonctionnement global:
 
-le dossier comporte le code source, les fichiers Makefile et les dependance specifiques
+Nous allons ici développer le fonctionnement de manière chronologique du fichier ```export_data.cpp``` qui permet de générer l'exécutable ```exportdata``` via le **Makefile**. Le tout repose sur l'utilisation de quelques classes mais surtout de la classe [```FluideComplexe```](#FC) qui va nous permettre de simuler le fluide dans un espace défini.  
+
+<div id='MAINiniFC'/>
+  
+## $${\color{red}Initialisation:}$$
+
+Pour instancier [```FluideComplexe```](#FC) nous posons en amon:  
+
+***L_x, L_z*** : les dimensions de la boîte  
+***delta_t*** : le pas de temps élémentaire pour l'évolution  
+***kappa, tau_P, tau_T*** : les paramètres physiques de la simulation  
+***r_c*** : rayon de coupure pour les interactions  
+
+De plus le ```main```, demande quatre arguments pour l'éxécution qui sont:  
+
+1. Un **fichier d'initialisation**  
+2. Une **température**  
+3. Une **pression**  
+4. Un [**nombre d'évolutions**](#EVO)  
+
+Pour éviter les problèmes plus tard nous commencons par **vérifier** que la température et la pression soient positives et que le fichier d'initialisation puisse être ouvert.  
+
+## $${\color{red}Instanciation\ du\ fluide\ complexe:}$$
+
+À la ligne 49 du fichier ```export_data.cpp```, nous instancions un objet [```FluideComplexe```](#FC) tel que :
+
+```cpp
+FluideComplexe fluide = FluideComplexe(L_x, L_z, delta_t, kappa, tau_P, tau_T, r_c, fichier_ini);
+```
+
+Cependant, ce constructeur ne permet pas l'instanciation complète d'un objet, en effet, il faut faire appel à la méthode [```initialisation```](#FCini) de la classe, qui dépend de la température entrée précédement.  
+
+## $${\color{red}Initialisation\ des\ particules\ du\ fluide:}$$
+
+### $${\color{green}Structure\ du\ fichier\ d'initialisation:}$$
+---
+Un fichier d'initialisation contient de haut en bas:  
+  
+1. Un en-tête commenté présentant le cadre de la simulation  
+  
+2. Une ligne par **ensemble de particules** contenant:<div id='MAINiniPA'/>
+```
+  # Format : 
+
+#N      E_0     d     masse   taille charge id_ini
+1000     1.0    0.1     10     0.0     0.0     D31
+2000     1.2    0.4     30     0.0     0.0     D32
+5000     1.0    0.1     10     0.0     0.0     D32
+300      0.1    0.8     100    0.3     0.0     D32
+100      0.2    0.7     300    0.9     0.0     D32
+5000     0.5    0.2     10     0.0     0.0     D32
+1000     1.0    0.1     10     0.0     0.0     D33
+```
+  2.1 Le nombre de particules ```N```  
+  2.2 l'énergie d’interaction ```E_0```  
+  2.3 La distance caractéristique ```d```  
+  2.4 La masse, taille et charge des particules  
+  2.5 Le domaine d'affectation décrit par son identifiant ```id_ini```  
+<div id='PAxy'/>
+  
+Ceci permet d'obtenir les informations nécessaire à l'instanciation d'un objet [```Particules```](#PA), sauf pour leurs positions et vitesses qui seront determinées via la methode d'initialisation de la classe ```FluideComplexe``` . Pour la vitesse, nous pourrons utiliser la méthode [```initialiserVitesses```](#PAini), pour les positions nous allons le faire plus tard via l'utilisation de la classe [```reseau```](#RE) défini par le [```domaines```](#DOM).  
+### $${\color{green}Placement\ des\ particules:}$$
+---
+L'initialisation des positions et vitesses est réalisée par [```initialisation_domaine```](#DOMini), nous retrouvons dans cette méthode:
+
+1. Une Récupèration des bornes du domaine (définies dans [```domaines```](#DOM) lors de l'instanciation de [```FluideComplexe```](#FC))  
+2. Utilisation de la classe [```reseau```](#RE) pour subdiviser l’espace en cellules liée à la classe [```Case```](#CA)
+3. Place les particules par [taille décroissante](#DOMini) pour optimiser le remplissage  
+4. Affecte les vitesses aux particules via [```initialiserVitesses```](#PAini)  
+<div id='POS'/>
+
+### $\text{Méthode}$ [initialisation](#FCini)
+
+## $${\color{red}Évolution\ du\ fluide:}$$
+
+Aprés l'initialisation nous faisons évoluer notre système via les lignes :   
+```cpp
+for (int i = 0; i < nombre_d_evolutions; i++) {
+    fluide.evoluer(Température, Pression);
+}
+```
+Nous pouvons retrouver le [nombre d'évolution](#MAINiniFC) défini précédemment qui limite l'évolution dans le temps, nous trouvons aussi la méthode [```evoluer```](#EXP) fait évoluer le fluide en mettant à jour :
+
+1. **Les positions** en fonction des vitesses et forces via la méthode [```mettre_a_jour_positions```](#CALC)  
+2. **Les forces d'interaction** avec la méthode [```calculer_forces```](#CALC)  
+3. **Les vitesses** selon l'algorithme de Verlet décrite dans la méthode [```mettre_a_jour_vitesses```](#CALC)  
+<div id='STAT'/>
+
+## $${\color{red}Rôle\ du\ thermostat\ et\ du\ barostat:}$$
+
+De plus nous appliquons un thermostat ainsi qu'un barostat pour controler la température et la pression du fluide, nous utilisons pour cela [```appliquer_thermostat```](#BARO) et [```appliquer_barostat_local```](#BARO). Ces ajustements suivent une relaxation définie par [```tau_T```](#DOM) (thermostat) et [```tau_P```](#DOM) (barostat).
+
+## $${\color{red}Conclusion:}$$
+
+Le programme ```exportdata``` permet :  
+
+1. **D'initialiser** un fluide complexe en lisant un fichier d'initialisation  
+2. **De faire évoluer le système** en mettant à jour positions, vitesses et forces au cours du temps  
+3. **De réguler la température et la pression** à l’aide d’un thermostat et d’un barostat défini par l'utilisateur  
+
+De plus chaque évolution du système est enregistrée dans des fichiers CSV pour permettre une analyse ultérieure.  
+
+# Les Classes:
+
+<div id='PA'/>
+
+## $${\color{red}Particules:}$$
+
+Cette classe décrit des ensembles de particules de même types  
+
+### $${\color{green}Attributs:}$$
+---
+***N*** : Nombre de particules  
+***E_0*** : Paramètre du potentiel de Lennard-Jones  
+***d*** : Paramètre du potentiel de Lennard-Jones  
+***masse*** : Masse des particules  
+***taille*** : Taille des particules (initialisée à 0 pour des particules ponctuelles)  
+***charge*** : Charge électrique des particules (initialisée à 0 pour )  
+***positions*** : Vecteurs positions des particules  
+***vitesses*** : Vecteurs vitesses des particules  
+
+Nous avons mis ces attributs en privés sauf pour la classe **FluideComplexe** via la ligne: 
+    ```friend class FluideComplexe;```
+Cela permet de faciliter l'interaction entre ces deux classes  
+
+### $${\color{green}Méthodes:}$$
+---
+#### $`\texttt{{\color{yellow}Particules}}`$ : ```N``` ,```E_0``` ,```d``` ,```masse,taille = 0.0``` ,```charge = 0.0```  
+Nous initialisons certaines constantes des particules, elles sont donc supposés par défaut ponctuelles et neutre dans ce premier cas, les autres grandeurs seront définies avec les prochaines méthodes  
+<div id='PAini'/>
+ 
+#### [initialiserVitesses](#MAINiniPA) : ```T```  
+Cette méthode vise à statistiquement définir une vitesse pour chaque particules en fonction de la température global du fluide. 
+Nous posons alors ```sigma = std::sqrt(K_B * T / masse)``` l'écart-type de la distribution de Maxwell-Boltzmann, puis nous générons un nombre aléatoire qui va nous permettre de calculer une distribution de position et de vitesse aléatoire et de type maxwellienne centrée et d'écart type ```sigma```.  
+Puis d'autres pars nous créeons le vecteur ```sommeVitesses(0.0, 0.0)``` initialisé nulle, ce vecteur permet de "normer" les vecteurs vitesses pour que la vitesse du barycentre reste nulle  
+ 
+#### $`\texttt{{\color{yellow}setPositions}}`$ : ```newPositions``` , setVitesses : ```newVitesses``` , getPositions et getVitesses  
+Ces deux méthodes ont pour objetifs respectifs de définir la position et la vitesse et de lire c'est dernières en dehors de la classe, ce sont des méthodes non utilisées pour le fluide complexe du fait de la relation entre ```Particules``` et ```FluideComplexe```. Elles peuvent servir notament à tester la classe ```Particules``` en dehors de son utlisation dans un objet de type fluide complexe.  
+<div id='FC'/>
+
+## $${\color{red}Fluidecomplexe:}$$
+
+Cette méthode permet de regrouper plusieurs objets ```Particules``` avec l'objet de ```FluideComplexe``` et de décrire l'évolution de ce nouvel objet et d'appliquer les conditions limites périodiques  
+
+### $${\color{green}Fonctions:}$$
+---
+***Vec2 force_LJ*** : ```E_0i``` ,```E_0j``` ,```di``` ,```dj``` ,```r_ij```  
+Fonction pour calculer la force de Lennard-Jones entre deux particules i et j, cela repose sur le produit de ```r_ij``` et d'un facteur calculé à partir des quatre paramètres du potentiel de Lennard-Jones  
+
+***Vec2 maxwellBoltzmannSample*** : ```T``` ,```masse```  
+Fonction pour générer une vitesse selon une distribution de Maxwell-Boltzmann centrée et d'écart type ```sigma = std::sqrt(K_B * T / masse)```  
+
+***void relaxationVersMaxwell*** : ```& vitesse``` ,```T``` ,```masse``` ,```alpha```  
+Fonction pour appliquer la relaxation de Maxwell-Boltzmann sur une vitesse, ce qui correspond à une moyenne pondéré par alpha   
+
+***double periodic_boundary_if_needed*** : ```coord``` ,```L``` ,```& modifie```  
+Fonction pour appliquer les conditions périodiques à une unique coordonné si nécessaire  
+
+***bool extraireEnteteEnsemble*** ```& ligne``` ,```& N``` ,```& d``` ,```& E_0``` ,```& taille``` ,```& masse```  
+Fonction pour lire les en-têtes, utile pour l'initialisation d'un objet ```FluideComplexe``` via des fichiers de positions et vitesses précédement obtenues    
+
+<div id='DOM'/>
+
+### $${\color{green}Attributs:}$$
+---
+***L_x*** : Longueur de la boîte selon x  
+***L_z*** : Longueur de la boîte selon z  
+***delta_t*** : Pas de temps pour la discrétisation en temps  
+***kappa*** : Coefficient de compressibilité isotherme  
+***[tau_P](#STAT)*** : Temps de réponse du barostat  
+***[tau_T](#STAT)*** : Temps de réponse du thermostat  
+***r_c*** : Rayon de coupure des intéractions, la distance limite au dessus de laquelle l'on suppose que les particules n'interagissent plus 
+***particules*** : Ensemble des ensembles de particules issue de la classe Particules, il s'agit d'une liste "concaténée" qui contient toutes les particules  
+***forces_interactions*** : Forces d'interactions entre les particules  
+***nb_interactions*** : Nombre de voisins d'une particule  
+***Pxx*** : Composante xx du tenseur de pression  
+***Pzz*** : Composante zz du tenseur de pression  
+***fichier_nom*** : nom du fichier d'initialisation contenant la description initiale de fluide complexe en termes d'ensemble de particules 
+***[std::unordered_map<std::string, std::tuple<double, double, double, double>> domaines](#PAxy)*** : Bibliothéque contenant les informations sur l'espace accessibles pour les particules comme ```xmin```, ```xmax```, ```zmin```, ```zmax```. Dans cette variable nous avons une liste de mot clés qui va induire une forme de domaine:  
+
+| ***id_ini*** | ***xmin*** | ***xmax*** | ***zmin*** | ***zmax*** | 
+|---|---|---|---|---| 
+| D1 | -L_x / 2 | L_x / 2 | -L_z / 2 | L_z / 2 | 
+| D2 | -L_x / 2 | L_x / 2 | -L_z / 4 | L_z / 4 | 
+| D31 | -L_x / 2 | L_x / 2 | -L_z / 2 | L_z / 4 | 
+| D32 | -L_x / 2 | L_x / 2 | -L_z / 4 | L_z / 4 | 
+| D33 | -L_x / 2 | L_x / 2 | L_z / 4 | L_z / 2 | 
+| DFG | -L_x / 2 | L_x / 2 | -L_z / 2 | -L_z / 20 | 
+| DFM | -L_x / 2 | L_x / 2 | -L_z / 20 | L_z / 20 | 
+| DFD | -L_x / 2 | L_x / 2 | L_z / 20 | L_z / 2 | 
+
+
+<div id='DOMini'/>
+
+### $${\color{green}Méthodes:}$$
+---
+#### [initialisation_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
+Cette initialisation vise à définir les positions et vitesses initiales des particules du fluide  
+
+#### [traiter_domaine](#PAxy) : ```T``` ,```& domaine``` ,```& vecteur_intermediaire```  
+Cette méthode vise à préparer l'ordre des particules dans chaques domaines, en effet pour placer les particules initialement nous avons besoin de trier les particules par tailles croissante  
+
+#### $`\texttt{{\color{yellow}FluideComplexe}}`$ : ```L_x``` ,```L_z``` ,```delta_t``` ,```kappa``` ,```tau_P``` ,```tau_T``` ,```r_c``` ,```fichier_nom```  
+Initialisation du fluide complexe avec les différentes grandeurs qui lui sont caractéristiques  
+<div id='FCini'/>
+  
+#### [initialisation](#MAINiniFC) : ```T```  
+Méthode d'initialisation des positions et vitesses des particules du fluide, elle permet de "finir" l'instanciation du fluide en utilisant [initialisation_domaine](#PAxy)  
+
+#### $`\texttt{{\color{yellow}initialisationViaCSV}}`$ : ```& filePositions``` ,```& fileVitesses```  
+Cette méthode est assimilable à la précédente dans son objectif, mais l'information sur la répartition des vitesses et positions ne vient pas de la température imposée, mais de deux fichiers qui contiennent déjà la répartition, ces fichiers doivent avoir le même format que les fichiers généré par les méthodes [exporterPositionsCSV](#POS) et [exporterVitessesCSV](#POS)    
+<div id='CALC'/>
+
+#### [calculer_forces](#POS) :  
+Cette méthode vise à calculer les forces d'interactions entre les particules  
+
+#### [mettre_a_jour_positions](#EVO) : ```P```  
+Méthode pour mettre à jour les positions des particules en fonctions des forces calculé avec la méthode précédente et des conditons limites périodiques  
+
+#### [mettre_a_jour_vitesses](#EVO) : ```T``` ,```& forces_interactions_precedentes```  
+Méthode pour mettre à jour les vitesses pour un temps ```t+dt``` des particules en fonctions des forces calculé à un temps ```t``` et un temps ```t+dt```  
+    
+#### $`\texttt{{\color{yellow}appliquer\_conditions\_periodiques}}`$ : 
+Cette méthode vise à ramener une particule dans l'espace ```L_x*L_z``` par périodicité de cette boîte  
+<div id='BARO'/>
+
+#### [appliquer_thermostat](#STAT) : ```T```  
+Pour ramener la temépérature à ```T```, et éviter une explosion des vitesses  
+
+#### [appliquer_barostat_local](#STAT) : ```P_cible```  
+Cette méthode et comme la précédente mais en prenant cette fois ci la pression en compte  
+
+#### $`\texttt{{\color{yellow}calculer\_temperature}}`$ :  
+Méthode de calcule de la température du fluide via un calcul statistique sur la vitesse de chaque particules  
+
+#### $`\texttt{{\color{yellow}calculer\_tenseur\_pression}}`$ : ```alpha``` ,```beta``` ,```Delta_z``` ,```z_k```  
+Cette méthode permet de calculer le tenseur de pression sur une tranche de l'espace selon ```z```  
+<div id='EXP'/>
+
+#### [evoluer](#EVO) : ```T``` ,```P```  
+Cette méthode est celle qui permet l'évolution global du système avec toutes les méthodes précédentes, c'est pour cela qu'elle demande une température et une pression, ce sera le thermostat et le barostat  
+    
+#### [exporterPositionsCSV](#POS) : ```& fileCSV```  
+Méthode pour exporter les positions des particules vers un fichier CSV  
+
+#### [exporterVitessesCSV](#POS) : ```& fileCSV```
+Méthode pour exporter les vitesses des particules vers un fichier CSV  
+<div id='CA'/>
+
+## $${\color{red}Case:}$$
+
+Cette classe est faite pour faciliter la manipulation des cases qui pave le domaine de travail, elles sont contenu dans un réseau. C'est ensuite la subdivisation de ce réseau et le remplissage des cases qui permet d'initialiser les positions des particules du fluide  
+
+### $${\color{green}Attributs:}$$
+---
+***x, z*** : Position du centre de la case  
+***ordre_subdivision*** : Ordre de subdivision, le nombre de subdivision à suivre pour être dans cette case  
+***enfants*** : Pointeurs intelligents pour limiter la taille en mémoire du réseau  
+***taille_case*** : Taille d'une case  
+***est_libre*** : État de la case, pour savoir si elle est vide ou non  
+
+### $${\color{green}Méthodes:}$$
+---
+#### $`\texttt{{\color{yellow}Case}}`$ : ```x``` ,```z```, ```taille_case```, ```ordre_subdivision = 0```, ```est_libre = true```  
+Initialisation de la classe avec des cases  
+
+#### $`\texttt{{\color{yellow}subdiviser}}`$ :  
+Méthode pour subdiviser une case en 4 case enfants de même tailles  
+
+#### $`\texttt{{\color{yellow}estParent}}`$ :  
+Vérifie si la case est un parent, donc si elle admet des case d'ordre plus élevée en elle  
+
+#### $`\texttt{{\color{yellow}estLibre}}`$ :  
+Vérifie si la case est libre (non occupée)  
+
+#### $`\texttt{{\color{yellow}marquerOccupee}}`$ :  
+Change l'état de liberté de la case vers occupée  
+
+#### $`\texttt{{\color{yellow}afficher}}`$ :  
+Affiche des informations de la case  
+
+#### $`\texttt{{\color{yellow}getX}}`$ , $`\texttt{{\color{yellow}getZ}}`$ , $`\texttt{{\color{yellow}getOrdreSubdivision}}`$ , $`\texttt{{\color{yellow}getEnfants}}`$ et $`\texttt{{\color{yellow}getTaille}}`$ :  
+Getter pour accéder aux attributs d'une case en dehors de la classe 
+
+<div id='RE'/>
+
+## $${\color{red}Reseau:}$$
+
+Cette classe permet de découper le domaine de travail en cases  
+
+### $${\color{green}Attributs:}$$
+---
+***xmin, xmax, zmin, zmax*** : Les limites de la boîte  
+***taille_case*** : Tailles des cases du réseau  
+***n_lignes, n_colonnes*** : nombre de lignes et de colonnes  
+***cases*** : Matrice 2D de cases stockées sous forme de pointeurs intelligents  
+***cases_libres*** : Ensemble de pointeurs lié à des cases libres
+
+### $${\color{green}Méthodes:}$$
+---
+#### $`\texttt{{\color{yellow}Reseau}}`$ : ```xmin``` ,```xmax``` ,```zmin``` ,```zmax``` ,```taille_case```  
+Constructeur de la classe  
+
+#### $`\texttt{{\color{yellow}tirerCaseLibre}}`$ :  
+Méthode pour tirer au hasard une case parmi les cases libres du réseau 
+
+#### $`\texttt{{\color{yellow}subdiviserCase}}`$ : ```case_a_subdiviser```  
+Méthode pour subdiviser une case libre en 4 enfants  
+
+#### $`\texttt{{\color{yellow}subdiviser}}`$ : ```ordre```  
+Méthode pour subdiviser toutes les cases libres du reseau pour un ordre de subdivision donné  
+
+#### $`\texttt{{\color{yellow}retirerCaseLibre}}`$ : ```case_a_retirer```  
+Cette méthode permet de retirer une case de l'ensemble des cases libres  
+
+#### $`\texttt{{\color{yellow}ajouterEnfantsCasesLibres}}`$ : ```case_parent```  
+Méthode pour ajouter les enfants d'une case à ```cases_libres```  
+
+#### $`\texttt{{\color{yellow}afficher}}`$ :  
+Méthode d'affichage du réseau et de ses caractéristiques  
+
+#### $`\texttt{{\color{yellow}afficher\_details}}`$ :  
+Méthode pour afficher les statistiques du réseau  
+
+#### $`\texttt{{\color{yellow}exporterCSV}}`$ : ```filename```  
+Méthode pour exporter le réseau et ses caractéristiques sous CSV  
+
+#### $`\texttt{{\color{yellow}getCases}}`$ , $`\texttt{{\color{yellow}getCasesLibres}}`$ :  
+Méthode pour accéder aux grandeurs misent en ```private```  
